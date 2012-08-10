@@ -84,7 +84,7 @@ class Dispatcher {
 
         require APP_ROOT . "config/router.php";
 
-        $uri = $_G['uri'];
+        $uri = strtolower($_G['uri']);
 
         if (isset($_config['router'][$uri])) {
 
@@ -113,6 +113,7 @@ class Dispatcher {
                     break;
                 }
             }
+
             return false;
         }
     }
@@ -128,7 +129,7 @@ class Dispatcher {
         $_G['uri'] = preg_replace('/\?.*$/', '', $_G['uri']);
 
         if ($_G['uri']) {
-            $_G['uri'] = rtrim(strtolower($_G['uri']), '/');
+            $_G['uri'] = rtrim($_G['uri'], '/');
         }
 
         if (!$_G['uri']) {

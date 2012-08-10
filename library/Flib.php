@@ -141,6 +141,10 @@ class Flib {
             }
             return require_once($file);
         }
+
+        if ($_G['debug']) {
+            $_G['debug_info']['autoload_files'][] = "<span style='color:red'>{$inc_file} <strong>[ FAILED ]</strong></span><br /> Class: {$className}";
+        }
     }
 
     /**
