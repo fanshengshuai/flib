@@ -7,7 +7,7 @@
  * 创建: 2011-07-19 11:37:41
  * vim: set expandtab sw=4 ts=4 sts=4 * 
  *
- * $Id: Dispatcher.php 112 2012-08-02 08:26:56Z www $
+ * $Id: Dispatcher.php 126 2012-08-05 08:18:46Z fanshengshuai $
  */
 class Dispatcher {
 
@@ -93,6 +93,26 @@ class Dispatcher {
 
             return true;
         } else {
+
+            foreach ($_config['router'] as $key => $item) {
+                if (strpos($key, '(') === false) {
+                    continue;
+                }
+
+                if (preg_match("#^{$key}$#", $uri, $res)) {
+                    $c = $_config['router'][$key]['controller'];
+                    $a = $_config['router'][$key]['action'];
+
+                    $params = explode(',', $_config['router'][$key]['params']);
+
+                    foreach ($params as $k => $p) {
+                        $p = trim($p);
+                        $_GET[$p] = $res[$k + 1];
+                    }
+
+                    break;
+                }
+            }
             return false;
         }
     }

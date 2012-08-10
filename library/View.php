@@ -7,9 +7,8 @@
  * 创建: 2012-07-28 10:57:45
  * vim: set expandtab sw=4 ts=4 sts=4 * 
  *
- * $Id: View.php 119 2012-08-03 02:05:59Z fanshengshuai $
+ * $Id: View.php 128 2012-08-06 08:58:30Z fanshengshuai $
  */
-
 $smarty_class_file = SYS_ROOT . '../smarty/Smarty.class.php';
 if (!file_exists($smarty_class_file)) {
     $smarty_class_file = SYS_ROOT . 'smarty/Smarty.class.php';
@@ -36,8 +35,16 @@ class View extends Smarty {
     }
 
     public function displaySysPage($tpl) {
+        global $_G;
+
         $this->template_dir = SYS_ROOT . 'View/';
-        echo $this->fetch($tpl);
+        $contents = $this->fetch($tpl);
+
+        if ($_G['debug']) {
+            $contents .= $this->getDebugInfo();
+        }
+
+        echo $contents;
     }
 
     public function disp($tpl) {
@@ -66,6 +73,14 @@ class View extends Smarty {
         }
 
         if ($_G['debug']) {
+            $contents .= $this->getDebugInfo();
+        }
+
+
+        return $contents . $debug_contents;
+    }
+
+    public function getDebugInfo() {
             $debug_contents = '<style> .debug_table { margin-left:20px; border:1px solid rgb(0, 0, 0);} .debug_table th, .debug_table td { padding:5px; border:1px solid rgb(0, 0, 0); } </style>';
 
             // SQL DEBUG
@@ -98,12 +113,6 @@ class View extends Smarty {
             }
             $debug_contents .= '</table>';
 
-            //$this->template_dir = SYS_ROOT . 'View/';
-            //$this->cache_dir = APP_ROOT . "data/cache";
-            //$this->compile_dir = APP_ROOT . 'data/template/';
-            //$debug_contents = $this->fetch('debug.tpl');
-        }
-
-        return $contents . $debug_contents;
+            return $debug_contents;
     }
 }
