@@ -179,7 +179,7 @@ class Config {
         $path = explode('.', $key);
 
         if (is_file(APP_ROOT . "config/{$path[0]}.php")) {
-            require_once APP_ROOT . "config/{$path[0]}.php";
+            require APP_ROOT . "config/{$path[0]}.php";
 
             $_v = $_config[$path[0]];
             foreach ($path as $_path_key => $_subkey) {
