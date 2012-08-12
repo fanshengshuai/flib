@@ -7,7 +7,7 @@
  * 创建: 2011-04-18 22:35:29
  * vim: set expandtab sw=4 ts=4 sts=4 * 
  *
- * $Id: Flib.php 125 2012-08-05 03:31:14Z fanshengshuai $
+ * $Id: Flib.php 178 2012-08-10 03:35:55Z fanshengshuai $
  */
 class Flib {
     private static $_instance = array();
@@ -49,6 +49,8 @@ class Flib {
         }
 
         $_G['domain'] = $_SERVER['HTTP_HOST'];
+        $_G['top_domain'] = substr($_G['domain'], strpos($_G['domain'], '.') + 1);
+        $_G['cookie_domain'] = substr($_G['domain'], strpos($_G['domain'], '.'));
         $_G['cname'] = substr($_G['domain'], 0, strpos($_G['domain'], '.'));
 
         if ($_REQUEST['in_ajax']) {

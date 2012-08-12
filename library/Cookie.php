@@ -11,6 +11,9 @@
 
 class Cookie {
     public static function set($var, $value, $life = 7200) {
+        global $_G;
+
+        $domain = $_G['cookie_domain'];
 
         $timestamp = time();
         $path = "/";

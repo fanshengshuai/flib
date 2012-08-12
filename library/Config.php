@@ -1,14 +1,12 @@
 <?php
-
 /**
  *
  * 作者: 范圣帅(fanshengshuai@gmail.com)
  * 时间: 2012-07-02 01:21:51
  *
  * vim: set expandtab sw=4 ts=4 sts=4
- * $Id: Config.php 24 2012-07-25 06:26:36Z fanshengshuai $
+ * $Id: Config.php 192 2012-08-11 08:31:08Z fanshengshuai $
  */
-
 class Config {
 
     private $_values = array();

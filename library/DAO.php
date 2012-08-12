@@ -7,7 +7,7 @@
  * 创建: 2012-07-24 22:57:17
  * vim: set expandtab sw=4 ts=4 sts=4 * 
  *
- * $Id: DAO.php 62 2012-07-27 16:45:54Z fanshengshuai $
+ * $Id: DAO.php 196 2012-08-11 10:46:03Z fanshengshuai $
  */
 class DAO extends DB_Table {
 
@@ -67,7 +67,7 @@ class DAO extends DB_Table {
         $start = $page_option['start'];
         $limit = $page_option['per_page'];
 
-        $results = $this->findAll($conditions, array(), array('*'), $start, $limit, $order = array());
+        $results = $this->findAll($conditions, array(), array('*'), $start, $limit, $order);
 
         return array('data' => $results, 'page_option' => $page_option);
     }
