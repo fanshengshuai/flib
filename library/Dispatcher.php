@@ -82,13 +82,7 @@ class Dispatcher {
     private function _checkRouter(&$c, &$a) {
         global $_G;
 
-        $router_config_file = APP_ROOT . "config/router.php";
-
-        if (!file_exists($router_config_file)) {
-            return false;
-        }
-
-        require $router_config_file;
+        require APP_ROOT . "config/router.php";
 
         $uri = strtolower($_G['uri']);
 
