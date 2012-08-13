@@ -36,26 +36,17 @@ class Flib {
 
         // 加载函数类
         require_once SYS_ROOT . "functions/function_core.php";
-        require_once APP_ROOT . "config/global.php";
 
-        if ($_config['global']['debug']) {
-            $_G['debug'] = true;
+        $app_config_global = APP_ROOT . "config/global.php";
+
+        if (file_exists($app_config_global)) {
+
+            require_once $app_config_global;
+            if ($_config['global']['debug']) {
+                $_G['debug'] = true;
+            }
         }
 
-        if ($_REQUEST['refer']) {
-            $_G['refer'] = $_REQUEST['refer'];
-        } else {
-            $_G['refer'] = $_SERVER['HTTP_REFERER'];
-        }
-
-        $_G['domain'] = $_SERVER['HTTP_HOST'];
-        $_G['top_domain'] = substr($_G['domain'], strpos($_G['domain'], '.') + 1);
-        $_G['cookie_domain'] = substr($_G['domain'], strpos($_G['domain'], '.'));
-        $_G['cname'] = substr($_G['domain'], 0, strpos($_G['domain'], '.'));
-
-        if ($_REQUEST['in_ajax']) {
-            $_G['in_ajax'] = true;
-        }
 
         // 设定错误和异常处理
         set_error_handler(array('Flib','appError'));
@@ -66,6 +57,22 @@ class Flib {
 
         // 运行应用
         if (RUN_MODE == 'web') {
+
+            if ($_REQUEST['refer']) {
+                $_G['refer'] = $_REQUEST['refer'];
+            } else {
+                $_G['refer'] = $_SERVER['HTTP_REFERER'];
+            }
+
+            $_G['domain'] = $_SERVER['HTTP_HOST'];
+            $_G['top_domain'] = substr($_G['domain'], strpos($_G['domain'], '.') + 1);
+            $_G['cookie_domain'] = substr($_G['domain'], strpos($_G['domain'], '.'));
+            $_G['cname'] = substr($_G['domain'], 0, strpos($_G['domain'], '.'));
+
+            if ($_REQUEST['in_ajax']) {
+                $_G['in_ajax'] = true;
+            }
+
             App::run();
         }
 
