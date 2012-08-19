@@ -126,7 +126,7 @@ class DB_Table {
         try {
             $data = $this->_dbh->fetchRow($sql, $params);
         } catch (PDOException $e) {
-            throw new DB_Exception($e->getMessage());
+            throw new DB_Exception($e);
         }
 
         return $data;
@@ -173,7 +173,7 @@ class DB_Table {
         try {
             $rows = $this->_dbh->fetchAll($sql, $params);
         } catch (PDOException $e){
-            throw new DB_Exception($e->getMessage());
+            throw new DB_Exception($e);
         }
         return $rows;
     }
@@ -191,7 +191,7 @@ class DB_Table {
             $sql = $this->_rewriteSql($sql);
             $data = $this->_dbh->fetchAll($sql, $params);
         } catch (PDOException $e){
-            throw new DB_Exception($e->getMessage());
+            throw new DB_Exception($e);
         }
         return $data;
     }
@@ -209,7 +209,7 @@ class DB_Table {
         try {
             return $this->_dbh->exec($sql, $params);
         } catch (PDOException $e){
-            throw new DB_Exception($e->getMessage());
+            throw new DB_Exception($e);
         }
     }
 
@@ -244,7 +244,7 @@ class DB_Table {
         try{
             return $this->_dbh->exec($sql, $params);
         } catch (PDOException $e){
-            throw new DB_Exception($e->getMessage());
+            throw new DB_Exception($e);
         }
     }
 
@@ -269,7 +269,7 @@ class DB_Table {
         try{
             return $this->_dbh->exec($sql, $tempParams);
         } catch (PDOException $e){
-            throw new DB_Exception($e->getMessage());
+            throw new DB_Exception($e);
         }
     }
 
@@ -283,7 +283,7 @@ class DB_Table {
         try{
             return $this->_dbh->lastInsertId();
         } catch (PDOException $e){
-            throw new DB_Exception($e->getMessage());
+            throw new DB_Exception($e);
         }
     }
 
@@ -318,7 +318,7 @@ class DB_Table {
         try {
             return  $this->_dbh->exec($conditions,$mergeArr);
         } catch (PDOException  $e) {
-            throw new DB_Exception($e->getMessage());
+            throw new DB_Exception($e);
         }
     }
 
@@ -356,7 +356,7 @@ class DB_Table {
             return  $this->_dbh->fetchOne($sql, $params);
 
         } catch (PDOException  $e) {
-            throw new DB_Exception($e->getMessage());
+            throw new DB_Exception($e);
 
         }
     }
@@ -412,7 +412,7 @@ class DB_Table {
         try {
             $result = $this->_dbh->exec($sql, $params);
         } catch (PDOException $e) {
-            throw new DB_Exception($e->getMessage);
+            throw new DB_Exception($e);
         }
         return $result;
     }
@@ -425,7 +425,7 @@ class DB_Table {
         try {
             return $this->_dbh->exec($sql, $params);
         } catch (PDOException $e) {
-            throw new DB_Exception($e->getMessage());
+            throw new DB_Exception($e);
         }
     }
 

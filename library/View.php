@@ -38,9 +38,17 @@ class View extends Smarty {
         global $_G;
 
         $this->template_dir = SYS_ROOT . 'View/';
-        $contents = $this->fetch($tpl);
+        $content = $this->fetch($tpl);
 
-        echo $contents;
+        if (RUN_MODE != 'web') {
+            $content = str_replace(array('<br />', '</p>', '</tr>'), "\n", $content);
+            $content = str_replace(array('&nbsp;'), " ", $content);
+            $content = preg_replace('/<head>.+?<\/head>/si', '', $content);
+            $content = preg_replace('/<.+?>/', '', $content);
+            $content = preg_replace("/\n\s+/i", "\n", $content);
+        }
+
+        echo $content;
         exit;
     }
 
@@ -80,7 +88,12 @@ class View extends Smarty {
     public function getDebugInfo() {
         global $_G;
 
-        $debug_contents = '<style> .debug_table { margin-left:20px; border:1px solid rgb(0, 0, 0);} .debug_table th, .debug_table td { padding:5px; border:1px solid rgb(0, 0, 0); } </style>';
+
+        if (RUN_MODE != 'web') {
+            $debug_contents = "DEBUG INFO:\n";
+        } else {
+            $debug_contents = '<style> .debug_table { margin-left:20px; border:1px solid rgb(0, 0, 0);} .debug_table th, .debug_table td { padding:5px; border:1px solid rgb(0, 0, 0); } </style>';
+        }
 
         // SQL DEBUG
         $debug_contents .= '<table class="debug_table" rules="none" cellspacing="0" cellpadding="5"><tr><td colspan="2">SQL：</td></tr>';
@@ -111,6 +124,11 @@ class View extends Smarty {
             $debug_contents .= "<tr><th>{$key}</th><td>{$item}</td></tr>";
         }
         $debug_contents .= '</table>';
+
+        if (RUN_MODE != 'web') {
+            $debug_contents = str_replace('</tr>', "\n", $debug_contents);
+            $debug_contents = preg_match('/<.+?>/', '', $debug_contents);
+        }
 
         return $debug_contents;
     }
