@@ -446,8 +446,11 @@ class DB_Table {
 
     protected function _rewriteSql($sql) {
 
-        $pattern = '/((?:select.*?from|insert into|delete from|update|replace into|truncate table|describe|alter table)\s+)`?(\w+)`?/i';
-        return preg_replace($pattern, '\1' . $this->_table, $sql);
+        if (strpos(strtolower($sql), ' join ')) {
+            return $sql;
+        } else {
+            $pattern = '/((?:select.*?from|insert into|delete from|update|replace into|truncate table|describe|alter table)\s+)`?(\w+)`?/i';
+            return preg_replace($pattern, '\1' . $this->_table, $sql);
+        }
     }
-
 }
