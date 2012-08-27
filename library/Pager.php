@@ -6,11 +6,12 @@
  * 时间: 2012-07-02 01:22:53
  *
  * vim: set expandtab sw=4 ts=4 sts=4
- * $Id: Pager.php 49 2012-07-26 16:46:00Z fanshengshuai $
+ * $Id: Pager.php 281 2012-08-26 03:43:45Z fanshengshuai $
  */
 
 class Pager {
     public static function build(&$page_option) {
+        global $_G;
 
         if (!$page_option['per_page']) {
             $page_option['per_page'] = 20;
@@ -46,12 +47,12 @@ class Pager {
         $next_page = min($pages, $curr_page + 1);
 
         $html = '共 ' . $page_option['total'] . ' 条，' . $pages . '页&nbsp;';
-        $html .= '<a href="' . $query . '1">首页</a>&nbsp;<a href="' . $query . $pre_page . '">上一页</a>&nbsp;';
+        $html .= '<a ajax="true" href="' . $query . '1">首页</a>&nbsp;<a ajax="true" href="' . $query . $pre_page . '">上一页</a>&nbsp;';
         $start_page = max(1, $curr_page - 9);
         $end_page = min($pages, $start_page + 20);
 
         for ($show_page = $start_page;$show_page <= $end_page; $show_page ++) {
-            $html .= '<a href="' . $query . ($show_page) . '"> [';
+            $html .= '<a ajax="true" href="' . $query . ($show_page) . '"> [';
             if ($show_page == $curr_page) {
                 $html .= '<font style="color: #f00">' . $show_page . '</font>';
             } else {
@@ -60,7 +61,11 @@ class Pager {
             $html .= '] </a>&nbsp;';
         }
 
-        $html .= '<a href="' . $query . $next_page . '">下一页</a>&nbsp;<a href="' . $query . $pages . '">尾页</a>';
+        $html .= '<a ajax="true" href="' . $query . $next_page . '">下一页</a>&nbsp;<a ajax="true" href="' . $query . $pages . '">尾页</a>';
+
+        if (!$_G['in_ajax']) {
+            $html = str_replace('ajax="true"', '', $html);
+        }
 
         $page_option['html'] = $html;
 
