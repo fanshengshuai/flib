@@ -15,3 +15,5 @@ Fast Libraries for PHP
  * demo 代码位于 demo 目录中
  * 将域名配置到 demo/public 目录
  * 修改 demo/public/index.php，将 flib 框架中的 Flib.php 包含过来。
+
+	require_once APP_ROOT . "libraries/flib/Flib.php";
