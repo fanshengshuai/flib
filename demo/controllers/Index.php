@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * 作者: 范圣帅(fanshengshuai@gmail.com)
@@ -13,18 +12,7 @@ class Controller_Index extends Controller_Abstract {
     public function defaultAction() {
         global $_G;
 
-        if ($_G['cname'] != 'www') {
-            $this->subDomain();
-            exit;
-        }
-
         $this->view->set('cur_nav', 'index');
         $this->view->disp('index');
-    }
-
-    public function subDomain() {
-
-        $this->view->set('cur_nav', 'index');
-        $this->view->disp('school/index');
     }
 }
