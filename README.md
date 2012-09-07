@@ -17,3 +17,4 @@ Fast Libraries for PHP
  * 修改 demo/public/index.php，将 flib 框架中的 Flib.php 包含过来。
 
     require_once APP_ROOT . "libraries/flib/Flib.php";
+	
