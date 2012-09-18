@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * 作者: 范圣帅(fanshengshuai@gmail.com)
@@ -77,10 +76,9 @@ class View extends Smarty {
             $contents = preg_replace('/<\!\-\-.+?\-\->/s', '', $contents);
         }
 
-        if ($_G['debug']) {
+        if ($_G['debug'] && !$_G['in_ajax']) {
             $contents .= $this->getDebugInfo();
         }
-
 
         return $contents . $debug_contents;
     }

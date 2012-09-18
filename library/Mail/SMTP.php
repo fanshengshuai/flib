@@ -19,13 +19,10 @@ class Mail_SMTP {
         $mail->SMTPAuth   = true;                  // enable SMTP authentication
         $mail->Host       = "smtp.qq.com"; // sets the SMTP server
         $mail->Port       = 25;                    // set the SMTP port for the GMAIL server
-        $mail->Username   = "oa@upnb.com"; // SMTP account username
-        $mail->Password   = "oa6688upnboa";        // SMTP account password
+        $mail->Username   = ""; // SMTP account username
+        $mail->Password   = "";        // SMTP account password
 
-        $mail->SetFrom('oa@upnb.com', 'OA系统');
-
-        //$mail->AddReplyTo("ferris@upnb.com","First Last");
-
+        $mail->SetFrom($mail->Username, 'OA系统');
     }
 
     public function send($recs, $subject, $contents, $alt_contents) {
