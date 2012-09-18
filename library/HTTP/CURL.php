@@ -90,7 +90,7 @@ class HTTP_CURL {
             }
         }
         //启用时会将服务器服务器返回的“Location:”放在header中递归的返回给服务器
-        //curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
         //打开的支持SSL
         if($this->setopt['ssl']){
             //curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, 1);
