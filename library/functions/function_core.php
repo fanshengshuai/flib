@@ -34,6 +34,8 @@ function is_mobile() {
     return $is_mobile;
 }
 
+if (!function_exists('T')) {
 function T($table) {
     return new DB_Table($table);
+}
 }
