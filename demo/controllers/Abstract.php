@@ -15,9 +15,5 @@ class Controller_Abstract extends Controller {
         global $_G;
 
         parent::__construct();
-
-        if ($_G['cname'] != 'www') {
-            $_G['is_school'] = true;
-        }
     }
 }

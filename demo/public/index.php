@@ -11,5 +11,4 @@ define('APP_ROOT', dirname(dirname(__FILE__)) . '/');
 define('RUN_MODE', 'web');
 
 // 这里包含flib.php，一般放在 APP_ROOT 下的 libraries 中
-// require_once APP_ROOT . "libraries/flib/Flib.php";
-require_once "E:/www/flib/library/Flib.php";
+require_once "Flib.php";

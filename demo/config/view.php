@@ -1,3 +1,3 @@
 <?php
 
-$_config['view']['compress'] = 0;
+$_config['view']['compress'] = 1;

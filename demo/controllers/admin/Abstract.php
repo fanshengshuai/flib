@@ -16,8 +16,26 @@ class Controller_Admin_Abstract extends Controller {
 
         parent::__construct();
 
-        if ($_G['cname'] != 'www') {
-            $_G['is_school'] = true;
+        // 不需要登录的
+        $no_auth_controllers = array('Controller_Auth', 'Controller_Index');
+
+        if (in_array($_G['controller'], $no_auth_controllers)) {
+            $this->checkAuth();
         }
+    }
+
+    public function checkAuth() {
+        global $_G;
+
+        $auth_cookie = Cookie::get('auth');
+
+        list($uid, $auth_str) = explode("\t", $auth_cookie);
+
+        // todo 认证判断，请补充完整判断条件
+        if (!$uid || !$auth_str) {
+            redirect('/login');
+        }
+
+        $_G['uid'] = $uid;
     }
 }

@@ -51,7 +51,17 @@ class View extends Smarty {
         exit;
     }
 
-    public function disp($tpl) {
+    public function disp($tpl = '') {
+        global $_G;
+
+        if (!$tpl) {
+            if ($_G['app']) {
+                $c = str_replace('Controller_' . ucfirst($_G['app']) . '_', '', $_G['controller']);
+                $c = strtolower($c);
+                $tpl = "{$_G['app']}/{$c}/{$_G['action']}";
+            }
+        }
+
         $contents = $this->fetch($tpl . '.tpl');
 
         echo $contents;
