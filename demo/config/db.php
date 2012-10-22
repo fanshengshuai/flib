@@ -1,9 +1,9 @@
 <?php
 
 $_config['db']['default'] = array(
-    'dsn' => 'mysql:dbname=kuboluo_ims;host=localhost',
-    'user' => 'www',
-    'password' => 'u4N8xpn5U4PzCbaN',
+    'dsn' => 'mysql:dbname=db_name;host=localhost',
+    'user' => 'db_username',
+    'password' => '',
     'charset' => 'utf8',
     'failover' => '',
     'persistent' => false,
