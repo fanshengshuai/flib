@@ -10,9 +10,9 @@
 define('APP_ROOT', dirname(dirname(__FILE__)) . '/');
 define('RUN_MODE', 'cli');
 
-require_once APP_ROOT . "libraries/flib/Flib.php";
+require_once "Flib.php";
 
-$sql_file = APP_ROOT . "docs/anjoyo_oa.sql";
+$sql_file = APP_ROOT . "docs/db.sql";
 
 $sql_content = file_get_contents($sql_file);
 
