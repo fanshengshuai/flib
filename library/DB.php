@@ -191,14 +191,14 @@ class DB {
 
 
     public static function query($sql) {
-        $db_config = Config::get('db');
+        $db_config = Config::get('db.default');
 
         $db = new DB($db_config['dsn'], $db_config['user'], $db_config['password'], $db_config['charset']);
         return $db->exec($sql);
     }
 
     public static function fetch($sql) {
-        $db_config = Config::get('db');
+        $db_config = Config::get('db.default');
 
         $db = new DB($db_config['dsn'], $db_config['user'], $db_config['password'], $db_config['charset']);
         return $db->fetchAll($sql);

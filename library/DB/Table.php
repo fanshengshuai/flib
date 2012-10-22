@@ -48,24 +48,21 @@ class DB_Table {
             $db = substr($table, 0, strpos($table, '.'));
             $table = substr($table, strpos($table, '.') + 1);
         } else {
-            $db = 'db';
+            $db = 'default';
         }
-        //var_dump($conf[$db]);
 
-        $this->_table = $_config[$db]['table_pre'] . $table;
+        $config_db = $_config['db'][$db];
+        $this->_table = $config_db['table_pre'] . $table;
 
         $this->_dbh = DB::connect(
-            $_config[$db]['dsn'],
-            $_config[$db]['user'],
-            $_config[$db]['password'],
-            $_config[$db]['charset'],
-            $_config[$db]['failover'],
-            $_config[$db]['persistent'],
-            $_config[$db]['timeout']
+            $config_db['dsn'],
+            $config_db['user'],
+            $config_db['password'],
+            $config_db['charset'],
+            $config_db['failover'],
+            $config_db['persistent'],
+            $config_db['timeout']
         );
-
-        //var_dump($this->_dbh);
-        //exit;
     }
 
     /**
