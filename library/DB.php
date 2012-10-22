@@ -6,7 +6,7 @@
  * 时间: 2012-07-02 01:22:18
  *
  * vim: set expandtab sw=4 ts=4 sts=4
- * $Id: DB.php 116 2012-08-03 01:40:31Z fanshengshuai $
+ * $Id: DB.php 273 2012-08-22 10:37:34Z fanshengshuai $
  */
 
 class DB {
@@ -189,4 +189,18 @@ class DB {
         }
     }
 
+
+    public static function query($sql) {
+        $db_config = Config::get('db');
+
+        $db = new DB($db_config['dsn'], $db_config['user'], $db_config['password'], $db_config['charset']);
+        return $db->exec($sql);
+    }
+
+    public static function fetch($sql) {
+        $db_config = Config::get('db');
+
+        $db = new DB($db_config['dsn'], $db_config['user'], $db_config['password'], $db_config['charset']);
+        return $db->fetchAll($sql);
+    }
 }
