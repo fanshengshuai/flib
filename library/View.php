@@ -77,12 +77,9 @@ class View extends Smarty {
         $view_compress = Config::get('view.compress');
 
         if ($view_compress) {
-            $contents = preg_replace("/^\s*\/\/.*$/im", '', $contents);
-            $contents = preg_replace('/>\s+/', '>', $contents);
-            $contents = preg_replace('/\s+</', '<', $contents);
-            $contents = preg_replace('/;\s+/', ';', $contents);
-            $contents = preg_replace('/{\s+/', '{', $contents);
-            $contents = preg_replace('/\s*}\s*/', '}', $contents);
+            //$contents = preg_replace('/;\s+/', ';', $contents);
+            $contents = preg_replace('/>\s+/im', '>', $contents);
+            $contents = str_replace("\n", '', $contents);
             $contents = preg_replace('/<\!\-\-.+?\-\->/s', '', $contents);
         }
 
