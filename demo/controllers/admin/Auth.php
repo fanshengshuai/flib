@@ -20,12 +20,9 @@ class Controller_Admin_Auth extends Controller_Admin_Abstract {
 
             $auth_info = Service_Auth::checkUser($username, $password);
             if ($auth_info) {
-                $auth_str = md5("{$auth_info['school_id']}|{$auth_info['username']}|{$auth_info['password']}");
-//                var_dump($auth_str);
-                //var_dump(time());
-                Cookie::set('auth', "{$auth_info['school_id']}\t{$auth_str}");
-                //exit;
-                redirect("http://{$auth_info['cname']}.{$_G['top_domain']}/admin/main/index");
+                $auth_str = md5("{$auth_info['username']}|{$auth_info['password']}");
+                Cookie::set('auth', "{$auth_info['uid']}\t{$auth_str}");
+                redirect("/admin/main/index");
             }
         }
 
@@ -33,7 +30,7 @@ class Controller_Admin_Auth extends Controller_Admin_Abstract {
     }
 
     public function logoutAction() {
-        Cookie::set('auth', "anjoyo", -1);
+        Cookie::set('auth', "", -1);
         redirect('/');
     }
 }

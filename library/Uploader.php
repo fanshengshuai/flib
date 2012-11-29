@@ -11,19 +11,20 @@
  */
 class Uploader {
 
-    public function saveAttach($field, $obj) {
+    public function saveAttach($field, &$obj) {
 
         // 处理扩展名
         if (strpos($obj, '.attach')) {
             $file_ext = addslashes(strtolower(substr(strrchr($_FILES[$field]['type'], '/'), 1, 10)));
-            //echo $file_ext;exit;
+            //jjecho $file_ext;exit;
             $obj = str_replace('.attach', '.' . $file_ext, $obj);
+            //echo $obj;exit;
         }
 
         $attach_url = $obj;
 
         if (strpos($obj, APP_ROOT) === false) {
-            $obj = APP_ROOT . "www/attachs/" . $obj;
+            $obj = APP_ROOT . "public/attachs/" . $obj;
         }
 
         $attach_dir = dirname($obj);
@@ -45,7 +46,8 @@ class Uploader {
                 'file_path' => $attach_url,
             );
 
-            return $attachDAO->add($data);
+            $attachDAO->add($data);
+            return $data;
         }
 
         return false;
