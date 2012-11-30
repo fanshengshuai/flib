@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{if !$_G['in_ajax']}<!DOCTYPE html>
 <html>
     <head>
         <title>{$_G['header']['keywords']}</title>
@@ -42,3 +42,4 @@
         </div>
         <br />
         {include "admin/top.tpl"}
+{/if}

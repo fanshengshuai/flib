@@ -1,9 +1,9 @@
 <?php
 
 $_config['db']['default'] = array(
-    'dsn' => 'mysql:dbname=db_name;host=localhost',
-    'user' => 'db_username',
-    'password' => '',
+    'dsn' => 'mysql:dbname=flib_demo;host=localhost',
+    'user' => 'flib_demo',
+    'password' => 'DYvaCsrQQEzXACBK',
     'charset' => 'utf8',
     'failover' => '',
     'persistent' => false,

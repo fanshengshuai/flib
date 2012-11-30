@@ -41,6 +41,55 @@ CREATE TABLE `attachments` (
 ) ENGINE=MyISAM AUTO_INCREMENT=58 DEFAULT CHARSET=utf8 COMMENT='附件表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+CREATE TABLE IF NOT EXISTS `blocks` (
+  `bid` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `page` int(10) unsigned NOT NULL DEFAULT '0',
+  `area` int(10) unsigned NOT NULL DEFAULT '0',
+  `block_type` tinyint(1) NOT NULL DEFAULT '0',
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `title` text NOT NULL,
+  `summary` text NOT NULL,
+  `ext_fields` text NOT NULL COMMENT '扩展项目',
+  `shownum` smallint(6) unsigned NOT NULL DEFAULT '0',
+  `picwidth` smallint(6) unsigned NOT NULL DEFAULT '0',
+  `picheight` smallint(6) unsigned NOT NULL DEFAULT '0',
+  `target` varchar(255) NOT NULL DEFAULT '',
+  `param` text NOT NULL,
+  `cache_time` int(10) unsigned NOT NULL DEFAULT '0',
+  `create_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
+  `update_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '更新时间',
+  `remove_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '删除时间',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态',
+  PRIMARY KEY (`bid`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
+
+CREATE TABLE IF NOT EXISTS `block_items` (
+  `item_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `bid` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `id` int(10) unsigned NOT NULL DEFAULT '0',
+  `idtype` varchar(255) NOT NULL DEFAULT '',
+  `itemtype` tinyint(1) NOT NULL DEFAULT '0',
+  `title` varchar(255) NOT NULL DEFAULT '',
+  `url` varchar(255) NOT NULL DEFAULT '',
+  `pic` varchar(255) NOT NULL DEFAULT '',
+  `picflag` tinyint(1) NOT NULL DEFAULT '0',
+  `makethumb` tinyint(1) NOT NULL DEFAULT '0',
+  `summary` text NOT NULL,
+  `showstyle` text NOT NULL,
+  `related` text NOT NULL,
+  `fields` text NOT NULL,
+  `displayorder` smallint(6) NOT NULL DEFAULT '0',
+  `note` text NOT NULL COMMENT '注释',
+  `startdate` int(10) unsigned NOT NULL DEFAULT '0',
+  `enddate` int(10) unsigned NOT NULL DEFAULT '0',
+  `create_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
+  `update_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '更新时间',
+  `remove_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '删除时间',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态',
+  PRIMARY KEY (`item_id`),
+  KEY `bid` (`bid`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+
 --
 -- Table structure for table `category`
 --

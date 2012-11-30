@@ -22,10 +22,10 @@ class Controller_Admin_Abstract extends Controller {
         global $_G;
 
         if ($_G['controller'] != 'Controller_Admin_Auth') {
-            $this->checkAuth();
+            //$this->checkAuth();
 
             // 检查权限
-            $this->checkRole();
+            //$this->checkRole();
         }
     }
 
