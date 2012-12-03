@@ -53,6 +53,10 @@ class DB {
         }
     }
 
+public function table($t) {
+return $t;
+}
+
     /**
      * 获取数据库连接类
      *

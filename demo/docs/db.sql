@@ -1,27 +1,3 @@
-
--- MySQL dump 10.13  Distrib 5.5.23, for osx10.5 (i386)
---
--- Host: localhost    Database: anjoyo_www
--- ------------------------------------------------------
--- Server version	5.5.23
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
--- Table structure for table `attachments`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `attachments` (
   `aid` int(11) NOT NULL AUTO_INCREMENT COMMENT '活动附件ID',
   `rel_id` int(11) NOT NULL COMMENT '关联ID',
@@ -39,9 +15,8 @@ CREATE TABLE `attachments` (
   `status` tinyint(1) NOT NULL COMMENT '状态',
   PRIMARY KEY (`aid`)
 ) ENGINE=MyISAM AUTO_INCREMENT=58 DEFAULT CHARSET=utf8 COMMENT='附件表';
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-CREATE TABLE IF NOT EXISTS `blocks` (
+CREATE TABLE `blocks` (
   `bid` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `page` int(10) unsigned NOT NULL DEFAULT '0',
   `area` int(10) unsigned NOT NULL DEFAULT '0',
@@ -63,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `blocks` (
   PRIMARY KEY (`bid`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 ;
 
-CREATE TABLE IF NOT EXISTS `block_items` (
+CREATE TABLE `block_items` (
   `item_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `bid` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -94,10 +69,9 @@ CREATE TABLE IF NOT EXISTS `block_items` (
 -- Table structure for table `category`
 --
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `category` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `pid` int(11) NOT NULL COMMENT 'parent id',
   `category_name` varchar(20) NOT NULL COMMENT '分类名称',
   `create_time` date NOT NULL COMMENT '创建时间',
   `update_time` date NOT NULL COMMENT '更新时间',
@@ -105,7 +79,6 @@ CREATE TABLE `category` (
   `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='分类';
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `certification`
@@ -115,8 +88,6 @@ CREATE TABLE `category` (
 -- Table structure for table `courses`
 --
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `friend_links` (
   `site_id` int(11) NOT NULL AUTO_INCREMENT,
   `school_id` int(11) NOT NULL DEFAULT '0' COMMENT '分校id',
@@ -130,10 +101,7 @@ CREATE TABLE `friend_links` (
   `status` tinyint(1) NOT NULL COMMENT '状态',
   PRIMARY KEY (`site_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 COMMENT='友情链接';
-/*!40101 SET character_set_client = @saved_cs_client */;
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `news` (
   `news_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '编号',
   `cid` int(11) NOT NULL COMMENT '所属分类',
@@ -148,14 +116,11 @@ CREATE TABLE `news` (
   `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '记录状态',
   PRIMARY KEY (`news_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='新闻';
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `settings`
 --
 
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `settings` (
   `k` varchar(50) NOT NULL COMMENT 'key',
   `v` longtext NOT NULL COMMENT '数值',
@@ -165,7 +130,6 @@ CREATE TABLE `settings` (
   `status` tinyint(1) DEFAULT NULL COMMENT '状态',
   PRIMARY KEY (`k`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='设置表';
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 create table `slide_show`(
   `pic_id` int(11) not null auto_increment,
@@ -209,15 +173,3 @@ CREATE TABLE `users` (
   PRIMARY KEY (`uid`),
   UNIQUE KEY `username` (`username`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='用户表';
-
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2012-08-12  8:10:13
