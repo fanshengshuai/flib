@@ -27,5 +27,6 @@
             <p id="trace" class="message"> {$exception_trace}</p>
             {/if}
         </div>
+        <div style="padding:20px;">Power by <a target="_blank" href="https://github.com/fanshengshuai/flib">flib</a>. <a href="http://www.kuboluo.com">fanshengshuai@gmail.com</a></div>
     </body>
 </html>
