@@ -9,6 +9,7 @@ function apply_ajax() {
 
             $('a, button').each(function() {
                     if ($(this).attr('ajax') == 'true') {
+                        $(this).attr('ajax', '');
 
                         $(this).click(function() {
                                 var url_href = $(this).attr('href');
@@ -50,6 +51,7 @@ function apply_ajax() {
                 $.getScript('/js/jquery.form.js', function() {
                         $("form").each(function() {
                                 if ($(this).attr('ajax') == 'true') {
+                                    $(this).attr('ajax', '');
 
                                     //if (!$('input[name=in_ajax]')[0]) {
                                     $("<input type='hidden' name='in_ajax' value='1' />").appendTo($(this));
