@@ -38,12 +38,18 @@ class Controller_Admin_Category extends Controller_Admin_Abstract {
             $data = $this->getPostData($fields);
 
             if ($cid) {
+
+                // 父分类不能和当前分类 ID 一样
+                if ($data['pid'] == $cid) {
+                    $this->error(array('pid' => '父分类不能和当前分类相同'));
+                }
+
                 $cateDAO->update($cid, $data);
             } else {
                 $cateDAO->add($data);
             }
+
             $this->success('分类操作成功。', '/admin/category/list');
-            exit;
         }
 
         $category_info = $cateDAO->get($cid);
