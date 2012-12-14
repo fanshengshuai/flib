@@ -10,6 +10,7 @@ class Controller_Admin_Category extends Controller_Admin_Abstract {
         $this->view->set('ctype', $ctype);
 
         $cate_list = Service_Category::get();
+        //var_dump($cate_list);
 
         $this->view->set('cate_list', $cate_list);
 
@@ -32,7 +33,7 @@ class Controller_Admin_Category extends Controller_Admin_Abstract {
 
 
         if ($this->isPost()) {
-            $fields = array('c_name', 'pid', 'ctype');
+            $fields = array('category_name', 'pid', 'ctype');
 
             $data = $this->getPostData($fields);
 

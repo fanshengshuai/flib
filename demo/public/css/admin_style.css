@@ -12,10 +12,10 @@ body { color: #5E5E5E; padding:0; margin:0; font-size: 14px; font-family: "Helve
 /*input, textarea { border-radius: 5px; }*/
 
 .g_w { width:1000px; margin:auto; }
-.tmain { margin:auto;text-align:left }
+.tmain { margin:auto;text-align:left; border:none; }
 .tmain a{text-decoration: none}
-.tmain th { overflow: hidden; padding-top: 10px; padding-bottom: 7px; border-bottom: 1px solid #E7E7E7; }
-.tmain td { overflow: hidden; padding-top: 10px; padding-bottom: 7px; border-bottom: 1px dashed #BEBEBE; }
+.tmain th { overflow: hidden; padding: 10px;  border-bottom: 1px solid #E7E7E7; }
+.tmain td { overflow: hidden; padding: 10px;  border-bottom: 1px dashed #BEBEBE; }
 
 .tmain2  th{text-align: right}
 .tmain2  td{text-align: left}

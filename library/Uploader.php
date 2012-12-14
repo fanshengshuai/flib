@@ -32,9 +32,10 @@ class Uploader {
         }
     }
 
-    public static function saveFile($field) {
+
+    public static function saveFile($field, $attach_type='image') {
         $uploader = new Uploader;
-        $photo_file = "image/" . date('Ymd') . '/' . date('YmdHis') . ".attach";
+        $photo_file = "{$attach_type}/" . date('Ymd') . '/' . date('YmdHis') . ".attach";
         $upload_file = $uploader->saveAttach('pic_url', $photo_file);
         return $upload_file['file_path'];
     }
@@ -71,7 +72,9 @@ class Uploader {
 
 
         if ($_FILES[$field]) {
-            move_uploaded_file($_FILES[$field]['tmp_name'], $obj);
+            if (!move_uploaded_file($_FILES[$field]['tmp_name'], $obj)) {
+                throw new Exception('请检查public/attachs目录是否可写!');
+            }
 
             $attachDAO = new DAO_Attach;
             $data = array(

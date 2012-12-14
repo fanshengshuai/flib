@@ -1,7 +1,6 @@
 CREATE TABLE `attachments` (
   `aid` int(11) NOT NULL AUTO_INCREMENT COMMENT '活动附件ID',
   `rel_id` int(11) NOT NULL COMMENT '关联ID',
-  `school_id` int(11) NOT NULL DEFAULT '0' COMMENT '分校id',
   `attach_type` int(11) NOT NULL COMMENT '类型1为图片2为视频3上传图片',
   `attach_url` varchar(200) NOT NULL COMMENT '地址',
   `file_name` varchar(100) NOT NULL,
@@ -9,12 +8,25 @@ CREATE TABLE `attachments` (
   `file_size` int(11) NOT NULL,
   `file_path` varchar(100) NOT NULL,
   `comment` varchar(200) NOT NULL COMMENT '备注说明',
-  `create_time` datetime NOT NULL COMMENT '纪录创建时间',
-  `update_time` datetime NOT NULL COMMENT '纪录更新时间',
-  `remove_time` datetime NOT NULL COMMENT '纪录删除时间',
+  `create_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
+  `update_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '更新时间',
+  `remove_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '删除时间',
   `status` tinyint(1) NOT NULL COMMENT '状态',
   PRIMARY KEY (`aid`)
-) ENGINE=MyISAM AUTO_INCREMENT=58 DEFAULT CHARSET=utf8 COMMENT='附件表';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='附件表';
+
+CREATE TABLE `categories` (
+  `cid` int(11) NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `ctype` int(11) NOT NULL,
+  `pid` int(11) NOT NULL,
+  `category_name` varchar(20) NOT NULL COMMENT '分类名称',
+  `display_order` int(11) NOT NULL,
+  `create_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
+  `update_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '更新时间',
+  `remove_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '删除时间',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态',
+  PRIMARY KEY (`cid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='分类';
 
 CREATE TABLE `blocks` (
   `bid` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
@@ -65,42 +77,18 @@ CREATE TABLE `block_items` (
   KEY `bid` (`bid`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
---
--- Table structure for table `category`
---
-
-CREATE TABLE `category` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '编号',
-  `pid` int(11) NOT NULL COMMENT 'parent id',
-  `category_name` varchar(20) NOT NULL COMMENT '分类名称',
-  `create_time` date NOT NULL COMMENT '创建时间',
-  `update_time` date NOT NULL COMMENT '更新时间',
-  `remove_time` date NOT NULL COMMENT '删除时间',
-  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态',
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='分类';
-
---
--- Table structure for table `certification`
---
-
---
--- Table structure for table `courses`
---
-
 CREATE TABLE `friend_links` (
   `site_id` int(11) NOT NULL AUTO_INCREMENT,
-  `school_id` int(11) NOT NULL DEFAULT '0' COMMENT '分校id',
   `site_name` varchar(100) NOT NULL COMMENT '站点名称',
   `site_url` varchar(100) NOT NULL COMMENT '站点URL',
   `display_order` int(11) NOT NULL DEFAULT '0' COMMENT '排序',
   `comment` varchar(200) NOT NULL COMMENT '描述',
-  `create_time` datetime NOT NULL COMMENT '纪录创建时间',
-  `update_time` datetime NOT NULL COMMENT '纪录更新时间',
-  `remove_time` datetime NOT NULL COMMENT '纪录删除时间',
+  `create_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
+  `update_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '更新时间',
+  `remove_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '删除时间',
   `status` tinyint(1) NOT NULL COMMENT '状态',
   PRIMARY KEY (`site_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 COMMENT='友情链接';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='友情链接';
 
 CREATE TABLE `news` (
   `news_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '编号',
@@ -110,23 +98,19 @@ CREATE TABLE `news` (
   `pic_url` varchar(100) NOT NULL COMMENT '图片',
   `content` text NOT NULL COMMENT '内容',
   `click_time` int(11) NOT NULL DEFAULT '1' COMMENT '点击次数',
-  `create_time` date NOT NULL COMMENT '创建时间',
-  `update_time` date NOT NULL COMMENT '更新时间',
-  `remove_time` date NOT NULL COMMENT '删除时间',
+  `create_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
+  `update_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '更新时间',
+  `remove_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '删除时间',
   `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '记录状态',
   PRIMARY KEY (`news_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='新闻';
 
---
--- Table structure for table `settings`
---
-
 CREATE TABLE `settings` (
   `k` varchar(50) NOT NULL COMMENT 'key',
   `v` longtext NOT NULL COMMENT '数值',
-  `create_time` date NOT NULL COMMENT '创建时间',
-  `update_time` date NOT NULL COMMENT '更新时间',
-  `remove_time` date NOT NULL COMMENT '删除时间',
+  `create_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
+  `update_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '更新时间',
+  `remove_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '删除时间',
   `status` tinyint(1) DEFAULT NULL COMMENT '状态',
   PRIMARY KEY (`k`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='设置表';
@@ -136,10 +120,9 @@ create table `slide_show`(
   `pic_url` varchar(50) not null comment '图片',
   `url` varchar(50) not null comment 'URL',
   `display_order` int(11) not null comment '排序',
-  `school_id` int(11) not null comment '所属院校',
-  `create_time` datetime NOT NULL COMMENT '纪录创建时间',
-  `update_time` datetime NOT NULL COMMENT '纪录更新时间',
-  `remove_time` datetime NOT NULL COMMENT '纪录删除时间',
+  `create_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
+  `update_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '更新时间',
+  `remove_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '删除时间',
   `status` tinyint(1) NOT NULL COMMENT '状态',
   primary key(`pic_id`)
 )  ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='幻灯片';
@@ -166,9 +149,9 @@ CREATE TABLE `users` (
   `password` varchar(50) NOT NULL COMMENT '密码',
   `phone` varchar(100) NOT NULL COMMENT '电话',
   `address` varchar(200) NOT NULL COMMENT '地址',
-  `create_time` datetime NOT NULL COMMENT '纪录创建时间',
-  `update_time` datetime NOT NULL COMMENT '纪录更新时间',
-  `remove_time` datetime NOT NULL COMMENT '纪录删除时间',
+  `create_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '添加时间',
+  `update_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '更新时间',
+  `remove_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '删除时间',
   `status` tinyint(1) NOT NULL COMMENT '状态',
   PRIMARY KEY (`uid`),
   UNIQUE KEY `username` (`username`)

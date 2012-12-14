@@ -8,8 +8,12 @@
             <th>新闻分类：</th>
             <td>
                 <select name="cid">
-                    {foreach from=$categoryList item=item}
-                    <option value="{$item['cid']}" {if $item['cid'] eq $news_info['cid']}selected="" {/if}>{$item['c_name']}</option>
+                    {foreach from=$cate_list item=item}
+                    <optgroup label="{$item['category_name']}">
+                    {foreach from=$item['sub'] item=sitem}
+                    <option value="{$sitem['cid']}" {if $v_info['cid'] eq $sitem['cid']}selected{/if}>{$sitem['category_name']}</option>
+                    {/foreach}
+                    </optgroup>
                     {/foreach}
                 </select>
             </td>

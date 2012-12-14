@@ -31,14 +31,6 @@
             <span><a target="_blank" href="http://{$_G['domain']}">查看页面</a></span>
             &nbsp;
             <span><a href="/admin/global/setting" style="{if $_G['controller'] eq 'Controller_Admin_Global'}color:#ccc; font-weight:bold; {/if}">网站设置</a></span>
-            {if !$_G['is_school']}
-            &nbsp;
-            <span><a href="/admin/school/list" style="{if $_G['controller'] eq 'Controller_Admin_School'}color:#ccc; font-weight:bold; {/if}">分校管理</a></span>
-            {/if}
-            {if !$_G['is_school']}
-            &nbsp;
-            <span><a href="/admin/netDisk/list" style="{if $_G['controller'] eq 'Controller_Admin_NetDisk'}color:#ccc; font-weight:bold; {/if}">网盘</a></span>
-            {/if}
         </div>
         <br />
         {include "admin/top.tpl"}

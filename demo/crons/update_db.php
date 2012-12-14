@@ -32,7 +32,9 @@ foreach ($tables as $key => $t) {
     } catch(Exception $e) {
         if (strpos($e->getMessage(), 'table or view not found')) {
             DB::query($sqls[$key]. ';');
-            echo $sql . "\n";
+            echo "creating {$tables[$key]}...\n";
+            unset ($sqls[$key], $tables[$key]);
+            continue;
         }
     }
 
@@ -49,6 +51,8 @@ foreach ($sqls as $key => $sql) {
 foreach ($tables as $key => $t) {
     echo update_table($t);
 }
+
+echo "\n\n";
 
 function update_table($table) {
     global $table_cols, $old_tables;
@@ -108,21 +112,21 @@ function update_table($table) {
         }
     }
 
-    echo "\n" .$table . "\n";
+    //echo "\n" .$table . "\n";
     //var_dump($updates);
     //return;
 
 
     if(!empty($updates)) {
         $usql = "ALTER TABLE ".$table." ".implode(', ', $updates);
-        echo $usql;
+        //echo $usql;
         DB::query($usql);
         $msg = '升级表 '.$table.' 完成！';
     } else {
         $msg = '检查表 '.$table.' 完成，不需升级，跳过';
     }
 
-    echo $msg;
+    echo "{$msg}\n";
 }
 
 function getcolumn($creatsql) {

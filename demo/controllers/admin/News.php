@@ -31,8 +31,9 @@ class Controller_Admin_News extends Controller_Admin_Abstract {
         }
 
         $categoryDAO=new DAO_Category();
-        $categoryList=$categoryDAO->findAll('status=1');
-        $this->view->set('categoryList',$categoryList);
+        $cate_list = Service_Category::get();
+        $this->view->set('cate_list', $cate_list);
+
         $this->view->disp('admin/news/add');
     }
 

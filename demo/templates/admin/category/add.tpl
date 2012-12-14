@@ -6,7 +6,7 @@
                 <select name="pid">
                     <option value="0">无</option>
                     {foreach from=$cate_list item=item}
-                    <option value="{$item['cid']}" {if $item['cid'] eq $category_info['pid']}selected{/if}></option>
+                    <option value="{$item['cid']}" {if $item['cid'] eq $category_info['pid']}selected{/if}>{$item['category_name']}</option>
                     {/foreach}
                 </select>
             </td>
@@ -14,7 +14,7 @@
         <tr>
             <th>名称</th>
             <td>
-                <input name="c_name" value="{$category_info['c_name']}" />
+                <input name="category_name" value="{$category_info['category_name']}" />
             </td>
         </tr>
         <tr>

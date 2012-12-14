@@ -87,6 +87,10 @@ function apply_ajax() {
                         });
                 });
             }
+
+            $('.tmain .t_c')
+            .mouseover(function() { $(this).css({ 'background':'#eee' }); })
+            .mouseout(function() { $(this).css({ 'background':'#fff' });} );
     });
 }
 

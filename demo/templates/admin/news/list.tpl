@@ -23,14 +23,14 @@
     </table>
 </form>
 <table class="tmain g_w">
-    <tr>
+    <tr class="t_h">
         <th width="30">编号</th>
         <th width="auto">新闻标题</th>
-        <th width="100">添加时间</th>
+        <th width="160">添加时间</th>
         <th width="100">操作</th>
     </tr>
     {foreach from=$list item=item}
-    <tr>
+    <tr class="t_c">
         <td style="text-align:center;">{$item['news_id']}</td>
         <td>{$item['title']}</td>
         <td>{$item['create_time']}</td>
@@ -40,17 +40,10 @@
         </td>
     </tr>
     {/foreach}
-    <tr>
+    <tr class="t_b">
         <td colspan="6" style="text-align: center">
             {$pager}
         </td>
     </tr>
 </table>
 {include file="admin/footer.tpl"}
-<script type="text/javascript">
-    $().ready(function(){
-            $('#addNewRecord').fancybox();
-            });
-var fancybox_editor;
-$('a[display=ajax_window]').fancybox();
-</script>
