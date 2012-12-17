@@ -10,26 +10,38 @@
  */
 
 class Cache {
-    public static function set($cache_key, $cache_contents, $cache_time = 7200, $force = false) {
+    public static function set($cache_key, $cache_content, $cache_time = 7200, $force = false) {
+
+        $save_content = json_encode(array('cache_time' => $cache_time, 'content' => $cache_content));
 
         $cache_file = Cache::getFileCachePath($cache_key);
 
         if ($force || !file_exists($cache_file) || (filemtime($cache_file) < time() - $cache_time)) {
-            file_put_contents($cache_file, $cache_contents);
+            file_put_contents($cache_file, $save_content);
         }
     }
 
     public static function get($cache_key) {
+
         $cache_file = Cache::getFileCachePath($cache_key);
-        return file_get_contents($cache_file);
+        $content = json_decode(file_get_contents($cache_file), true);
+
+        if ($content &&
+            (filemtime($cache_file) + intval($content['cache_time'])) < time()
+        ) {
+            return $content['content'];
+        } else {
+            return null;
+        }
     }
 
     public static function getFileCachePath($cache_key) {
+
         if (!defined("APP_ROOT")) {
             throw new Exception("Cache Exception: APP_ROOT not defined.");
         }
 
-        $cache_file = APP_ROOT . "data/cache/" . md5($cache_key);
+        $cache_file = APP_ROOT . "data/cache/c_" . md5($cache_key);
 
         return $cache_file;
     }

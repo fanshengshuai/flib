@@ -12,6 +12,10 @@ class Controller_Index extends Controller_Abstract {
     public function defaultAction() {
         global $_G;
 
+        C::set('test', 'test', 2);
+
+        var_dump(C::get('test'));exit;
+
         $this->view->set('cur_nav', 'index');
         $this->view->disp('index');
     }
