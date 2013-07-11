@@ -11,11 +11,14 @@
  */
 class Dispatcher {
 
-    public static function dispatch() {
+    public static function init() {
         global $_G;
 
         $dispatcher = new Dispatcher;
-        $dispatcher->_getURI();
+
+        if (!$_G['uri']) {
+            self::getURI();
+        }
 
         $c = $_GET['c'];
         $a = $_GET['a'];
@@ -26,13 +29,13 @@ class Dispatcher {
             $dispatcher->_checkRouter($c, $a);
         }
 
-
         if (!$c || !$a) {
 
-            if ($_G['uri'] == '/') {
+            if ($_G['uri'] == '/' || $_G['uri'] == '' || $_G['uri'] == '/index') {
 
                 $c = 'index';
                 $a = 'default';
+
             } else {
 
                 $path_info = explode('/', $_G['uri']);
@@ -48,11 +51,6 @@ class Dispatcher {
             }
         }
 
-
-        if (!$c || !$a) {
-            throw new Exception("访问路径不正确，没有找到 {$_G['uri']} 。");exit;
-        }
-
         if ($_G['app']) {
             $_G['controller'] = 'Controller_' . ucfirst($_G['app']) . '_' . ucfirst($c);
         } else {
@@ -61,8 +59,24 @@ class Dispatcher {
 
         $_G['action'] = $a;
 
+    }
+
+    public static function dispatch() {
+        global $_G;
+
+        if (!$_G['controller'] || !$_G['action']) {
+            if (RUN_MODE == 'sync') {
+                return ;
+            }
+            throw new Exception("访问路径不正确，没有找到 {$_G['uri']} 。", 404);exit;
+        }
+
+
         if (!class_exists($_G['controller'])) {
-            throw new Exception("找不到控制器：{$_G['controller']}");exit;
+            if (RUN_MODE == 'sync') {
+                return ;
+            }
+            throw new Exception("找不到控制器：{$_G['controller']}",  404);exit;
         }
 
         $controller = new $_G['controller'];
@@ -74,7 +88,10 @@ class Dispatcher {
         if (method_exists($controller, $action . "")) {
             $controller->$action();
         } else {
-            throw new Exception("找不到 {$_G['action']}Action ");exit;
+            if (RUN_MODE == 'sync') {
+                //return ;
+            }
+            throw new Exception("找不到 {$_G['action']}Action ", 404);exit;
             //throw new Exception($_G['controller'] . ".{$_G['action']} not exists");exit;
         }
     }
@@ -124,7 +141,7 @@ class Dispatcher {
         }
     }
 
-    private function _getURI() {
+    public static function getURI() {
         global $_G;
 
         $_G['uri'] = $_SERVER['HTTP_X_ORIGINAL_URL'];

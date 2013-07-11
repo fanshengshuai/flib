@@ -25,8 +25,10 @@ class Flib {
 
         global $_G;
 
+        $_G['config'] = array();
+
         header("Content-type: text/html; charset=utf-8");
-        define('SYS_ROOT', dirname(__FILE__) . '/');
+        define('FLIB_ROOT', dirname(__FILE__) . '/');
 
         date_default_timezone_set('Asia/Chongqing');
         error_reporting(7);
@@ -34,60 +36,73 @@ class Flib {
             set_magic_quotes_runtime(0);
         }
 
+        if (file_exists(APP_ROOT . "data/run_mode_dev.lock")) {
+            $_G['run_mode'] = $_config['global']['run_mode'] = 'dev';
+        }
+
         // 加载函数类
-        require_once SYS_ROOT . "functions/function_core.php";
+        require_once FLIB_ROOT . "functions/function_core.php";
 
         $app_config_global = APP_ROOT . "config/global.php";
 
         if (file_exists($app_config_global)) {
 
             require_once $app_config_global;
+            $_G['config'] = $_config;
             if ($_config['global']['debug']) {
                 $_G['debug'] = true;
+            } else {
+                $_G['debug'] = false;
             }
+        }
+
+        $_G['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+        $_G['query_string'] = $_SERVER['QUERY_STRING'];
+        $_G['domain'] = $_SERVER['HTTP_HOST'];
+        $_G['top_domain'] = substr($_G['domain'], strpos($_G['domain'], '.') + 1);
+        $_G['cookie_domain'] = substr($_G['domain'], strpos($_G['domain'], '.'));
+        $_G['cname'] = substr($_G['domain'], 0, strpos($_G['domain'], '.'));
+
+        if ($_REQUEST['refer']) {
+            $_G['refer'] = $_REQUEST['refer'];
+        } else {
+            $_G['refer'] = $_SERVER['HTTP_REFERER'];
+        }
+
+        if ($_GET['in_ajax'] || $_POST['in_ajax']) {
+            $_G['in_ajax'] = true;
         }
 
 
         // 设定错误和异常处理
-        set_error_handler(array('Flib','appError'));
-        set_exception_handler(array('Flib','appException'));
+        set_error_handler(array('Flib', 'appError'));
+        set_exception_handler(array('Flib', 'appException'));
 
         // 注册AUTOLOAD方法
         spl_autoload_register(array('Flib', 'autoload'));
 
+        if (!$_G['uri']) {
+            Dispatcher::getURI();
+        }
+
         // 运行应用
         if (RUN_MODE == 'web') {
 
-            if ($_REQUEST['refer']) {
-                $_G['refer'] = $_REQUEST['refer'];
-            } else {
-                $_G['refer'] = $_SERVER['HTTP_REFERER'];
-            }
-
-            $_G['domain'] = $_SERVER['HTTP_HOST'];
-            $_G['top_domain'] = substr($_G['domain'], strpos($_G['domain'], '.') + 1);
-            $_G['cookie_domain'] = substr($_G['domain'], strpos($_G['domain'], '.'));
-            $_G['cname'] = substr($_G['domain'], 0, strpos($_G['domain'], '.'));
-
-            if ($_REQUEST['in_ajax']) {
-                $_G['in_ajax'] = true;
-            }
+            App::run();
+        } elseif (RUN_MODE == 'sync') {
 
             App::run();
+            FRobot::getFromWeb(SYNC_SRC);
         }
 
         return ;
     }
 
     /**
-     +----------------------------------------------------------
      * 系统自动加载Flib类库
      * 并且支持配置自动加载路径
-     +----------------------------------------------------------
      * @param string $class 对象类名
-     +----------------------------------------------------------
      * @return void
-     +----------------------------------------------------------
      */
     public static function autoload($className) {
         global $_G;
@@ -103,7 +118,7 @@ class Flib {
             $className
         );
 
-        $inc_file = SYS_ROOT . $file . '.php';
+        $inc_file = FLIB_ROOT . $file . '.php';
         if (file_exists($inc_file)) {
             if ($_G['debug']) {
                 $_G['debug_info']['autoload_files'][] = $inc_file;
@@ -166,7 +181,7 @@ class Flib {
      +----------------------------------------------------------
      */
     static public function appException($e) {
-        $exception = new FlibException;
+        $exception = new FException;
         $exception->traceError($e);
         exit;
     }
@@ -187,7 +202,7 @@ class Flib {
      */
     static public function appError($errno, $errstr, $errfile, $errline) {
 
-        $exception = new FlibException;
+        $exception = new FException;
 
       switch ($errno) {
           case E_ERROR:

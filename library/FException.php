@@ -7,9 +7,9 @@
  * 创建: 2012-07-24 10:29:39
  * vim: set expandtab sw=4 ts=4 sts=4 * 
  *
- * $Id: FlibException.php 11 2012-07-24 03:42:35Z fanshengshuai $
+ * $Id: FException.php 11 2012-07-24 03:42:35Z fanshengshuai $
  */
-class FlibException extends Exception {
+class FException extends Exception {
 
     public function __construct() {
         $this->view = new View;
@@ -17,7 +17,7 @@ class FlibException extends Exception {
 
     public function traceError($e) {
 
-        if ($e->code == 404) { redirect('/e404'); }
+        //if ($e->code) { redirect('/e404'); }
 
         $exception_message = $e->getMessage() . '<br /> 异常出现在：' . $e->getFile() . '&nbsp;&nbsp;&nbsp;&nbsp; 第 ' . $e->getLine() . ' 行';
         $exception_trace = nl2br($e->__toString());

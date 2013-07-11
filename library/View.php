@@ -8,9 +8,9 @@
  *
  * $Id: View.php 128 2012-08-06 08:58:30Z fanshengshuai $
  */
-$smarty_class_file = SYS_ROOT . '../smarty/Smarty.class.php';
+$smarty_class_file = FLIB_ROOT . '../smarty/Smarty.class.php';
 if (!file_exists($smarty_class_file)) {
-    $smarty_class_file = SYS_ROOT . 'smarty/Smarty.class.php';
+    $smarty_class_file = FLIB_ROOT . 'smarty/Smarty.class.php';
 }
 
 require_once $smarty_class_file;
@@ -26,7 +26,7 @@ class View extends Smarty {
 
         $this->caching = false;
         $this->debugging = false;
-        $this->cache_lifetime = 120;
+        $this->cache_lifetime = 300;
     }
 
     public function set($val, $value) {
@@ -36,10 +36,10 @@ class View extends Smarty {
     public function displaySysPage($tpl) {
         global $_G;
 
-        $this->template_dir = SYS_ROOT . 'View/';
+        $this->template_dir = FLIB_ROOT . 'View/';
         $content = $this->fetch($tpl);
 
-        if (RUN_MODE != 'web') {
+        if (!in_array(RUN_MODE, array('web', 'sync'))) {
             $content = str_replace(array('<br />', '</p>', '</tr>'), "\n", $content);
             $content = str_replace(array('&nbsp;'), " ", $content);
             $content = preg_replace('/<head>.+?<\/head>/si', '', $content);
@@ -62,7 +62,15 @@ class View extends Smarty {
             }
         }
 
-        $contents = $this->fetch($tpl . '.tpl');
+        if ($this->cache_id) {
+            $contents = $this->fetch($tpl . '.tpl', $this->cache_id);
+        } else {
+            $contents = $this->fetch($tpl . '.tpl');
+        }
+
+        if (!$_G['uid']) {
+            FCache::save($contents);
+        }
 
         echo $contents;
     }
@@ -71,7 +79,9 @@ class View extends Smarty {
         global $_G;
 
         $this->set('_G', $_G);
-
+        if (Config::get('view.whitespace')){
+            parent::loadFilter('output','trimwhitespace');
+        }
         $contents = parent::fetch($tpl);
 
         $view_compress = Config::get('view.compress');

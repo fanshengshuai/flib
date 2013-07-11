@@ -223,7 +223,7 @@ class Config {
             }
 
             if (!is_file($file)) {
-                $file = SYS_ROOT . '/config/global.php';
+                $file = FLIB_ROOT . '/config/global.php';
             }
             require_once($file);
         }

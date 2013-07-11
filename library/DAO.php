@@ -15,6 +15,24 @@ class DAO extends DB_Table {
         parent::__construct($this->_table);
     }
 
+    public function listByPage($page, $order = array(), $conditions = null, $per_page = 20) {
+
+        $page_option = array(
+            'curr_page' => max(1, intval($page)),
+            'total' => $this->count($conditions),
+            'per_page' => $per_page,
+        );
+
+        Pager::build($page_option);
+
+        $start = $page_option['start'];
+        $limit = $page_option['per_page'];
+
+        $results = $this->findAll($conditions, array(), array('*'), $start, $limit, $order);
+
+        return array('data' => $results, 'page_option' => $page_option);
+    }
+
     public function get($_pk_key) {
 
         $sql = "{$this->_pk} = '{$_pk_key}' and status = 1";
@@ -52,23 +70,5 @@ class DAO extends DB_Table {
 
 
         return $this->save($data, "{$this->_pk} = '{$_pk_key}'");
-    }
-
-    public function listByPage($page, $order = array(), $conditions = null) {
-
-        $page_option = array(
-            'curr_page' => max(1, intval($page)),
-            'total' => $this->count($conditions),
-            'per_page' => 20,
-        );
-
-        Pager::build($page_option);
-
-        $start = $page_option['start'];
-        $limit = $page_option['per_page'];
-
-        $results = $this->findAll($conditions, array(), array('*'), $start, $limit, $order);
-
-        return array('data' => $results, 'page_option' => $page_option);
     }
 }

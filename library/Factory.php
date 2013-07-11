@@ -20,8 +20,26 @@ class Factory {
 
 		$class = explode('.', $class);
 
+		if ($class[0] == 'mod') {
+			$classFile = APP_ROOT . 'include/class';
+		} elseif ($class[0] == 'han') {
+			$classFile = APP_ROOT . 'include/lib/' . $class[1] . '.han.php';
+
+//echo $classFile;exit;
+			if (file_exists($classFile)) {
+				require_once $classFile;
+				$class_name = "{$class[1]}Handler";
+				$class_ins = new $class_name;
+
+				return $class_ins;
+			}
+		} else {
+			$classFile = dirname(dirname(__FILE__)) . '/services/';
+		}
+
+		$class = explode('.', $class);
+
 		$className = ucfirst($class[0]);
-		$classFile = dirname(dirname(__FILE__)) . '/services/';
 
 		$classCount = count($class);
 		for ($i = 1; $i < $classCount; $i ++) {
@@ -35,6 +53,7 @@ class Factory {
 		}
 		$classFile .= '.php';
 
+echo $classFile;
 
 		$className =  str_replace('M_', 'Service_', $className);
 

@@ -54,9 +54,9 @@ class Controller {
      * 成功提示
      * $items = array('username' => '已经存在', 'password' => '长度不够');
      */
-    protected function _ajaxSuccessMessage($items, $url = '') {
+    protected function _ajaxSuccessMessage($items, $url='', $close_time=0) {
 
-        $result = array('result' => 'success');
+        $result = array('result' => 'success', 'close_time' => $close_time);
 
         if ($url) {
             $result['url'] = $url;
@@ -132,17 +132,21 @@ class Controller {
         echo json_encode($result);exit;
     }
 
-    public function success($message, $url = '') {
+    protected function success($message, $url='', $close_time=0) {
         global $_G;
 
+        if ($url == 'r') {
+            $url = $_SERVER['HTTP_REFERER'];
+        }
+
         if ($_G['in_ajax']) {
-            $this->_ajaxSuccessMessage($message, $url);
+            $this->_ajaxSuccessMessage($message, $url, $close_time);
         } else {
             $this->showMessage($message, $url);
         }
     }
 
-    public function error($message) {
+    protected function error($message) {
         global $_G;
 
         if ($_G['in_ajax']) {
@@ -152,6 +156,29 @@ class Controller {
         }
     }
 
+    /**
+     * 取出POST内容
+     */
+    protected function checkPostData($items) {
+
+        global $_G;
+
+        if ($_G['in_ajax']) {
+            $this->_ajaxCheckNullPostItems($items);
+        } else {
+            $check_results = null;
+
+            foreach ($items as $item) {
+                if (!$_POST[$item]) {
+                    $check_results .= $item . '不能为空 <br />';
+                }
+            }
+
+            if ($check_results) {
+                $this->error($check_results);exit;
+            }
+        }
+    }
 
     /**
      * 取出POST内容

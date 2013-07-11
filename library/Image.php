@@ -24,6 +24,7 @@ class Image {
     function image() {
         global $_G;
         $s = &$_G['setting'];
+
         $this->param = array(
             'imagelib'		=> $s['imagelib'],
             'imageimpath'		=> $s['imageimpath'],
@@ -41,7 +42,9 @@ class Image {
 
     function thumb($source, $target, $thumbwidth, $thumbheight, $thumbtype = 1, $nosuffix = 0) {
         global $_G;
+
         $return = $this->init('thumb', $source, $target, $nosuffix);
+
         if($return <= 0) {
             return $this->returncode($return);
         }
@@ -75,16 +78,17 @@ class Image {
 
     function Watermark($source, $target = '') {
         global $_G;
+
         $return = $this->init('watermask', $source, $target);
         if($return <= 0) {
             return $this->returncode($return);
         }
 
-        $this->param['watermarkminwidth'] = 10;
-        $this->param['watermarkminheight'] = 10;
+        $this->param['watermarkminwidth'] = 130;
+        $this->param['watermarkminheight'] = 30;
 
         if (!$this->param['watermarkstatus']) {
-            $this->param['watermarkstatus'] = 5;
+            $this->param['watermarkstatus'] = 9;
         }
 
         if (!$this->param['watermarktype']) {
@@ -94,7 +98,7 @@ class Image {
         if(!$this->param['watermarkstatus'] || ($this->param['watermarkminwidth'] && $this->imginfo['width'] <= $this->param['watermarkminwidth'] && $this->param['watermarkminheight'] && $this->imginfo['height'] <= $this->param['watermarkminheight'])) {
             return $this->returncode(0);
         }
-        $this->param['watermarkfile'] = YP_ROOT . 'static/image/common/watermark.png';
+        $this->param['watermarkfile'] = APP_ROOT. '/images/watermark.png';
         //echo $this->param['watermarkfile'];exit;
         if(!is_readable($this->param['watermarkfile']) || ($this->param['watermarktype'] == 'text' && (!file_exists($this->param['watermarktext']['fontpath']) || !is_file($this->param['watermarktext']['fontpath'])))) {
             return $this->returncode(-3);
@@ -114,18 +118,21 @@ class Image {
 
         $this->errorcode = 0;
         if (empty($source)) {
+
             return -2;
         }
 
         $parse = parse_url($source);
         if(isset($parse['host'])) {
             if(empty($target)) {
+
                 return -2;
             }
             $data = dfsockopen($source);
             $this->tmpfile = $source = tempnam($_G['setting']['attachdir'].'./temp/', 'tmpimg_');
             file_put_contents($source, $data);
             if(!$data || $source === FALSE) {
+
                 return -2;
             }
         }
@@ -133,13 +140,15 @@ class Image {
         if ($method == 'thumb') {
             $target = empty($target) ?  $source.(!$nosuffix ? '.thumb.jpg' : '') : $target;
         } elseif ($method == 'watermask') {
-            $target = empty($target) ?  $source : $_G['setting']['attachdir'].'./'.$target;
+            $target = empty($target) ?  $source : $target;
         }
         $targetpath = dirname($target);
+
         mkdir($targetpath, 0777, true);
 
         //clearstatcache();
         if(!is_readable($source) || !is_writable($targetpath)) {
+
             return -2;
         }
 
@@ -274,7 +283,7 @@ class Image {
 
         switch($this->param['thumbtype']) {
         case 'fixnone':
-            case 1:
+        case 1:
                 if($this->imginfo['width'] >= $this->param['thumbwidth'] || $this->imginfo['height'] >= $this->param['thumbheight']) {
                     $attach_photo = $this->loadsource();
                     if($attach_photo < 0) {
@@ -289,7 +298,7 @@ class Image {
                 }
                 break;
             case 'fixwr':
-                case 2:
+            case 2:
                     $attach_photo = $this->loadsource();
                     if($attach_photo < 0) {
                         return $attach_photo;
@@ -309,6 +318,82 @@ class Image {
                         imagecopymerge($thumb_photo, $attach_photo, $startx, $starty, 0, 0, $this->imginfo['width'], $this->imginfo['height'], 100);
                     }
                     break;
+            case 3:
+                if($this->imginfo['width'] >= $this->param['thumbwidth'] || $this->imginfo['height'] >= $this->param['thumbheight']) {
+                    $attach_photo = $this->loadsource();
+                    if($attach_photo < 0) {
+                        return $attach_photo;
+                    }
+                    $thumb = array();
+                    list(,,$thumb['width'], $thumb['height']) = $this->sizevalue(0);
+                    $cx = $this->imginfo['width'];
+                    $cy = $this->imginfo['height'];
+                    $thumb_photo = imagecreatetruecolor($this->param['thumbwidth'], $this->param['thumbheight']);
+                    $bgcolor = imagecolorallocate($thumb_photo, 255, 255, 255);
+                    imagefill($thumb_photo, 0, 0, $bgcolor);
+                    if ($thumb['width'] == $this->param['thumbwidth']) {
+                        $top = ($this->param['thumbheight'] - $thumb['height']) / 2;
+                    } else $top = 0;
+
+                    if ($thumb['height'] == $this->param['thumbheight']) {
+                        $left = ($this->param['thumbwidth'] - $thumb['width']) / 2;
+                    } else $left = 0;
+
+                    imagecopyresampled($thumb_photo, $attach_photo, $left, $top, 0, 0, $thumb['width'], $thumb['height'], $cx, $cy);
+                }
+                break;
+            // 保证宽度，充满图像
+            case 4:
+            {
+                $attach_photo = $this->loadsource();
+                if($attach_photo < 0) {
+                    return $attach_photo;
+                }
+
+                $src_info = array('x' => 0, 'y' => 0, 'w' => 0, 'h' => 0);
+                $desc_info = array('x' => 0, 'y' =>0, 'w' => 0, 'h' => 0);
+
+                $pic_info = array('w' => $this->imginfo['width'], 'h' => $this->imginfo['height']);
+                $canvas_info = array('w' => $this->param['thumbwidth'], 'h' => $this->param['thumbheight']);
+
+                $pic_bl = $pic_info['w'] / $pic_info['h'];
+                $canvas_bl = $canvas_info['w'] / $canvas_info['h'];
+
+                $src_info['w'] = $pic_info['w'];
+                $src_info['h'] = $pic_info['h'];
+
+                $desc_info['w'] = $this->param['thumbwidth'];
+                $desc_info['h'] = $desc_info['w'] / $pic_bl;
+
+                if ($pic_info['w'] < $canvas_info['w']) {
+                    $desc_info['w'] = $pic_info['w'];
+                    $desc_info['h'] = $desc_info['w'] / $pic_bl;
+                    $desc_info['x'] = ($canvas_info['w'] - $desc_info['w']) / 2;
+                }
+
+
+
+                if ($desc_info['w'] == 220) {
+                    if ($desc_info['h'] <= 100) {
+
+                    } elseif ($desc_info['h'] > 100 && $desc_info['h'] < 440) {
+                        $canvas_info['h'] = $desc_info['h'];
+                    } elseif ($desc_info['h'] >= 440){
+                        $canvas_info['h'] = 440;
+                    }
+                }
+
+                if ($desc_info['h'] < $canvas_info['h']) {
+                    $desc_info['y'] = ($canvas_info['h'] - $desc_info['h']) / 2;
+                }
+                
+                $thumb_photo = imagecreatetruecolor($canvas_info['w'], $canvas_info['h']);
+                $bgcolor = imagecolorallocate($thumb_photo, 241, 241, 241);
+                imagefill($thumb_photo, 0, 0, $bgcolor);
+
+                imagecopyresampled($thumb_photo, $attach_photo, $desc_info['x'], $desc_info['y'], $src_info['x'], $src_info['y'], $desc_info['w'], $desc_info['h'], $src_info['w'], $src_info['h']);
+            }
+                break;
         }
         clearstatcache();
         if($this->imginfo['mime'] == 'image/jpeg') {
@@ -460,6 +545,7 @@ class Image {
             if($target_photo < 0) {
                 return $target_photo;
             }
+
             imageCopy($dst_photo, $target_photo, 0, 0, 0, 0, $this->imginfo['width'], $this->imginfo['height']);
 
             if($this->param['watermarktype'] == 'png') {
