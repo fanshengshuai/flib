@@ -27,7 +27,7 @@ class Cache {
         $content = json_decode(file_get_contents($cache_file), true);
 
         if ($content &&
-            (filemtime($cache_file) + intval($content['cache_time'])) < time()
+            (filemtime($cache_file) + intval($content['cache_time'])) > time()
         ) {
             return $content['content'];
         } else {
