@@ -16,9 +16,7 @@ class Cache {
 
         $cache_file = Cache::getFileCachePath($cache_key);
 
-        if ($force || !file_exists($cache_file) || (filemtime($cache_file) < time() - $cache_time)) {
-            file_put_contents($cache_file, $save_content);
-        }
+        file_put_contents($cache_file, $save_content);
     }
 
     public static function get($cache_key) {
@@ -41,7 +39,13 @@ class Cache {
             throw new Exception("Cache Exception: APP_ROOT not defined.");
         }
 
-        $cache_file = APP_ROOT . "data/cache/c_" . md5($cache_key);
+        $cache_dir = Config::get('global.cache_dir');
+
+        if ($cache_dir) { $cache_dir = "{$cache_dir}/"; }
+        else { $cache_dir = APP_ROOT . "data/cache/"; }
+
+        $hash_file_path = FFile::getHashPath($cache_key, 3, $cache_dir, true);
+        $cache_file = $hash_file_path['file_path'];
 
         return $cache_file;
     }
