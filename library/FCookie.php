@@ -22,6 +22,9 @@ class FCookie {
         $secure = $_SERVER['SERVER_PORT'] == 443 ? 1 : 0;
         $life = $life > 0 ? $timestamp + $life : ($life < 0 ? $timestamp - 31536000 : 0);
 
+        setcookie($var, $value, $life, $path);//, $domain, $secure);
+        return ;
+
         if(PHP_VERSION < '5.2.0') {
             setcookie($var, $value, $life, $path, $domain, $secure);
         } else {

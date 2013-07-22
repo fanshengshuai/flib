@@ -52,13 +52,13 @@ class Pager {
         $end_page = min($pages, $start_page + 20);
 
         for ($show_page = $start_page;$show_page <= $end_page; $show_page ++) {
-            $html .= '<a ajax="true" href="' . $query . ($show_page) . '"> [';
+            $html .= '<a ajax="true" href="' . $query . ($show_page) . '"> ';
             if ($show_page == $curr_page) {
                 $html .= '<font style="color: #f00">' . $show_page . '</font>';
             } else {
                 $html .= $show_page;
             }
-            $html .= '] </a>&nbsp;';
+            $html .= ' </a>&nbsp;';
         }
 
         $html .= '<a ajax="true" href="' . $query . $next_page . '">下一页</a>&nbsp;<a ajax="true" href="' . $query . $pages . '">尾页</a>';

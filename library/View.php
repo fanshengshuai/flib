@@ -87,11 +87,15 @@ class View extends Smarty {
         $view_compress = Config::get('view.compress');
 
         if ($view_compress) {
-            //$contents = preg_replace('/\/\/.+?/', '', $contents);
-            //$contents = preg_replace('/<\!\-\-.+?\-\->/s', '', $contents);
+            // 会有 http:// 这样的都替换没了
+            //$contents = preg_replace('#//.*$#im', '', $contents);
+            $contents = preg_replace('#<!--.+?-->#si', '', $contents);
             $contents = preg_replace('/^\s+/im', '', $contents);
-            //$contents = preg_replace('/;\s+/', ';', $contents);
             $contents = preg_replace('/>\s+/im', '>', $contents);
+            /*$contents = str_replace(";\n", ';', $contents);
+            $contents = str_replace("}\n", '}', $contents);
+            $contents = str_replace("{\n", '{', $contents);
+             */
             //$contents = str_replace("\n", '', $contents);
         }
 

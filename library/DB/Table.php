@@ -40,29 +40,9 @@ class DB_Table {
      */
     public function __construct($table, $shardKey = array()) {
 
-        $conf = self::shardTable($table, $shardKey);
-
-        require APP_ROOT . "config/db.php";
-
-        if (strpos($table, '.')) {
-            $db = substr($table, 0, strpos($table, '.'));
-            $table = substr($table, strpos($table, '.') + 1);
-        } else {
-            $db = 'default';
-        }
-
-        $config_db = $_config['db'][$db];
         $this->_table = $config_db['table_pre'] . $table;
 
-        $this->_dbh = DB::connect(
-            $config_db['dsn'],
-            $config_db['user'],
-            $config_db['password'],
-            $config_db['charset'],
-            $config_db['failover'],
-            $config_db['persistent'],
-            $config_db['timeout']
-        );
+        $this->_dbh = FDB::connect();
     }
 
     /**
@@ -239,7 +219,8 @@ class DB_Table {
 
         // 捕获PDOException后 抛出DB_Exception
         try{
-            return $this->_dbh->exec($sql, $params);
+            $this->_dbh->exec($sql, $params);
+            return $this->lastInsertId();
         } catch (PDOException $e){
             throw new DB_Exception($e);
         }

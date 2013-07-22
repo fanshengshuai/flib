@@ -71,11 +71,33 @@ class FDB {
      * @param integer $timeout
      * @return DB 实例
      */
-    public static function connect($dsn, $user, $password, $charset, $failover = '', $persistent = false, $timeout = 0) {
+    public static function connect() {
+        global $_G;
+
+        require APP_ROOT . "config/db.php";
+
+        if (strpos($table, '.')) {
+            $db = substr($table, 0, strpos($table, '.'));
+            $table = substr($table, strpos($table, '.') + 1);
+        } else {
+            $db = 'default';
+        }
+        $dsn = $config_db['dsn'];
+
+        $config_db = $_config['db'][$db];
 
         if (!array_key_exists($dsn, self::$_conns)){
-            self::$_conns[$dsn] = new FDB($dsn, $user, $password, $charset, $failover, $persistent, $timeout);
+            self::$_conns[$dsn] = new FDB(
+                $config_db['dsn'],
+                $config_db['user'],
+                $config_db['password'],
+                $config_db['charset'],
+                $config_db['failover'],
+                $config_db['persistent'],
+                $config_db['timeout']
+            );
         }
+        $_G['db'][$db] = self::$_conns[$dsn];
 
         return self::$_conns[$dsn];
     }
@@ -202,9 +224,22 @@ class FDB {
     }
 
 
+    public static function connect_mysql() {
+    }
+
     public static function fetch_first($sql) {
-        $table = new DB_Table();
-        return $table->find($sql);
+        global $_G;
+
+        $_dbh = $_G['db']['default'];
+        if (!$_dbh) { $_dbh = FDB::connect(); }
+
+        try {
+            $data = $_dbh->fetchRow($sql, $params);
+        } catch (PDOException $e) {
+            throw new DB_Exception($e);
+        }
+
+        return $data;
     }
 
     public static function insert($table, $data) {
