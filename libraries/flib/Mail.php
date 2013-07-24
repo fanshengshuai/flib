@@ -219,4 +219,3 @@ class EMail {
     }
 
 }
-}
