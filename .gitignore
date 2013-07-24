@@ -1,4 +1,7 @@
 *.swp
+*.build*
+*.project*
+*.setting*
 */data/*
 */public/attachs/*/*
 www.kuboluo.com/public/p/
