@@ -40,6 +40,7 @@ class Flib {
             $_G['run_mode'] = $_config['global']['run_mode'] = 'dev';
         }
 
+
         // 加载函数类
         require_once FLIB_ROOT . "functions/function_core.php";
 
@@ -80,6 +81,11 @@ class Flib {
 
         // 注册AUTOLOAD方法
         spl_autoload_register(array('Flib', 'autoload'));
+
+        if (!file_exists(APP_ROOT . "data/_flib_min.php")) {
+            self::createFlibMin();
+        }
+        include_once(APP_ROOT . "data/_flib_min.php");
 
         if (!$_G['uri']) {
             Dispatcher::getURI();
@@ -220,6 +226,23 @@ class Flib {
       }
     }
 
+    public static function createFlibMin() {
+        $files = "DB/Table, FCookie, FFile, View, DAO, Config, App, FDB, Pager, FCache, FException, Dispatcher, Controller, C, Cache";
+        $files = explode(',', $files);
+
+        foreach ($files as $f) {
+            $f = FLIB_ROOT . trim($f) . '.php';
+            $flib_str .= file_get_contents($f);
+        }
+
+        $flib_str = preg_replace('#/\*.+?\*/#si', '', $flib_str);
+        $flib_str = preg_replace('#//.+?$#sim', '', $flib_str);
+        $flib_str = str_replace('<?php', '', $flib_str);
+        $flib_str = preg_replace("#\s{2,}#si", ' ', $flib_str);
+
+        file_put_contents(APP_ROOT."data/_flib_min.php", "<?php {$flib_str}");
+        echo "已经创建 flib.min";
+    }
 }
 
 Flib::Start();
