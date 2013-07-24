@@ -74,7 +74,13 @@ class FDB {
     public static function connect() {
         global $_G;
 
-        require APP_ROOT . "config/db.php";
+        if ($_G ['db'] ['default']) {
+			return $_G ['db'] ['default'];
+		}
+		
+		if (! include (APP_ROOT . "config/db.php")) {
+			throw new Exception ( 'NO DB CONFIG EXIST ! PLEASE CHECK config/db.php' );
+		}
 
         if (strpos($table, '.')) {
             $db = substr($table, 0, strpos($table, '.'));
@@ -86,7 +92,7 @@ class FDB {
 
         $config_db = $_config['db'][$db];
 
-        if (!array_key_exists($dsn, self::$_conns)){
+        if (!array_key_exists($dsn, self::$_conns)) {
             self::$_conns[$dsn] = new FDB(
                 $config_db['dsn'],
                 $config_db['user'],
@@ -103,7 +109,7 @@ class FDB {
     }
 
     /**
-     * 开启事物
+     * 开启事务
      */
     public function begin() {
 
@@ -133,6 +139,11 @@ class FDB {
      * @param array $params
      */
     public function fetchRow($query, $params = array()) {
+        global $_G;
+
+        if ($_G['debug']) {
+            $_G['debug_info']['sql'][] = $query;
+        }
 
         $stmt = $this->_dbh->prepare($query);
         $stmt->execute($params);
@@ -168,6 +179,11 @@ class FDB {
      * @param array $params
      */
     public function fetchOne($query, $params = array()) {
+        global $_G;
+
+        if ($_G['debug']) {
+            $_G['debug_info']['sql'][] = $query;
+        }
 
         $stmt = $this->_dbh->prepare($query);
         $result = $stmt->execute($params);
@@ -223,23 +239,20 @@ class FDB {
         $db->exec($sql);
     }
 
+    public static function fetch($sql) {
+    	global $_G;
 
-    public static function connect_mysql() {
+    	$_dbh = FDB::connect();
+    	
+    	return $_dbh->fetchAll($sql);
     }
-
-    public static function fetch_first($sql) {
+    
+    public static function fetchFirst($sql) {
         global $_G;
 
-        $_dbh = $_G['db']['default'];
-        if (!$_dbh) { $_dbh = FDB::connect(); }
+        $_dbh = FDB::connect();
 
-        try {
-            $data = $_dbh->fetchRow($sql, $params);
-        } catch (PDOException $e) {
-            throw new DB_Exception($e);
-        }
-
-        return $data;
+        return $_dbh->fetchRow($sql);
     }
 
     public static function insert($table, $data) {
