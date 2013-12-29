@@ -77,7 +77,7 @@ class FDB {
         if ($_G ['db'] ['default']) {
 			return $_G ['db'] ['default'];
 		}
-		
+
 		if (! include (APP_ROOT . "config/db.php")) {
 			throw new Exception ( 'NO DB CONFIG EXIST ! PLEASE CHECK config/db.php' );
 		}
@@ -159,7 +159,7 @@ class FDB {
      * @param array $params
      * @return array
      */
-    public function fetchAll($query, $params = array()) {
+    public function fetchAll($query, $from_cache=false) {
         global $_G;
 
         if ($_G['debug']) {
@@ -167,7 +167,7 @@ class FDB {
         }
 
         $stmt = $this->_dbh->prepare($query);
-        $stmt->execute($params);
+        $stmt->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $rows;
     }
@@ -235,24 +235,50 @@ class FDB {
 
 
     public static function query($sql) {
-        $db = new self;
-        $db->exec($sql);
+        global $_G;
+
+    	$_dbh = FDB::connect();
+        return $_dbh->exec($sql);
     }
 
     public static function fetch($sql) {
-    	global $_G;
+        global $_G;
 
-    	$_dbh = FDB::connect();
-    	
-    	return $_dbh->fetchAll($sql);
+        $_dbh = FDB::connect();
+
+        return $_dbh->fetchAll($sql, $from_cache=false);
     }
-    
-    public static function fetchFirst($sql) {
+
+    public static function fetchCached($sql, $cache_time=3600) {
+        $cache_key = "sql-fetch_{$sql}";
+    	$cache_content = C::get($cache_key);
+    	if ($cache_content) {
+    		return $cache_content;
+    	}
+
+    	$cache_content = self::fetch($sql);
+    	C::set($cache_key, $cache_content, $cache_time);
+    	return $cache_content;
+    }
+
+    public static function fetchFirst($sql, $from_cache=false) {
         global $_G;
 
         $_dbh = FDB::connect();
 
         return $_dbh->fetchRow($sql);
+    }
+
+    public static function fetchFirstCached($sql, $cache_time=3600) {
+        $cache_key = "sql-fetchFirst_{$sql}";
+        $cache_content = C::get($cache_key);
+        if ($cache_content) {
+            return $cache_content;
+        }
+
+        $cache_content = self::fetchFirst($sql);
+        C::set($cache_key, $cache_content, $cache_time);
+        return $cache_content;
     }
 
     public static function insert($table, $data) {
@@ -268,9 +294,21 @@ class FDB {
     }
 
     public static function update($table, $data, $condition) {
-        if (!$data['update_time']) {
+        global $_G;
+
+        if (!$data['update_time'] && $_G['upate_from'] != 'gather') {
             $data['update_time'] = date('Y-m-d H:i:s');
         }
+
+        $c = '';
+        if (is_array($condition)) {
+            foreach ($condition as $_k => $_v) {
+                $c .= " and {$_k}='{$_v}'";
+            }
+
+            $condition = ltrim($c, ' and');
+        }
+
         $table = new DB_Table($table);
         $table->save($data, $condition);
         return true;
@@ -286,5 +324,10 @@ class FDB {
         $table = new DB_Table($table);
         $table->save($data, $condition);
         return true;
+    }
+
+    public static function incr($table, $field, $conditions = null, $unit = 1) {
+        $table = new DB_Table($table);
+        $table->incr($field, $conditions, array(), $unit);
     }
 }

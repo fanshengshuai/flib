@@ -5,7 +5,7 @@
  * 作者: 范圣帅(fanshengshuai@gmail.com)
  *
  * 创建: 2012-07-24 22:57:17
- * vim: set expandtab sw=4 ts=4 sts=4 * 
+ * vim: set expandtab sw=4 ts=4 sts=4 *
  *
  * $Id: DAO.php 196 2012-08-11 10:46:03Z fanshengshuai $
  */

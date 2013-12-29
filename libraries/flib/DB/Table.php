@@ -5,7 +5,7 @@
  * 作者: 范圣帅(fanshengshuai@gmail.com)
  *
  * 创建: 2012-08-08 10:57:22
- * vim: set expandtab sw=4 ts=4 sts=4 * 
+ * vim: set expandtab sw=4 ts=4 sts=4 *
  *
  * $Id$
  */
@@ -145,7 +145,6 @@ class DB_Table {
         if ($limit) {
             $sql .= " LIMIT $start, $limit";
         }
-        //return $sql;
 
         try {
             $rows = $this->_dbh->fetchAll($sql, $params);

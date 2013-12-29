@@ -13,6 +13,8 @@ class FCookie {
     public static function set($var, $value, $life = 7200) {
         global $_G;
 
+//        ob_flush(); ob_clean();
+
         $domain = $_G['cookie_domain'];
 
         $timestamp = time();
@@ -39,5 +41,8 @@ class FCookie {
 
     public static function delete($key) {
         Cookie::set($key, null, -1);
+    }
+    public static function remove($key) {
+        self::set($key, null, -1);
     }
 }

@@ -111,6 +111,10 @@ class Dispatcher {
 
         if (isset($_config['router'][$uri])) {
 
+            if ($_config['router'][$uri]['url']) {
+                redirect($_config['router'][$uri]['url']);
+            }
+
             $c = $_config['router'][$uri]['controller'];
             $a = $_config['router'][$uri]['action'];
 
@@ -122,7 +126,12 @@ class Dispatcher {
                     continue;
                 }
 
-                if (preg_match("#^{$key}$#", $uri, $res)) {
+                if (preg_match("#^{$key}$#i", $_G['uri'], $res)) {
+
+                    if ($_config['router'][$uri]['url']) {
+                        redirect($_config['router'][$uri]['url']);
+                    }
+
                     $c = $_config['router'][$key]['controller'];
                     $a = $_config['router'][$key]['action'];
 

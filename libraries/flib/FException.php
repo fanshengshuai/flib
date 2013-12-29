@@ -22,12 +22,17 @@ class FException extends Exception {
         $exception_message = $e->getMessage() . '<br /> 异常出现在：' . $e->getFile() . '&nbsp;&nbsp;&nbsp;&nbsp; 第 ' . $e->getLine() . ' 行';
         $exception_trace = nl2br($e->__toString());
 
+        $exception_message = str_replace(APP_ROOT, '', $exception_message);
+        $exception_trace = str_replace(APP_ROOT, '', $exception_trace);
+
         $this->view->set('exception_message', $exception_message);
         $this->view->set('exception_trace', $exception_trace);
         $this->view->displaySysPage('exception.tpl');
     }
     public function printMessage($exception_message) {
 
+    	header('HTTP/1.1 500 FLib Error');
+    	header('status: 500 FLib Error');
         $this->view->set('exception_message', $exception_message);
         $this->view->displaySysPage('exception.tpl');
 

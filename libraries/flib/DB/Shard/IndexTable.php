@@ -24,13 +24,6 @@ class DB_Shard_IndexTable extends DB_Shard {
         // 从索引表中查找
         $table = $shardConfigs['table'];
         $this->db['charset'] = $shardConfig['charset'];
-
-        // 获取数据
-        try {
-
-        } catch (Exception $e) {
-
-        }
     }
 
     public function getDB() {

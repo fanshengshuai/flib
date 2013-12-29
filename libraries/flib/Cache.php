@@ -12,7 +12,19 @@
 class Cache {
     public static function set($cache_key, $cache_content, $cache_time = 7200, $force = false) {
 
-        $save_content = json_encode(array('cache_time' => $cache_time, 'content' => $cache_content));
+        global $_G;
+
+        $cache_key = $_G['domain'] . $cache_key;
+
+        self::init();
+
+        if ($_G['memcache']) {
+            $_G['memcache']->set($cache_key, $cache_content, MEMCACHE_COMPRESSED, $cache_time );
+			return true;
+		}
+
+		$save_content = json_encode ( array (
+				'cache_time' => $cache_time, 'content' => $cache_content));
 
         $cache_file = Cache::getFileCachePath($cache_key);
 
@@ -20,6 +32,15 @@ class Cache {
     }
 
     public static function get($cache_key) {
+        global $_G;
+
+        $cache_key = $_G['domain'] . $cache_key;
+
+        self::init();
+
+        if ($_G['memcache']) {
+            return $_G['memcache']->get($cache_key);
+        }
 
         $cache_file = Cache::getFileCachePath($cache_key);
         $content = json_decode(file_get_contents($cache_file), true);
@@ -57,6 +78,14 @@ class Cache {
     }
 
     public static function deleteAll() {
+        global $_G;
+
+        self::init();
+
+        if ($_G['memcache']) {
+            return $_G['memcache']->flush();
+        }
+
         $cache_dir = APP_ROOT . "data/cache/";
 
         $d = opendir($cache_dir);
@@ -69,5 +98,14 @@ class Cache {
         }
 
         closedir($d);
+    }
+
+    public static function init() {
+        global $_G;
+
+        if (Config::get('global.memcache.enable')) {
+	        $_G['memcache'] = new Memcache;
+	        $_G['memcache']->connect('127.0.0.1', 11211);
+        }
     }
 }

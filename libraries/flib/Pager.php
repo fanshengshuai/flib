@@ -46,28 +46,30 @@ class Pager {
         $pre_page = max(1, $curr_page - 1);
         $next_page = min($pages, $curr_page + 1);
 
-        $html = '共 ' . $page_option['total'] . ' 条，' . $pages . '页&nbsp;';
+        $html = '共 ' . $page_option['total'] . ' 条&nbsp;';
+        //$html = $pages . '页';
         $html .= '<a ajax="true" href="' . $query . '1">首页</a>&nbsp;<a ajax="true" href="' . $query . $pre_page . '">上一页</a>&nbsp;';
         $start_page = max(1, $curr_page - 9);
-        $end_page = min($pages, $start_page + 20);
+        $end_page = min($pages, $start_page + 10);
 
         for ($show_page = $start_page;$show_page <= $end_page; $show_page ++) {
-            $html .= '<a ajax="true" href="' . $query . ($show_page) . '"> ';
             if ($show_page == $curr_page) {
-                $html .= '<font style="color: #f00">' . $show_page . '</font>';
+                $html .= '<span class="current">' . $show_page . '</span>';
             } else {
+	            $html .= '<a ajax="true" href="' . $query . ($show_page) . '"> ';
                 $html .= $show_page;
+	            $html .= ' </a>&nbsp;';
             }
-            $html .= ' </a>&nbsp;';
         }
 
-        $html .= '<a ajax="true" href="' . $query . $next_page . '">下一页</a>&nbsp;<a ajax="true" href="' . $query . $pages . '">尾页</a>';
+        $html .= '<a ajax="true" href="' . $query . $next_page . '">下一页</a>&nbsp;';
+        // $html .= '<a ajax="true" href="' . $query . $pages . '">尾页</a>';
 
         if (!$_G['in_ajax']) {
             $html = str_replace('ajax="true"', '', $html);
         }
 
-        $page_option['html'] = $html;
+        $page_option['html'] = "<div class=\"ui-bar\" id=\"page-area\"><div class=\"ui-pages commpage\" id=\"comment-pages\">{$html}</div></div>";
 
     }
 }

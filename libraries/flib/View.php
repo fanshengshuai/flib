@@ -4,7 +4,7 @@
  * 作者: 范圣帅(fanshengshuai@gmail.com)
  *
  * 创建: 2012-07-28 10:57:45
- * vim: set expandtab sw=4 ts=4 sts=4 * 
+ * vim: set expandtab sw=4 ts=4 sts=4 *
  *
  * $Id: View.php 128 2012-08-06 08:58:30Z fanshengshuai $
  */
@@ -47,6 +47,10 @@ class View extends Smarty {
             $content = preg_replace("/\n\s+/i", "\n", $content);
         }
 
+        if ($_G['debug'] && !$_G['in_ajax']) {
+            $content .= $this->getDebugInfo();
+        }
+
         echo $content;
         exit;
     }
@@ -63,9 +67,9 @@ class View extends Smarty {
         }
 
         if ($this->cache_id) {
-            $contents = $this->fetch($tpl . '.tpl', $this->cache_id);
+            $contents = $this->load($tpl . '.tpl', $this->cache_id);
         } else {
-            $contents = $this->fetch($tpl . '.tpl');
+            $contents = $this->load($tpl . '.tpl');
         }
 
         if (!$_G['uid']) {
@@ -75,16 +79,13 @@ class View extends Smarty {
         echo $contents;
     }
 
-    public function fetch($tpl) {
+    public function load($tpl) {
         global $_G;
 
         $this->set('_G', $_G);
-        if (Config::get('view.whitespace')){
-            parent::loadFilter('output','trimwhitespace');
-        }
-        $contents = parent::fetch($tpl);
 
         $view_compress = Config::get('view.compress');
+        $contents = $this->fetch($tpl);
 
         if ($view_compress) {
             // 会有 http:// 这样的都替换没了
@@ -92,25 +93,20 @@ class View extends Smarty {
             $contents = preg_replace('#<!--.+?-->#si', '', $contents);
             $contents = preg_replace('/^\s+/im', '', $contents);
             $contents = preg_replace('/>\s+/im', '>', $contents);
-            /*$contents = str_replace(";\n", ';', $contents);
-            $contents = str_replace("}\n", '}', $contents);
-            $contents = str_replace("{\n", '{', $contents);
-             */
-            //$contents = str_replace("\n", '', $contents);
         }
 
         if ($_G['debug'] && !$_G['in_ajax']) {
             $contents .= $this->getDebugInfo();
         }
 
-        return $contents . $debug_contents;
+        return $contents;
     }
 
     public function getDebugInfo() {
         global $_G;
 
 
-        if (RUN_MODE != 'web') {
+        if (RUN_MODE == 'cli') {
             $debug_contents = "DEBUG INFO:\n";
         } else {
             $debug_contents = '<style> .debug_table { margin-left:20px; border:1px solid rgb(0, 0, 0);} .debug_table th, .debug_table td { padding:5px; border:1px solid rgb(0, 0, 0); } </style>';
@@ -146,11 +142,11 @@ class View extends Smarty {
         }
         $debug_contents .= '</table>';
 
-        if (RUN_MODE != 'web') {
+        if (RUN_MODE == 'cli') {
             $debug_contents = str_replace('</tr>', "\n", $debug_contents);
             $debug_contents = preg_match('/<.+?>/', '', $debug_contents);
         }
 
-        return $debug_contents;
+        return "<div class=\"debug_info\">" . $debug_contents . "</div>";
     }
 }

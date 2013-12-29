@@ -27,8 +27,8 @@ class FFile {
         }
 
         if ($root_path) {
-            if (strpos($root_path, '/') !== 0) {
-                throw new Exception('root_path 必须是 / 开头的！');
+            if (strpos($root_path, '/') !== 0 && strpos($root_path, ':') === false) {
+                throw new Exception('root_path 必须是 绝对路径！');
             }
 
             $dir = rtrim($root_path, '/') . '/' . $dir;
@@ -50,5 +50,11 @@ class FFile {
 
     public static function parsePath($file_path) {
         $_tmp = parse_url($file_path);
+    }
+
+    public static function unlink($file_path) {
+        if (!unlink($file_path)) {
+            file_put_contents(APP_ROOT . "data/ffile_" . date('Y-m-d') . ".log", "{$file_path} unlink failed.\n", FILE_APPEND);
+        }
     }
 }

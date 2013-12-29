@@ -259,7 +259,7 @@ class HTTP_CURL {
         }else{
             curl_setopt($this->ch, CURLOPT_AUTOREFERER, true);
         }
-        curl_setopt($this->ch, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)");
+        curl_setopt($this->ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.3 Safari/537.36");
 
         $urlInfo = parse_url($url);
         $cookieJar = "/tmp/cookie_{$urlInfo['host']}";

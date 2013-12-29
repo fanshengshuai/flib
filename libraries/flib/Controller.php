@@ -69,7 +69,7 @@ class Controller {
         }
 
         ob_clean();
-        header("Content-Type: application/json; charset=UTF-8");
+        //header("Content-Type: application/json; charset=UTF-8");
         //echo '{"result":"failed","items":{"real_name":"\u4e0d\u80fd\u4e3a\u7a7a","username":"\u4e0d\u80fd\u4e3a\u7a7a","id_card":"\u4e0d\u80fd\u4e3a\u7a7a","phone":"\u4e0d\u80fd\u4e3a\u7a7a","email":"\u4e0d\u80fd\u4e3a\u7a7a","good_at":"\u4e0d\u80fd\u4e3a\u7a7a","join_date":"\u4e0d\u80fd\u4e3a\u7a7a","comment":"\u4e0d\u80fd\u4e3a\u7a7a","teacher_grade":"\u4e0d\u80fd\u4e3a\u7a7a"}}';
         //exit;
         echo json_encode($result);exit;
@@ -97,7 +97,7 @@ class Controller {
      * 检查下拉列表的选中值是否为-1
      */
 
-    protected  function  _ajaxCheckSelect($select_fields){
+    protected function  _ajaxCheckSelect($select_fields){
 
         $check_results = null;
 
@@ -183,11 +183,11 @@ class Controller {
     /**
      * 取出POST内容
      */
-    protected function getPostData($form_fields) {
+    protected function getPostData($form_fields, $force=false) {
 
         $post_data = array();
         foreach ($form_fields as $item) {
-            if ($_POST[$item]) {
+            if ($force || $_POST[$item]) {
                 $post_data[$item] = $_POST[$item];
             }
         }
