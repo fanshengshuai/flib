@@ -33,18 +33,20 @@ class App {
      */
     static public function run() {
 
+        global $_G;
+
         App::init();
 
-        if (RUN_MODE == 'web') {
+        if ($_G['uri']) {
 
-            Dispatcher::init();
+            FDispatcher::init();
         }
 
 
         //if (FCache::check()) {
          //   echo FCache::getContent();
         //} else {
-            Dispatcher::dispatch();
+            FDispatcher::dispatch();
         //}
     }
 }

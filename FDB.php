@@ -92,6 +92,8 @@ class FDB {
 
         $config_db = $_config['db'][$db];
 
+        $_G['db']['config'] = $config_db;
+
         if (!array_key_exists($dsn, self::$_conns)) {
             self::$_conns[$dsn] = new FDB(
                 $config_db['dsn'],
@@ -288,7 +290,7 @@ class FDB {
         if (!$data['status']) {
             $data['status'] = 1;
         }
-        $table = new DB_Table($table);
+        $table = new FDB_Table($table);
         $table->save($data);
         return $table->lastInsertId();
     }
@@ -309,25 +311,39 @@ class FDB {
             $condition = ltrim($c, ' and');
         }
 
-        $table = new DB_Table($table);
+        $table = new FDB_Table($table);
         $table->save($data, $condition);
         return true;
     }
 
-    public static function remove($table, $condition) {
+    /**
+     * @param      $table 表名
+     * @param      $condition 条件
+     * @param bool $is_real_delete true 真删除，false 假删除
+     * @return bool
+     */
+    public static function remove($table, $condition, $is_real_delete=false) {
 
-        $data = array(
-            'status' => 2,
-            'remove_time' => date('Y-m-d H:i:s'),
-        );
+        $table = new FDB_Table($table);
 
-        $table = new DB_Table($table);
-        $table->save($data, $condition);
+        if ($is_real_delete) {
+            $table->remove($condition);
+        } else {
+            $data = array(
+                'status' => 2,
+                'remove_time' => date('Y-m-d H:i:s'),
+            );
+            $table->save($data, $condition);
+        }
+
+
+
+
         return true;
     }
 
     public static function incr($table, $field, $conditions = null, $unit = 1) {
-        $table = new DB_Table($table);
+        $table = new FDB_Table($table);
         $table->incr($field, $conditions, array(), $unit);
     }
 }

@@ -6,7 +6,7 @@
  * 创建: 2012-07-28 10:57:45
  * vim: set expandtab sw=4 ts=4 sts=4 *
  *
- * $Id: View.php 128 2012-08-06 08:58:30Z fanshengshuai $
+ * $Id: FView.php 128 2012-08-06 08:58:30Z fanshengshuai $
  */
 $smarty_class_file = FLIB_ROOT . '../smarty/Smarty.class.php';
 if (!file_exists($smarty_class_file)) {
@@ -15,7 +15,7 @@ if (!file_exists($smarty_class_file)) {
 
 require_once $smarty_class_file;
 
-class View extends Smarty {
+class FView extends Smarty {
 
     public function __construct() {
         parent::__construct();

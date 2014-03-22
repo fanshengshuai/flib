@@ -12,7 +12,7 @@
 class FException extends Exception {
 
     public function __construct() {
-        $this->view = new View;
+        $this->view = new FView;
     }
 
     public function traceError($e) {
@@ -35,7 +35,5 @@ class FException extends Exception {
     	header('status: 500 FLib Error');
         $this->view->set('exception_message', $exception_message);
         $this->view->displaySysPage('exception.tpl');
-
-        echo $contents;exit;
     }
 }
