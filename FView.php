@@ -1,0 +1,179 @@
+<?php
+/**
+ *
+ * 作者: 范圣帅(fanshengshuai@gmail.com)
+ *
+ * 创建: 2012-07-28 10:57:45
+ * vim: set expandtab sw=4 ts=4 sts=4 *
+ *
+ * $Id: View.php 128 2012-08-06 08:58:30Z fanshengshuai $
+ */
+
+if (!class_exists('Smarty')) {
+
+    $smarty_class_file = FLIB_ROOT . '../smarty/Smarty.class.php';
+    if (!file_exists($smarty_class_file)) {
+        $smarty_class_file = FLIB_ROOT . 'smarty/Smarty.class.php';
+    }
+
+    require_once $smarty_class_file;
+}
+
+class FView extends Smarty {
+
+    public function __construct() {
+        parent::__construct();
+
+        $this->cache_dir = APP_ROOT . "data/cache";
+        $this->compile_dir = APP_ROOT . 'data/template/';
+        $this->template_dir = APP_ROOT . 'template/';
+
+        $this->caching = false;
+        $this->debugging = false;
+        $this->cache_lifetime = 300;
+    }
+
+    public function setTemplateDir($template_dir = '') {
+
+        if (!$template_dir) {
+            $template_dir = APP_ROOT . 'template/';
+        }
+
+        $this->template_dir = $template_dir;
+    }
+
+    public function __destruct() {
+
+    }
+
+    public function set($val, $value) {
+        $this->assign($val, $value);
+    }
+
+    public function displaySysPage($tpl) {
+        global $_G;
+
+        $this->template_dir = FLIB_ROOT . 'View/';
+        $content = $this->fetch($tpl);
+
+        if (!$_G['uri']) {
+            $content = str_replace(array('<br />', '</p>', '</tr>'), "\n", $content);
+            $content = str_replace(array('&nbsp;'), " ", $content);
+            $content = preg_replace('/<head>.+?<\/head>/si', '', $content);
+            $content = preg_replace('/<.+?>/', '', $content);
+            $content = preg_replace("/\n\s+/i", "\n", $content);
+        }
+
+        if ($_G['debug'] && !$_G['in_ajax']) {
+            $content .= $this->getDebugInfo();
+        }
+
+        echo $content;
+        exit;
+    }
+
+    public function disp($tpl = '') {
+        global $_G;
+
+        if (!$tpl) {
+            if ($_G['app']) {
+                $c = str_replace('Controller_' . ucfirst($_G['app']) . '_', '', $_G['controller']);
+                $c = strtolower($c);
+                $tpl = "{$_G['app']}/{$c}/{$_G['action']}";
+            }
+        }
+
+        if ($this->cache_id) {
+            $contents = $this->load($tpl . '.tpl', $this->cache_id);
+        } else {
+            $contents = $this->load($tpl . '.tpl');
+        }
+
+//        if (!$_G['uid']) {
+//            FCache::save($contents);
+//        }
+
+        echo $contents;
+    }
+
+    public function load($tpl) {
+        global $_G;
+
+        $this->set('_G', $_G);
+
+        $view_compress = Config::get('view.compress');
+        $contents = $this->fetch($tpl);
+
+        if ($view_compress) {
+            // 会有 http:// 这样的都替换没了
+            //$contents = preg_replace('#//.*$#im', '', $contents);
+            $contents = preg_replace('#<!--.+?-->#si', '', $contents);
+            $contents = preg_replace('/^\s+/im', '', $contents);
+            $contents = preg_replace('/>\s+/im', '>', $contents);
+        }
+
+        if ($_G['debug'] && !$_G['in_ajax']) {
+            $contents .= $this->getDebugInfo();
+        }
+
+        return $contents;
+    }
+
+    public function getDebugInfo() {
+        global $_G;
+
+
+        if (RUN_MODE == 'cli') {
+            $debug_contents = "DEBUG INFO:\n";
+        } else {
+            $debug_contents = '<style> .debug_table { margin-left:20px; border:1px solid #000;} .debug_table th, .debug_table td { padding:5px; border:1px solid #000; } </style>';
+        }
+
+        // SQL DEBUG
+        $debug_contents .= '<table class="debug_table" rules="none" cellspacing="0" cellpadding="5"><tr><td colspan="2">SQL：</td></tr>';
+        foreach ($_G['debug_info']['sql'] as $key => $item) {
+            $debug_contents .= "<tr><th>{$key}</th><td>{$item}</td></tr>";
+        }
+        $debug_contents .= '</table><br />';
+
+        // COOKIES DEBUG
+        $debug_contents .= '<table class="debug_table" rules="none" cellspacing="0" cellpadding="5"><tr><td colspan="2">COOKIES：</td></tr>';
+        foreach ($_COOKIE as $key => $item) {
+            $debug_contents .= "<tr><th>{$key}</th><td>{$item}</td></tr>";
+        }
+        $debug_contents .= '</table><br />';
+
+        // ERRORS
+        $debug_contents .= '<table class="debug_table" rules="none" cellspacing="0" cellpadding="5"><tr><td colspan="2"><span style="background: #ff0000; color: #fff; padding:5px;"> ERRORS：</span></td></tr>';
+        foreach ($_G['errors'] as $key => $item) {
+            foreach ($item as $skey => $sItem) {
+                $debug_contents .= "<tr><th>{$key}</th><td>{$sItem}</td></tr>";
+            }
+        }
+        $debug_contents .= '</table><br />';
+        unset($_G['errors']);
+
+        // $_G DEBUG
+        $debug_g = $_G;
+        unset($debug_g['debug_info']);
+        $debug_contents .= '<table class="debug_table" rules="none" cellspacing="0" cellpadding="5"><tr><td colspan="2">$_G：</td></tr>';
+        foreach ($debug_g as $key => $item) {
+            $debug_contents .= "<tr><th>{$key}</th><td>" . var_export($item, true) . "</td></tr>";
+        }
+        $debug_contents .= '</table><br />';
+
+        // FILE DEBUG
+        $debug_contents .= '<table class="debug_table" rules="none" cellspacing="0" cellpadding="5"><tr><td colspan="2">引用文件：</td></tr>';
+        foreach ($_G['debug_info']['autoload_files'] as $key => $item) {
+            $debug_contents .= "<tr><th>{$key}</th><td>{$item}</td></tr>";
+        }
+        $debug_contents .= '</table>';
+
+        if (RUN_MODE == 'cli') {
+            $debug_contents = str_replace('</tr>', "\n", $debug_contents);
+            $debug_contents = preg_match('/<.+?>/', '', $debug_contents);
+        }
+
+        return "<div class=\"debug_info\">" . $debug_contents . "</div>";
+    }
+}
