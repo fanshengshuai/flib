@@ -86,7 +86,7 @@ class Smarty_Security {
     /**
      * + flag if super globals can be accessed from template
      */
-    public $allow_super_globals = true;
+    public $allow_super_Flobals = true;
     /**
      * + flag if the {php} and {include_php} tag can be executed
      */

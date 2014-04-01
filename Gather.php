@@ -22,7 +22,7 @@ class Gather {
     }
 
     public static function getFromWeb($url_pre) {
-        global $_G;
+        global $_F;
 
         $uri = $_SERVER['REQUEST_URI'];
 
@@ -48,7 +48,7 @@ class Gather {
                     chmod($d_r, 0777);
                 }
 
-                $content = file_get_contents($url_pre . $uri);
+                $content = file_GET_contents($url_pre . $uri);
 
                 //$content = str_replace('www.ssyx.com.cn', 'www.zhihuikongjian.com', $content);
 

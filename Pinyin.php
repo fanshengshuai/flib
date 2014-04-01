@@ -6,7 +6,7 @@ class Pinyin {
 
     public static function getPinyin($string) {
         $pinyin = new self;
-        return $pinyin->_getPinyin($string, 'utf8');
+        return $pinyin->_GETPinyin($string, 'utf8');
     }
 
     /**
@@ -14,7 +14,7 @@ class Pinyin {
      * @param  $string ASCII码
      * @param  $charset 编码
      */
-    public function _getPinyin($string, $charset='gb2312') {
+    public function _GETPinyin($string, $charset='gb2312') {
         $dataKey = "a|ai|an|ang|ao|ba|bai|ban|bang|bao|bei|ben|beng|bi|bian|biao|bie|bin|bing|bo|bu|ca|cai|can|cang|cao|ce|ceng|cha".
             "|chai|chan|chang|chao|che|chen|cheng|chi|chong|chou|chu|chuai|chuan|chuang|chui|chun|chuo|ci|cong|cou|cu|".
             "cuan|cui|cun|cuo|da|dai|dan|dang|dao|de|deng|di|dian|diao|die|ding|diu|dong|dou|du|duan|dui|dun|duo|e|en|er".

@@ -11,11 +11,13 @@
 
 class FCookie {
     public static function set($var, $value, $life = 7200) {
-        global $_G;
+        global $_F;
 
 //        ob_flush(); ob_clean();
 
-        $domain = $_G['cookie_domain'];
+//        var_dump($_F);
+
+        $domain = $_F['cookie_domain'];
 
         $timestamp = time();
         $path = "/";

@@ -10,7 +10,7 @@
  */
 class FPager {
 	public static function build($total, $page_size = 20, $url = null, $page = -1) {
-		global $_G;
+		global $_F;
 
 		if ($total < $page_size) {
 			return array ();
@@ -49,7 +49,7 @@ class FPager {
 			$html .= "<a href=\"{$url}{$next_page}\" class=\"next pagegbk\">下一页</a>";
 		}
 
-		if (! $_G ['in_ajax']) {
+		if (! $_F ['in_ajax']) {
 			$html = str_replace ( 'ajax="true"', '', $html );
 		}
 
@@ -61,7 +61,7 @@ class FPager {
 
 	// 简单分页
 	public static function buildSimplePge($total, $page_size = 20, $url = null, $page = -1) {
-		global $_G;
+		global $_F;
 
 		if ($total < $page_size) {
 			return '';
@@ -98,7 +98,7 @@ class FPager {
 	 */
 	public static function getUrl($url) {
 		if (! $url) {
-			$url = $_G ['uri'];
+			$url = $_F ['uri'];
 		}
 		$url = preg_replace ( '#&*page=\d*#i', '', $url );
 		$url = trim ( $url, '?' );

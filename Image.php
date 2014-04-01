@@ -22,8 +22,8 @@ class Image {
     var $errorcode = 0;
 
     function image() {
-        global $_G;
-        $s = &$_G['setting'];
+        global $_F;
+        $s = &$_F['setting'];
 
         $this->param = array(
             'imagelib'		=> $s['imagelib'],
@@ -41,7 +41,7 @@ class Image {
 
 
     function thumb($source, $target, $thumbwidth, $thumbheight, $thumbtype = 1, $nosuffix = 0) {
-        global $_G;
+        global $_F;
 
         $return = $this->init('thumb', $source, $target, $nosuffix);
 
@@ -56,7 +56,7 @@ class Image {
         $this->param['thumbheight'] = $thumbheight;
         $this->param['thumbtype'] = $thumbtype;
 
-        $return = !$this->libmethod ? $this->Thumb_GD() : $this->Thumb_IM();
+        $return = !$this->libmethod ? $this->Thumb_FD() : $this->Thumb_IM();
         $return = !$nosuffix ? $return : 0;
 
         return $this->sleep($return);
@@ -77,7 +77,7 @@ class Image {
     }
 
     function Watermark($source, $target = '') {
-        global $_G;
+        global $_F;
 
         $return = $this->init('watermask', $source, $target);
         if($return <= 0) {
@@ -104,7 +104,7 @@ class Image {
             return $this->returncode(-3);
         }
 
-        $return = !$this->libmethod ? $this->Watermark_GD() : $this->Watermark_IM();
+        $return = !$this->libmethod ? $this->Watermark_FD() : $this->Watermark_IM();
 
         return $this->sleep($return);
     }
@@ -114,7 +114,7 @@ class Image {
     }
 
     function init($method, $source, $target, $nosuffix = 0) {
-        global $_G;
+        global $_F;
 
         $this->errorcode = 0;
         if (empty($source)) {
@@ -129,7 +129,7 @@ class Image {
                 return -2;
             }
             $data = dfsockopen($source);
-            $this->tmpfile = $source = tempnam($_G['setting']['attachdir'].'./temp/', 'tmpimg_');
+            $this->tmpfile = $source = tempnam($_F['setting']['attachdir'].'./temp/', 'tmpimg_');
             file_put_contents($source, $data);
             if(!$data || $source === FALSE) {
 
@@ -272,8 +272,8 @@ class Image {
         return $im;
     }
 
-    function Thumb_GD() {
-        global $_G;
+    function Thumb_FD() {
+        global $_F;
 
         if(!function_exists('imagecreatetruecolor') || !function_exists('imagecopyresampled') || !function_exists('imagejpeg') || !function_exists('imagecopymerge')) {
             return -4;
@@ -414,7 +414,7 @@ class Image {
     }
 
     function Thumb_IM() {
-        global $_G;
+        global $_F;
 
         switch($this->param['thumbtype']) {
         case 'fixnone':
@@ -458,8 +458,8 @@ class Image {
         return 1;
     }
 
-    function Watermark_GD() {
-        global $_G;
+    function Watermark_FD() {
+        global $_F;
 
         if(!function_exists('imagecreatetruecolor')) {
             return -4;
@@ -575,7 +575,7 @@ class Image {
     }
 
     function Watermark_IM() {
-        global $_G;
+        global $_F;
 
         switch($this->param['watermarkstatus']) {
         case 1:

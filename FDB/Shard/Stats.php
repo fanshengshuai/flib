@@ -59,7 +59,7 @@ class DB_Shard_Stats extends DB_Shard {
                 // 如果指定了读取主库
                 $hostIp = $db['dc_master_ip'];
                 $failoverIp = $db['dc_slave_ip'];
-            } elseif (0 == ($this->_getRandomByDiId($diId) % 2)) {
+            } elseif (0 == ($this->_GETRandomByDiId($diId) % 2)) {
 
                 // 随机调换主从IP，均衡负载
             	list($hostIp, $failoverIp) = array($db['dc_slave_ip'], $db['dc_master_ip']);
@@ -89,7 +89,7 @@ class DB_Shard_Stats extends DB_Shard {
      * @param integer $second 控制平均多长时间进行一次随机操作，单位(s)
      * @return integer
      */
-    protected function _getRandomByDiId($diId = 0, $second = 3600) {
+    protected function _GETRandomByDiId($diId = 0, $second = 3600) {
 
         $timestamp = time();
         // 通过站点ID、以及时间来生成一个随机数种子

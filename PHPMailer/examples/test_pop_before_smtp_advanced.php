@@ -24,7 +24,7 @@ try {
   $mail->AddReplyTo('name@yourdomain.com', 'First Last');
   $mail->Subject = 'PHPMailer Test Subject via mail(), advanced';
   $mail->AltBody = 'To view the message, please use an HTML compatible email viewer!'; // optional - MsgHTML will create an alternate automatically
-  $mail->MsgHTML(file_get_contents('contents.html'));
+  $mail->MsgHTML(file_GET_contents('contents.html'));
   $mail->AddAttachment('images/phpmailer.gif');      // attachment
   $mail->AddAttachment('images/phpmailer_mini.gif'); // attachment
   $mail->Send();

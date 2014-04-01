@@ -30,7 +30,7 @@ class Smarty_Internal_Compile_Eval extends Smarty_Internal_CompileBase {
         $this->required_attributes = array('var');
         $this->optional_attributes = array('assign'); 
         // check and get attributes
-        $_attr = $this->_get_attributes($args); 
+        $_attr = $this->_GET_attributes($args);
         if (isset($_attr['assign'])) {
               // output will be stored in a smarty variable instead of beind displayed
             $_assign = $_attr['assign'];

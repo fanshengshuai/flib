@@ -1,7 +1,7 @@
 <?php
 if (! function_exists ( 'redirect' )) {
 	function redirect($url, $target = '') {
-		global $_G;
+		global $_F;
 
         if ($target == 301) {
             header('HTTP/1.1 301 Moved Permanently'); // 301头部
@@ -13,7 +13,7 @@ if (! function_exists ( 'redirect' )) {
 			$url = $_SERVER ['HTTP_REFERER'];
 		}
 
-		if ($_G ['in_ajax']) {
+		if ($_F ['in_ajax']) {
 			$c = new Controller ();
 			$c->ajaxRedirect ( $url );
 		} else {

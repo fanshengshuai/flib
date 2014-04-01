@@ -1,52 +1,52 @@
 <?php
 /**
- * CURL HTTPÇëÇó¹¤¾ß£¬
- * Ö§³ÖÒÔÏÂ¹¦ÄÜ£º
- * 1£ºÖ§³ÖsslÁ¬½ÓºÍproxy´úÀíÁ¬½Ó
- * 2: ¶ÔcookieµÄ×Ô¶¯Ö§³Ö
- * 3: ¼òµ¥µÄGET/POST³£¹æ²Ù×÷
- * 4: Ö§³Öµ¥¸öÎÄ¼þÉÏ´«»òÍ¬×Ö¶ÎµÄ¶àÎÄ¼þÉÏ´«,Ö§³ÖÏà¶ÔÂ·¾¶»ò¾ø¶ÔÂ·¾¶.
- * 5: Ö§³Ö·µ»Ø·¢ËÍÇëÇóÇ°ºÍÇëÇóºóËùÓÐµÄ·þÎñÆ÷ÐÅÏ¢ºÍ·þÎñÆ÷HeaderÐÅÏ¢
- * 6: ×Ô¶¯Ö§³Ölighttpd·þÎñÆ÷
- * 7: Ö§³Ö×Ô¶¯ÉèÖÃ REFERER ÒýÓÃÒ³
- * 8: ×Ô¶¯Ö§³Ö·þÎñÆ÷301Ìø×ª»òÖØÐ´ÎÊÌâ(Ð»Ð»Ö£GG)
- * 9: ÆäËü¿ÉÑ¡Ïî,Èç×Ô¶¨Òå¶Ë¿Ú£¬³¬Ê±Ê±¼ä£¬USERAGENT£¬GzipÑ¹ËõµÈ.
+ * CURL HTTPï¿½ï¿½ï¿½ó¹¤¾ß£ï¿½
+ * Ö§ï¿½ï¿½ï¿½ï¿½ï¿½Â¹ï¿½ï¿½Ü£ï¿½
+ * 1ï¿½ï¿½Ö§ï¿½ï¿½sslï¿½ï¿½ï¿½Óºï¿½proxyï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ * 2: ï¿½ï¿½cookieï¿½ï¿½ï¿½Ô¶ï¿½Ö§ï¿½ï¿½
+ * 3: ï¿½òµ¥µï¿½GET/POSTï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ * 4: Ö§ï¿½Öµï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ï´ï¿½ï¿½ï¿½Í¬ï¿½Ö¶ÎµÄ¶ï¿½ï¿½Ä¼ï¿½ï¿½Ï´ï¿½,Ö§ï¿½ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½.
+ * 5: Ö§ï¿½Ö·ï¿½ï¿½Ø·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÐµÄ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½Í·ï¿½ï¿½ï¿½ï¿½ï¿½Headerï¿½ï¿½Ï¢
+ * 6: ï¿½Ô¶ï¿½Ö§ï¿½ï¿½lighttpdï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ * 7: Ö§ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ REFERER ï¿½ï¿½ï¿½ï¿½Ò³
+ * 8: ï¿½Ô¶ï¿½Ö§ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½301ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½(Ð»Ð»Ö£GG)
+ * 9: ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½,ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½Ë¿Ú£ï¿½ï¿½ï¿½Ê±Ê±ï¿½ä£¬USERAGENTï¿½ï¿½GzipÑ¹ï¿½ï¿½ï¿½ï¿½.
  */
 class HTTP_CURL {
 
-    //CURL¾ä±ú
+    //CURLï¿½ï¿½ï¿½
     private $ch = null;
-    //CURLÖ´ÐÐÇ°ºóËùÉèÖÃ»ò·þÎñÆ÷¶Ë·µ»ØµÄÐÅÏ¢
+    //CURLÖ´ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë·ï¿½ï¿½Øµï¿½ï¿½ï¿½Ï¢
     private $info = array();
-    //CURL SETOPT ÐÅÏ¢
+    //CURL SETOPT ï¿½ï¿½Ï¢
     private $setopt = array(
-                            //·ÃÎÊµÄ¶Ë¿Ú,httpÄ¬ÈÏÊÇ 80
+                            //ï¿½ï¿½ï¿½ÊµÄ¶Ë¿ï¿½,httpÄ¬ï¿½ï¿½ï¿½ï¿½ 80
                             'port'=>80,
-                            //¿Í»§¶Ë USERAGENT,Èç:"Mozilla/4.0",Îª¿ÕÔòÊ¹ÓÃÓÃ»§µÄä¯ÀÀÆ÷
+                            //ï¿½Í»ï¿½ï¿½ï¿½ USERAGENT,ï¿½ï¿½:"Mozilla/4.0",Îªï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                             'userAgent'=>'',
-                            //Á¬½Ó³¬Ê±Ê±¼ä
+                            //ï¿½ï¿½ï¿½Ó³ï¿½Ê±Ê±ï¿½ï¿½
                             'timeOut'=>30,
-                            //ÊÇ·ñÊ¹ÓÃ COOKIE ½¨Òé´ò¿ª£¬ÒòÎªÒ»°ãÍøÕ¾¶¼»áÓÃµ½
+                            //ï¿½Ç·ï¿½Ê¹ï¿½ï¿½ COOKIE ï¿½ï¿½ï¿½ï¿½ò¿ª£ï¿½ï¿½ï¿½ÎªÒ»ï¿½ï¿½ï¿½ï¿½Õ¾ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½
                             'useCookie'=>true,
-                            //ÊÇ·ñÖ§³ÖSSL
+                            //ï¿½Ç·ï¿½Ö§ï¿½ï¿½SSL
                             'ssl'=>false,
-                            //¿Í»§¶ËÊÇ·ñÖ§³Ö gzipÑ¹Ëõ
+                            //ï¿½Í»ï¿½ï¿½ï¿½ï¿½Ç·ï¿½Ö§ï¿½ï¿½ gzipÑ¹ï¿½ï¿½
                             'gzip'=>true,
 
-                            //ÊÇ·ñÊ¹ÓÃ´úÀí
+                            //ï¿½Ç·ï¿½Ê¹ï¿½Ã´ï¿½ï¿½ï¿½
                             'proxy'=>false,
-                            //´úÀíÀàÐÍ,¿ÉÑ¡Ôñ HTTP »ò SOCKS5
+                            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½Ñ¡ï¿½ï¿½ HTTP ï¿½ï¿½ SOCKS5
                             'proxyType'=>'HTTP',
-                            //´úÀíµÄÖ÷»úµØÖ·,Èç¹ûÊÇ HTTP ·½Ê½ÔòÒªÐ´³ÉURLÐÎÊ½Èç:"http://www.proxy.com"
-                            //SOCKS5 ·½Ê½ÔòÖ±½ÓÐ´Ö÷»úÓòÃûÎªIPµÄÐÎÊ½£¬Èç:"192.168.1.1"
+                            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·,ï¿½ï¿½ï¿½ï¿½ï¿½ HTTP ï¿½ï¿½Ê½ï¿½ï¿½ÒªÐ´ï¿½ï¿½URLï¿½ï¿½Ê½ï¿½ï¿½:"http://www.proxy.com"
+                            //SOCKS5 ï¿½ï¿½Ê½ï¿½ï¿½Ö±ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªIPï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½:"192.168.1.1"
                             'proxyHost'=>'http://www.proxy.com',
-                            //´úÀíÖ÷»úµÄ¶Ë¿Ú
+                            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¶Ë¿ï¿½
                             'proxyPort'=>1234,
-                            //´úÀíÊÇ·ñÒªÉí·ÝÈÏÖ¤(HTTP·½Ê½Ê±)
+                            //ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½Ö¤(HTTPï¿½ï¿½Ê½Ê±)
                             'proxyAuth'=>false,
-                            //ÈÏÖ¤µÄ·½Ê½.¿ÉÑ¡Ôñ BASIC »ò NTLM ·½Ê½
+                            //ï¿½ï¿½Ö¤ï¿½Ä·ï¿½Ê½.ï¿½ï¿½Ñ¡ï¿½ï¿½ BASIC ï¿½ï¿½ NTLM ï¿½ï¿½Ê½
                             'proxyAuthType'=>'BASIC',
-                            //ÈÏÖ¤µÄÓÃ»§ÃûºÍÃÜÂë
+                            //ï¿½ï¿½Ö¤ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                             'proxyAuthUser'=>'user',
                             'proxyAuthPwd'=>'password',
                             );
@@ -60,28 +60,28 @@ class HTTP_CURL {
                        );
 
     /**
-     * ¹¹Ôìº¯Êý
+     * ï¿½ï¿½ï¿½ìº¯ï¿½ï¿½
      *
-     * @param array $setopt :Çë²Î¿¼ private $setopt À´ÉèÖÃ
+     * @param array $setopt :ï¿½ï¿½Î¿ï¿½ private $setopt ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
      */
     public function __construct($setopt=array()) {
 
 
-        //ºÏ²¢ÓÃ»§µÄÉèÖÃºÍÏµÍ³µÄÄ¬ÈÏÉèÖÃ
+        //ï¿½Ï²ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãºï¿½ÏµÍ³ï¿½ï¿½Ä¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         $this->setopt = array_merge($this->setopt,$setopt);
-        //Èç¹ûÃ»ÓÐ°²×°CURLÔòÖÕÖ¹³ÌÐò
+        //ï¿½ï¿½ï¿½Ã»ï¿½Ð°ï¿½×°CURLï¿½ï¿½ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½
         function_exists('curl_init') || die('CURL Library Not Loaded');
-        //³õÊ¼»¯
+        //ï¿½ï¿½Ê¼ï¿½ï¿½
         $this->ch = curl_init();
-        //ÉèÖÃCURLÁ¬½ÓµÄ¶Ë¿Ú
+        //ï¿½ï¿½ï¿½ï¿½CURLï¿½ï¿½ï¿½ÓµÄ¶Ë¿ï¿½
         //curl_setopt($this->ch, CURLOPT_PORT, $this->setopt['port']);
-        //Ê¹ÓÃ´úÀí
+        //Ê¹ï¿½Ã´ï¿½ï¿½ï¿½
         if($this->setopt['proxy']){
             $proxyType = $this->setopt['proxyType']=='HTTP' ? CURLPROXY_HTTP : CURLPROXY_SOCKS5;
             curl_setopt($this->ch, CURLOPT_PROXYTYPE, $proxyType);
             curl_setopt($this->ch, CURLOPT_PROXY, $this->setopt['proxyHost']);
             curl_setopt($this->ch, CURLOPT_PROXYPORT, $this->setopt['proxyPort']);
-            //´úÀíÒªÈÏÖ¤
+            //ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½Ö¤
             if($this->setopt['proxyAuth']){
                 $proxyAuthType = $this->setopt['proxyAuthType']=='BASIC' ? CURLAUTH_BASIC : CURLAUTH_NTLM;
                 curl_setopt($this->ch, CURLOPT_PROXYAUTH, $proxyAuthType);
@@ -89,22 +89,22 @@ class HTTP_CURL {
                 curl_setopt($this->ch, CURLOPT_PROXYUSERPWD, $user);
             }
         }
-        //ÆôÓÃÊ±»á½«·þÎñÆ÷·þÎñÆ÷·µ»ØµÄ¡°Location:¡±·ÅÔÚheaderÖÐµÝ¹éµÄ·µ»Ø¸ø·þÎñÆ÷
+        //ï¿½ï¿½ï¿½ï¿½Ê±ï¿½á½«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ØµÄ¡ï¿½Location:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½headerï¿½ÐµÝ¹ï¿½Ä·ï¿½ï¿½Ø¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
-        //´ò¿ªµÄÖ§³ÖSSL
+        //ï¿½ò¿ªµï¿½Ö§ï¿½ï¿½SSL
         if($this->setopt['ssl']){
             //curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, 1);
             //curl_setopt($this->ch, CURLOPT_RETURNTRANSFER,1); // return into a variable 
-            //²»¶ÔÈÏÖ¤Ö¤ÊéÀ´Ô´µÄ¼ì²é
+            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¤Ö¤ï¿½ï¿½ï¿½ï¿½Ô´ï¿½Ä¼ï¿½ï¿½
             curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, false);
-            //´ÓÖ¤ÊéÖÐ¼ì²éSSL¼ÓÃÜËã·¨ÊÇ·ñ´æÔÚ
+            //ï¿½ï¿½Ö¤ï¿½ï¿½ï¿½Ð¼ï¿½ï¿½SSLï¿½ï¿½ï¿½ï¿½ï¿½ã·¨ï¿½Ç·ï¿½ï¿½ï¿½ï¿½
             curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, true);
         }
 
-        //ÉèÖÃhttpÍ·,Ö§³Ölighttpd·þÎñÆ÷µÄ·ÃÎÊ
+        //ï¿½ï¿½ï¿½ï¿½httpÍ·,Ö§ï¿½ï¿½lighttpdï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä·ï¿½ï¿½ï¿½
         $header[]= 'Expect:';
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $header);
-        //ÉèÖÃ HTTP USERAGENT
+        //ï¿½ï¿½ï¿½ï¿½ HTTP USERAGENT
         $userAgents = array(
                             'chrome' => 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/14.0.835.202 Safari/535.1',
                             'firefox' => 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:7.0.1) Gecko/20100101 Firefox/7.0.1',
@@ -115,25 +115,25 @@ class HTTP_CURL {
             $userAgent = $userAgents[array_rand($userAgents)];
         }
         curl_setopt($this->ch, CURLOPT_USERAGENT, $userAgent);
-        //ÉèÖÃÁ¬½ÓµÈ´ýÊ±¼ä,0²»µÈ´ý
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÓµÈ´ï¿½Ê±ï¿½ï¿½,0ï¿½ï¿½ï¿½È´ï¿½
         curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, $this->setopt['timeOut']);
-        //ÉèÖÃcurlÔÊÐíÖ´ÐÐµÄ×î³¤ÃëÊý
+        //ï¿½ï¿½ï¿½ï¿½curlï¿½ï¿½ï¿½ï¿½Ö´ï¿½Ðµï¿½ï¿½î³¤ï¿½ï¿½ï¿½ï¿½
         curl_setopt($this->ch, CURLOPT_TIMEOUT, $this->setopt['timeOut']);
-        //ÉèÖÃ¿Í»§¶ËÊÇ·ñÖ§³Ö gzipÑ¹Ëõ
+        //ï¿½ï¿½ï¿½Ã¿Í»ï¿½ï¿½ï¿½ï¿½Ç·ï¿½Ö§ï¿½ï¿½ gzipÑ¹ï¿½ï¿½
         if($this->setopt['gzip']){
             curl_setopt($this->ch, CURLOPT_ENCODING, 'gzip');
         }
-        //ÊÇ·ñÊ¹ÓÃµ½COOKIE
+        //ï¿½Ç·ï¿½Ê¹ï¿½Ãµï¿½COOKIE
         if($this->setopt['useCookie']){
-            //Éú³É´æ·ÅÁÙÊ±COOKIEµÄÎÄ¼þ(Òª¾ø¶ÔÂ·¾¶)
-            $cookfile = tempnam(sys_get_temp_dir(),'cuk');
-            //Á¬½Ó¹Ø±ÕÒÔºó£¬´æ·ÅcookieÐÅÏ¢
+            //ï¿½ï¿½É´ï¿½ï¿½ï¿½ï¿½Ê±COOKIEï¿½ï¿½ï¿½Ä¼ï¿½(Òªï¿½ï¿½ï¿½Â·ï¿½ï¿½)
+            $cookfile = tempnam(sys_GET_temp_dir(),'cuk');
+            //ï¿½ï¿½ï¿½Ó¹Ø±ï¿½ï¿½Ôºó£¬´ï¿½ï¿½cookieï¿½ï¿½Ï¢
             curl_setopt($this->ch, CURLOPT_COOKIEJAR, $cookfile);
             curl_setopt($this->ch, CURLOPT_COOKIEFILE, $cookfile);
         }
-        //ÊÇ·ñ½«Í·ÎÄ¼þµÄÐÅÏ¢×÷ÎªÊý¾ÝÁ÷Êä³ö(HEADERÐÅÏ¢),ÕâÀï±£Áô±¨ÎÄ
+        //ï¿½Ç·ï¿½Í·ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(HEADERï¿½ï¿½Ï¢),ï¿½ï¿½ï¿½ï±£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         curl_setopt($this->ch, CURLOPT_HEADER, true);
-        //»ñÈ¡µÄÐÅÏ¢ÒÔÎÄ¼þÁ÷µÄÐÎÊ½·µ»Ø£¬¶ø²»ÊÇÖ±½ÓÊä³ö¡£
+        //ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½Ø£ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true) ;
         curl_setopt($this->ch, CURLOPT_BINARYTRANSFER, true) ;
     }
@@ -156,12 +156,12 @@ class HTTP_CURL {
 
 
     /**
-     * ÒÔ GET ·½Ê½Ö´ÐÐÇëÇó
+     * ï¿½ï¿½ GET ï¿½ï¿½Ê½Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
      *
-     * @param string $url :ÇëÇóµÄURL
-     * @param array $params £ºÇëÇóµÄ²ÎÊý,¸ñÊ½Èç: array('id'=>10,'name'=>'yuanwei')
-     * @param array $referer :ÒýÓÃÒ³Ãæ,Îª¿ÕÊ±×Ô¶¯ÉèÖÃ,Èç¹û·þÎñÆ÷ÓÐ¶ÔÕâ¸ö¿ØÖÆµÄ»°ÔòÒ»¶¨ÒªÉèÖÃµÄ.
-     * @return ´íÎó·µ»Ø:false ÕýÈ··µ»Ø:½á¹ûÄÚÈÝ
+     * @param string $url :ï¿½ï¿½ï¿½ï¿½ï¿½URL
+     * @param array $params ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½,ï¿½ï¿½Ê½ï¿½ï¿½: array('id'=>10,'name'=>'yuanwei')
+     * @param array $referer :ï¿½ï¿½ï¿½ï¿½Ò³ï¿½ï¿½,Îªï¿½ï¿½Ê±ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÆµÄ»ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Òªï¿½ï¿½ï¿½Ãµï¿½.
+     * @return ï¿½ï¿½ï¿½ó·µ»ï¿½:false ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
      */
     public function get($url, $host = '', $params=array(), $referer='') {
 
@@ -173,15 +173,15 @@ class HTTP_CURL {
     }
 
     /**
-     * ÒÔ POST ·½Ê½Ö´ÐÐÇëÇó
+     * ï¿½ï¿½ POST ï¿½ï¿½Ê½Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
      *
-     * @param string $url :ÇëÇóµÄURL
-     * @param array $params £ºÇëÇóµÄ²ÎÊý,¸ñÊ½Èç: array('id'=>10,'name'=>'yuanwei')
-     * @param array $uploadFile :ÉÏ´«µÄÎÄ¼þ,Ö§³ÖÏà¶ÔÂ·¾¶,¸ñÊ½ÈçÏÂ
-     * µ¥¸öÎÄ¼þÉÏ´«:array('img1'=>'./file/a.jpg')
-     * Í¬×Ö¶Î¶à¸öÎÄ¼þÉÏ´«:array('img'=>array('./file/a.jpg','./file/b.jpg'))
-     * @param array $referer :ÒýÓÃÒ³Ãæ,ÒýÓÃÒ³Ãæ,Îª¿ÕÊ±×Ô¶¯ÉèÖÃ,Èç¹û·þÎñÆ÷ÓÐ¶ÔÕâ¸ö¿ØÖÆµÄ»°ÔòÒ»¶¨ÒªÉèÖÃµÄ.
-     * @return ´íÎó·µ»Ø:false ÕýÈ··µ»Ø:½á¹ûÄÚÈÝ
+     * @param string $url :ï¿½ï¿½ï¿½ï¿½ï¿½URL
+     * @param array $params ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½,ï¿½ï¿½Ê½ï¿½ï¿½: array('id'=>10,'name'=>'yuanwei')
+     * @param array $uploadFile :ï¿½Ï´ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½,Ö§ï¿½ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½,ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½
+     * ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ï´ï¿½:array('img1'=>'./file/a.jpg')
+     * Í¬ï¿½Ö¶Î¶ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ï´ï¿½:array('img'=>array('./file/a.jpg','./file/b.jpg'))
+     * @param array $referer :ï¿½ï¿½ï¿½ï¿½Ò³ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½Ò³ï¿½ï¿½,Îªï¿½ï¿½Ê±ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÆµÄ»ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Òªï¿½ï¿½ï¿½Ãµï¿½.
+     * @return ï¿½ï¿½ï¿½ó·µ»ï¿½:false ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
      */
     public function post($url,$params=array(),$uploadFile=array(), $referer='')
     {
@@ -190,7 +190,7 @@ class HTTP_CURL {
 
 
     /**
-     * µÃµ½´íÎóÐÅÏ¢
+     * ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
      *
      * @return string
      */
@@ -200,7 +200,7 @@ class HTTP_CURL {
     }
 
     /**
-     * µÃµ½´íÎó´úÂë
+     * ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
      *
      * @return int
      */
@@ -210,10 +210,10 @@ class HTTP_CURL {
     }
 
     /**
-     * µÃµ½·¢ËÍÇëÇóÇ°ºÍÇëÇóºóËùÓÐµÄ·þÎñÆ÷ÐÅÏ¢ºÍ·þÎñÆ÷HeaderÐÅÏ¢,ÆäÖÐ
-     * [before] £ºÇëÇóÇ°ËùÉèÖÃµÄÐÅÏ¢
-     * [after] :ÇëÇóºóËùÓÐµÄ·þÎñÆ÷ÐÅÏ¢
-     * [header] :·þÎñÆ÷Header±¨ÎÄÐÅÏ¢
+     * ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÐµÄ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½Í·ï¿½ï¿½ï¿½ï¿½ï¿½Headerï¿½ï¿½Ï¢,ï¿½ï¿½ï¿½ï¿½
+     * [before] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½Ï¢
+     * [after] :ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÐµÄ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
+     * [header] :ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Headerï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
      *
      * @return array
      */
@@ -224,36 +224,36 @@ class HTTP_CURL {
 
 
     /**
-     * Îö¹¹º¯Êý
+     * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
      *
      */
     public function __destruct() {
 
-        //¹Ø±ÕCURL
+        //ï¿½Ø±ï¿½CURL
         curl_close($this->ch);
     }
 
     /**
-     * Ë½ÓÐ·½·¨:Ö´ÐÐ×îÖÕÇëÇó
+     * Ë½ï¿½Ð·ï¿½ï¿½ï¿½:Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
      *
-     * @param string $method :HTTPÇëÇó·½Ê½
-     * @param string $url :ÇëÇóµÄURL
-     * @param array $params £ºÇëÇóµÄ²ÎÊý
-     * @param array $uploadFile :ÉÏ´«µÄÎÄ¼þ(Ö»ÓÐPOSTÊ±²ÅÉúÐ§)
-     * @param array $referer :ÒýÓÃÒ³Ãæ
-     * @return ´íÎó·µ»Ø:false ÕýÈ··µ»Ø:½á¹ûÄÚÈÝ
+     * @param string $method :HTTPï¿½ï¿½ï¿½ï¿½Ê½
+     * @param string $url :ï¿½ï¿½ï¿½ï¿½ï¿½URL
+     * @param array $params ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½
+     * @param array $uploadFile :ï¿½Ï´ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½(Ö»ï¿½ï¿½POSTÊ±ï¿½ï¿½ï¿½ï¿½Ð§)
+     * @param array $referer :ï¿½ï¿½ï¿½ï¿½Ò³ï¿½ï¿½
+     * @return ï¿½ï¿½ï¿½ó·µ»ï¿½:false ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
      */
     private function _request($method, $url, $params=array(), $uploadFile=array(), $referer='')
     {
-        //Èç¹ûÊÇÒÔGET·½Ê½ÇëÇóÔòÒªÁ¬½Óµ½URLºóÃæ
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½GETï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Óµï¿½URLï¿½ï¿½ï¿½ï¿½
         if($method == 'GET'){
             $url = $this->_parseUrl($url,$params);
         }
-        //ÉèÖÃÇëÇóµÄURL
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½URL
         curl_setopt($this->ch, CURLOPT_URL, $url);
 
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $this->header);
-        //ÉèÖÃÁËÒýÓÃÒ³,·ñÔò×Ô¶¯ÉèÖÃ
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò³,ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½
         if($referer){
             curl_setopt($this->ch, CURLOPT_REFERER, $referer);
         }else{
@@ -265,19 +265,19 @@ class HTTP_CURL {
         $cookieJar = "/tmp/cookie_{$urlInfo['host']}";
         curl_setopt($this->ch, CURLOPT_COOKIEJAR, $cookieJar);
 
-        //Èç¹ûÊÇPOST
+        //ï¿½ï¿½ï¿½ï¿½ï¿½POST
         if($method == 'POST'){
-            //·¢ËÍÒ»¸ö³£¹æµÄPOSTÇëÇó£¬ÀàÐÍÎª£ºapplication/x-www-form-urlencoded
+            //ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½POSTï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½application/x-www-form-urlencoded
             curl_setopt($this->ch, CURLOPT_POST, true) ;
-            //ÉèÖÃPOST×Ö¶ÎÖµ
+            //ï¿½ï¿½ï¿½ï¿½POSTï¿½Ö¶ï¿½Öµ
             $postData = $this->_parsmEncode($params,false);
-            //Èç¹ûÓÐÉÏ´«ÎÄ¼þ
+            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ï¿½Ä¼ï¿½
             if($uploadFile){
                 foreach($uploadFile as $key=>$file){
                     if(is_array($file)){
                         $n = 0;
                         foreach($file as $f){
-                            //ÎÄ¼þ±ØÐèÊÇ¾ø¶ÔÂ·¾¶
+                            //ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½Â·ï¿½ï¿½
                             $postData[$key.'['.$n++.']'] = '@'.realpath($f);
                         }
                     }else{
@@ -289,18 +289,18 @@ class HTTP_CURL {
             curl_setopt($this->ch, CURLOPT_POSTFIELDS, $postData);
         }
 
-        //µÃµ½ËùÓÐÉèÖÃµÄÐÅÏ¢
-        $this->info['before'] = curl_getinfo($this->ch);
-        //¿ªÊ¼Ö´ÐÐÇëÇó
+        //ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½Ï¢
+        $this->info['before'] = curl_GETinfo($this->ch);
+        //ï¿½ï¿½Ê¼Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         $result = curl_exec($this->ch);
-        //µÃµ½±¨ÎÄÍ·
-        $headerSize = curl_getinfo($this->ch, CURLINFO_HEADER_SIZE);
+        //ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½Í·
+        $headerSize = curl_GETinfo($this->ch, CURLINFO_HEADER_SIZE);
         $this->info['header'] = substr($result, 0, $headerSize);
-        //È¥µô±¨ÎÄÍ·
+        //È¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í·
         $result = substr($result, $headerSize);
-        //µÃµ½ËùÓÐ°üÀ¨·þÎñÆ÷·µ»ØµÄÐÅÏ¢
-        $this->info['after'] = curl_getinfo($this->ch);
-        //Èç¹ûÇëÇó³É¹¦
+        //ï¿½Ãµï¿½ï¿½ï¿½ï¿½Ð°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½Ï¢
+        $this->info['after'] = curl_GETinfo($this->ch);
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¹ï¿½
         if($this->getErrCode() == 0){ //&& $this->info['after']['http_code'] == 200
             return $result;
         } else {
@@ -310,10 +310,10 @@ class HTTP_CURL {
     }
 
     /**
-     * ·µ»Ø½âÎöºóµÄURL£¬GET·½Ê½Ê±»áÓÃµ½
+     * ï¿½ï¿½ï¿½Ø½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½URLï¿½ï¿½GETï¿½ï¿½Ê½Ê±ï¿½ï¿½ï¿½Ãµï¿½
      *
      * @param string $url :URL
-     * @param array $params :¼ÓÔÚURLºóµÄ²ÎÊý
+     * @param array $params :ï¿½ï¿½ï¿½ï¿½URLï¿½ï¿½Ä²ï¿½ï¿½ï¿½
      * @return string
      */
     private function _parseUrl($url,$params)
@@ -327,10 +327,10 @@ class HTTP_CURL {
     }
 
     /**
-     * ¶Ô²ÎÊý½øÐÐENCODE±àÂë
+     * ï¿½Ô²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ENCODEï¿½ï¿½ï¿½ï¿½
      *
-     * @param array $params :²ÎÊý
-     * @param bool $isRetStr : true£ºÒÔ×Ö·û´®·µ»Ø false:ÒÔÊý×é·µ»Ø
+     * @param array $params :ï¿½ï¿½ï¿½ï¿½
+     * @param bool $isRetStr : trueï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ false:ï¿½ï¿½ï¿½ï¿½ï¿½é·µï¿½ï¿½
      * @return string || array
      */
     private function _parsmEncode($params,$isRetStr=true)

@@ -84,10 +84,10 @@ class Smarty_Internal_Configfilelexer
         if ($this->counter >= strlen($this->data)) {
             return false; // end of input
         }
-        $yy_global_pattern = "/^(#)|^(\\[)|^(\\])|^(=)|^([ \t\r]+)|^(\n)|^([0-9]*[a-zA-Z_]\\w*)/iS";
+        $yy_Flobal_pattern = "/^(#)|^(\\[)|^(\\])|^(=)|^([ \t\r]+)|^(\n)|^([0-9]*[a-zA-Z_]\\w*)/iS";
 
         do {
-            if (preg_match($yy_global_pattern, substr($this->data, $this->counter), $yymatches)) {
+            if (preg_match($yy_Flobal_pattern, substr($this->data, $this->counter), $yymatches)) {
                 $yysubmatches = $yymatches;
                 $yymatches = array_filter($yymatches, 'strlen'); // remove empty sub-patterns
                 if (!count($yymatches)) {
@@ -191,10 +191,10 @@ class Smarty_Internal_Configfilelexer
         if ($this->counter >= strlen($this->data)) {
             return false; // end of input
         }
-        $yy_global_pattern = "/^([ \t\r]+)|^(\\d+\\.\\d+(?=[ \t\r]*[\n#]))|^(\\d+(?=[ \t\r]*[\n#]))|^('[^'\\\\]*(?:\\\\.[^'\\\\]*)*'(?=[ \t\r]*[\n#]))|^(\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"(?=[ \t\r]*[\n#]))|^(\"\"\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"\"\"(?=[ \t\r]*[\n#]))|^([a-zA-Z]+(?=[ \t\r]*[\n#]))|^([^\n]+?(?=[ \t\r]*\n))|^(\n)/iS";
+        $yy_Flobal_pattern = "/^([ \t\r]+)|^(\\d+\\.\\d+(?=[ \t\r]*[\n#]))|^(\\d+(?=[ \t\r]*[\n#]))|^('[^'\\\\]*(?:\\\\.[^'\\\\]*)*'(?=[ \t\r]*[\n#]))|^(\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"(?=[ \t\r]*[\n#]))|^(\"\"\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"\"\"(?=[ \t\r]*[\n#]))|^([a-zA-Z]+(?=[ \t\r]*[\n#]))|^([^\n]+?(?=[ \t\r]*\n))|^(\n)/iS";
 
         do {
-            if (preg_match($yy_global_pattern, substr($this->data, $this->counter), $yymatches)) {
+            if (preg_match($yy_Flobal_pattern, substr($this->data, $this->counter), $yymatches)) {
                 $yysubmatches = $yymatches;
                 $yymatches = array_filter($yymatches, 'strlen'); // remove empty sub-patterns
                 if (!count($yymatches)) {
@@ -312,10 +312,10 @@ class Smarty_Internal_Configfilelexer
         if ($this->counter >= strlen($this->data)) {
             return false; // end of input
         }
-        $yy_global_pattern = "/^([^\n]+?(?=[ \t\r]*\n))/iS";
+        $yy_Flobal_pattern = "/^([^\n]+?(?=[ \t\r]*\n))/iS";
 
         do {
-            if (preg_match($yy_global_pattern, substr($this->data, $this->counter), $yymatches)) {
+            if (preg_match($yy_Flobal_pattern, substr($this->data, $this->counter), $yymatches)) {
                 $yysubmatches = $yymatches;
                 $yymatches = array_filter($yymatches, 'strlen'); // remove empty sub-patterns
                 if (!count($yymatches)) {
@@ -381,10 +381,10 @@ class Smarty_Internal_Configfilelexer
         if ($this->counter >= strlen($this->data)) {
             return false; // end of input
         }
-        $yy_global_pattern = "/^([ \t\r]+)|^([^\n]+?(?=[ \t\r]*\n))|^(\n)/iS";
+        $yy_Flobal_pattern = "/^([ \t\r]+)|^([^\n]+?(?=[ \t\r]*\n))|^(\n)/iS";
 
         do {
-            if (preg_match($yy_global_pattern, substr($this->data, $this->counter), $yymatches)) {
+            if (preg_match($yy_Flobal_pattern, substr($this->data, $this->counter), $yymatches)) {
                 $yysubmatches = $yymatches;
                 $yymatches = array_filter($yymatches, 'strlen'); // remove empty sub-patterns
                 if (!count($yymatches)) {
@@ -459,10 +459,10 @@ class Smarty_Internal_Configfilelexer
         if ($this->counter >= strlen($this->data)) {
             return false; // end of input
         }
-        $yy_global_pattern = "/^(\\.)|^(.*?(?=[\.=[\]\r\n]))/iS";
+        $yy_Flobal_pattern = "/^(\\.)|^(.*?(?=[\.=[\]\r\n]))/iS";
 
         do {
-            if (preg_match($yy_global_pattern, substr($this->data, $this->counter), $yymatches)) {
+            if (preg_match($yy_Flobal_pattern, substr($this->data, $this->counter), $yymatches)) {
                 $yysubmatches = $yymatches;
                 $yymatches = array_filter($yymatches, 'strlen'); // remove empty sub-patterns
                 if (!count($yymatches)) {

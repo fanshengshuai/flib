@@ -156,8 +156,8 @@ function tln_findnxreg($body, $offset, $reg){
  *				   - integer where the tag ends (ending ">")
  *				   first three members will be false, if the tag is invalid.
  */
-function tln_getnxtag($body, $offset){
-	$me = 'tln_getnxtag';
+function tln_GETnxtag($body, $offset){
+	$me = 'tln_GETnxtag';
 	if ($offset > strlen($body)){
 		return false;
 	}
@@ -621,7 +621,7 @@ function tln_sanitize($body,
 	 * &{alert('boo')};
 	 */
 	$body = preg_replace('/&(\{.*?\};)/si', '&amp;\\1', $body);
-	while (($curtag = tln_getnxtag($body, $curpos)) != FALSE){
+	while (($curtag = tln_GETnxtag($body, $curpos)) != FALSE){
 		list($tagname, $attary, $tagtype, $lt, $gt) = $curtag;
 		$free_content = substr($body, $curpos, $lt - $curpos);
 		if ($skip_content == false){

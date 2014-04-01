@@ -28,7 +28,7 @@ class Smarty_Internal_Compile_Capture extends Smarty_Internal_CompileBase {
     {
         $this->compiler = $compiler;
         // check and get attributes
-        $_attr = $this->_get_attributes($args);
+        $_attr = $this->_GET_attributes($args);
 
         $buffer = isset($_attr['name']) ? $_attr['name'] : "'default'";
         $assign = isset($_attr['assign']) ? $_attr['assign'] : null;
@@ -58,7 +58,7 @@ class Smarty_Internal_Compile_CaptureClose extends Smarty_Internal_CompileBase {
     {
         $this->compiler = $compiler; 
         // check and get attributes
-        $_attr = $this->_get_attributes($args);
+        $_attr = $this->_GET_attributes($args);
         // must endblock be nocache?
         if ($this->compiler->nocache) {
             $this->compiler->tag_nocache = true;
@@ -68,12 +68,12 @@ class Smarty_Internal_Compile_CaptureClose extends Smarty_Internal_CompileBase {
 
         $_output = "<?php ";
         if (isset($assign)) {
-            $_output .= " \$_smarty_tpl->assign($assign, ob_get_contents());";
+            $_output .= " \$_smarty_tpl->assign($assign, ob_GET_contents());";
         } 
         if (isset($append)) {
-            $_output .= " \$_smarty_tpl->append($append, ob_get_contents());";
+            $_output .= " \$_smarty_tpl->append($append, ob_GET_contents());";
         } 
-        $_output .= " Smarty::\$_smarty_vars['capture'][$buffer]=ob_get_clean();?>";
+        $_output .= " Smarty::\$_smarty_vars['capture'][$buffer]=ob_GET_clean();?>";
         return $_output;
     } 
 } 

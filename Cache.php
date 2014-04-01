@@ -12,14 +12,14 @@
 class Cache {
     public static function set($cache_key, $cache_content, $cache_time = 7200, $force = false) {
 
-        global $_G;
+        global $_F;
 
-        $cache_key = $_G['domain'] . $cache_key;
+        $cache_key = $_F['domain'] . $cache_key;
 
         self::init();
 
-        if ($_G['memcache']) {
-            $_G['memcache']->set($cache_key, $cache_content, MEMCACHE_COMPRESSED, $cache_time );
+        if ($_F['memcache']) {
+            $_F['memcache']->set($cache_key, $cache_content, MEMCACHE_COMPRESSED, $cache_time );
 			return true;
 		}
 
@@ -32,18 +32,18 @@ class Cache {
     }
 
     public static function get($cache_key) {
-        global $_G;
+        global $_F;
 
-        $cache_key = $_G['domain'] . $cache_key;
+        $cache_key = $_F['domain'] . $cache_key;
 
         self::init();
 
-        if ($_G['memcache']) {
-            return $_G['memcache']->get($cache_key);
+        if ($_F['memcache']) {
+            return $_F['memcache']->get($cache_key);
         }
 
         $cache_file = Cache::getFileCachePath($cache_key);
-        $content = json_decode(file_get_contents($cache_file), true);
+        $content = json_decode(file_GET_contents($cache_file), true);
 
         if ($content &&
             (filemtime($cache_file) + intval($content['cache_time'])) > time()
@@ -78,12 +78,12 @@ class Cache {
     }
 
     public static function deleteAll() {
-        global $_G;
+        global $_F;
 
         self::init();
 
-        if ($_G['memcache']) {
-            return $_G['memcache']->flush();
+        if ($_F['memcache']) {
+            return $_F['memcache']->flush();
         }
 
         $cache_dir = APP_ROOT . "data/cache/";
@@ -101,11 +101,11 @@ class Cache {
     }
 
     public static function init() {
-        global $_G;
+        global $_F;
 
         if (Config::get('global.memcache.enable')) {
-	        $_G['memcache'] = new Memcache;
-	        $_G['memcache']->connect('127.0.0.1', 11211);
+	        $_F['memcache'] = new Memcache;
+	        $_F['memcache']->connect('127.0.0.1', 11211);
         }
     }
 }

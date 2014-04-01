@@ -46,13 +46,13 @@ SyntaxHighlighter.brushes.Php = function()
 					'closedir closelog copy cos cosh count count_chars date decbin dechex decoct '+
 					'deg2rad delete ebcdic2ascii echo empty end ereg ereg_replace eregi eregi_replace error_log '+
 					'error_reporting escapeshellarg escapeshellcmd eval exec exit exp explode extension_loaded '+
-					'feof fflush fgetc fgetcsv fgets fgetss file_exists file_get_contents file_put_contents '+
+					'feof fflush fgetc fgetcsv fgets fgetss file_exists file_GET_contents file_put_contents '+
 					'fileatime filectime filegroup fileinode filemtime fileowner fileperms filesize filetype '+
 					'floatval flock floor flush fmod fnmatch fopen fpassthru fprintf fputcsv fputs fread fscanf '+
 					'fseek fsockopen fstat ftell ftok getallheaders getcwd getdate getenv gethostbyaddr gethostbyname '+
 					'gethostbynamel getimagesize getlastmod getmxrr getmygid getmyinode getmypid getmyuid getopt '+
 					'getprotobyname getprotobynumber getrandmax getrusage getservbyname getservbyport gettext '+
-					'gettimeofday gettype glob gmdate gmmktime ini_alter ini_get ini_get_all ini_restore ini_set '+
+					'gettimeofday gettype glob gmdate gmmktime ini_alter ini_GET ini_GET_all ini_restore ini_set '+
 					'interface_exists intval ip2long is_a is_array is_bool is_callable is_dir is_double '+
 					'is_executable is_file is_finite is_float is_infinite is_int is_integer is_link is_long '+
 					'is_nan is_null is_numeric is_object is_readable is_real is_resource is_scalar is_soap_fault '+

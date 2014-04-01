@@ -31,7 +31,7 @@ class Smarty_Internal_Compile_Private_Registered_Function extends Smarty_Interna
         // This tag does create output
         $this->compiler->has_output = true;
         // check and get attributes
-        $_attr = $this->_get_attributes($args); 
+        $_attr = $this->_GET_attributes($args);
         if ($_attr['nocache']) {
             $this->compiler->tag_nocache = true;
         }

@@ -41,7 +41,7 @@ class Barcode {
             ImageString ($im, 5, 3, 10, "Code $code is not valid", $fg);
             ImageString ($im, 5, 3, 30, "12 digits?", $fg);
             ImagePng ($im);
-            break;
+//            break;
         }
 
 

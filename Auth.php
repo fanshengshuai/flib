@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * 作者: 范圣帅(fanshengshuai@gmail.com)
@@ -32,10 +31,9 @@ class Auth {
         return true;
     }
 
-
     public function checkAccount() {
 
-        global $_G;
+        global $_F;
 
         $auth_raw = $_COOKIE['auth'];
 
@@ -48,9 +46,9 @@ class Auth {
             if ($user) {
                 if (md5($user['username'] . '_' . $user['password']) == $auth_str) {
 
-                    $_G['uid'] = $uid;
-                    $_G['username'] = $user['username'];
-                    $_G['real_name'] = $user['real_name'];
+                    $_F['uid'] = $uid;
+                    $_F['username'] = $user['username'];
+                    $_F['real_name'] = $user['real_name'];
 
                     return true;
                 }
@@ -59,7 +57,6 @@ class Auth {
 
         return false;
     }
-
 
     public function checkLogin() {
     }

@@ -161,7 +161,7 @@ class Smarty_Internal_Configfileparser#line 79 "smarty_internal_configfileparser
         }
     }
 
-    private function add_global_vars(Array $vars) {
+    private function add_Flobal_vars(Array $vars) {
         if (!isset($this->compiler->config_data['vars'])) {
 	    $this->compiler->config_data['vars'] = Array();
         }
@@ -375,7 +375,7 @@ static public $yy_action = array(
         }
     }
 
-    function yy_get_expected_tokens($token)
+    function yy_GET_expected_tokens($token)
     {
         $state = $this->yystack[$this->yyidx]->stateno;
         $expected = self::$yyExpectedTokens[$state];
@@ -655,7 +655,7 @@ static public $yy_action = array(
     function yy_r0(){ $this->_retvalue = null;     }
 #line 652 "smarty_internal_configfileparser.php"
 #line 135 "smarty_internal_configfileparser.y"
-    function yy_r1(){ $this->add_global_vars($this->yystack[$this->yyidx + 0]->minor); $this->_retvalue = null;     }
+    function yy_r1(){ $this->add_Flobal_vars($this->yystack[$this->yyidx + 0]->minor); $this->_retvalue = null;     }
 #line 655 "smarty_internal_configfileparser.php"
 #line 141 "smarty_internal_configfileparser.y"
     function yy_r4(){ $this->add_section_vars($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + 0]->minor); $this->_retvalue = null;     }

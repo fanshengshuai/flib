@@ -33,7 +33,7 @@ class Smarty_Internal_Compile_Include extends Smarty_Internal_CompileBase {
     {
         $this->compiler = $compiler;
         // check and get attributes
-        $_attr = $this->_get_attributes($args); 
+        $_attr = $this->_GET_attributes($args);
         // save posible attributes
         $include_file = $_attr['file'];
         $has_compiled_template = false;
@@ -93,7 +93,7 @@ class Smarty_Internal_Compile_Include extends Smarty_Internal_CompileBase {
             } elseif ($_attr['scope'] == 'root') {
                 $_parent_scope = Smarty::SCOPE_ROOT;
             } elseif ($_attr['scope'] == 'global') {
-                $_parent_scope = Smarty::SCOPE_GLOBAL;
+                $_parent_scope = Smarty::SCOPE_FLOBAL;
             } 
         } 
         $_caching = 'null';

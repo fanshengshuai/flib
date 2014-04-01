@@ -70,7 +70,7 @@ class FController {
 
         ob_clean();
         //header("Content-Type: application/json; charset=UTF-8");
-        //echo '{"result":"failed","items":{"real_name":"\u4e0d\u80fd\u4e3a\u7a7a","username":"\u4e0d\u80fd\u4e3a\u7a7a","id_card":"\u4e0d\u80fd\u4e3a\u7a7a","phone":"\u4e0d\u80fd\u4e3a\u7a7a","email":"\u4e0d\u80fd\u4e3a\u7a7a","good_at":"\u4e0d\u80fd\u4e3a\u7a7a","join_date":"\u4e0d\u80fd\u4e3a\u7a7a","comment":"\u4e0d\u80fd\u4e3a\u7a7a","teacher_grade":"\u4e0d\u80fd\u4e3a\u7a7a"}}';
+        //echo '{"result":"failed","items":{"real_name":"\u4e0d\u80fd\u4e3a\u7a7a","username":"\u4e0d\u80fd\u4e3a\u7a7a","id_card":"\u4e0d\u80fd\u4e3a\u7a7a","phone":"\u4e0d\u80fd\u4e3a\u7a7a","email":"\u4e0d\u80fd\u4e3a\u7a7a","good_at":"\u4e0d\u80fd\u4e3a\u7a7a","join_date":"\u4e0d\u80fd\u4e3a\u7a7a","comment":"\u4e0d\u80fd\u4e3a\u7a7a","teacher_Frade":"\u4e0d\u80fd\u4e3a\u7a7a"}}';
         //exit;
         echo json_encode($result);exit;
     }
@@ -133,13 +133,13 @@ class FController {
     }
 
     protected function success($message, $url='', $close_time=0) {
-        global $_G;
+        global $_F;
 
         if ($url == 'r') {
             $url = $_SERVER['HTTP_REFERER'];
         }
 
-        if ($_G['in_ajax']) {
+        if ($_F['in_ajax']) {
             $this->_ajaxSuccessMessage($message, $url, $close_time);
         } else {
             $this->showMessage($message, $url);
@@ -147,9 +147,9 @@ class FController {
     }
 
     protected function error($message) {
-        global $_G;
+        global $_F;
 
-        if ($_G['in_ajax']) {
+        if ($_F['in_ajax']) {
             $this->_ajaxErrorMessage($message);
         } else {
             $this->showMessage($message, $url);
@@ -161,9 +161,9 @@ class FController {
      */
     protected function checkPostData($items) {
 
-        global $_G;
+        global $_F;
 
-        if ($_G['in_ajax']) {
+        if ($_F['in_ajax']) {
             $this->_ajaxCheckNullPostItems($items);
         } else {
             $check_results = null;
@@ -193,5 +193,13 @@ class FController {
         }
 
         return $post_data;
+    }
+
+    protected function disp($tpl = null) {
+        $this->view->disp($tpl);
+    }
+
+    protected function display($tpl = null) {
+        $this->view->disp($tpl);
     }
 }

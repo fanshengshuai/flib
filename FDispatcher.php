@@ -12,11 +12,11 @@
 class FDispatcher {
 
     public static function init() {
-        global $_G;
+        global $_F;
 
         $dispatcher = new FDispatcher;
 
-        if (!$_G['uri']) {
+        if (!$_F['uri']) {
             self::getURI();
         }
 
@@ -31,17 +31,17 @@ class FDispatcher {
 
         if (!$c || !$a) {
 
-            if ($_G['uri'] == '/' || $_G['uri'] == '' || $_G['uri'] == '/index') {
+            if ($_F['uri'] == '/' || $_F['uri'] == '' || $_F['uri'] == '/index') {
 
                 $c = 'index';
                 $a = 'default';
 
             } else {
 
-                $path_info = explode('/', $_G['uri']);
+                $path_info = explode('/', $_F['uri']);
 
                 if ($path_info[3]) {
-                    $_G['app'] = $app = $path_info[1];
+                    $_F['app'] = $app = $path_info[1];
                     $c = $path_info[2];
                     $a = $path_info[3];
                 } else {
@@ -51,36 +51,35 @@ class FDispatcher {
             }
         }
 
-        if ($_G['app']) {
-            $_G['controller'] = 'Controller_' . ucfirst($_G['app']) . '_' . ucfirst($c);
+        if ($_F['app']) {
+            $_F['controller'] = 'Controller_' . ucfirst($_F['app']) . '_' . ucfirst($c);
         } else {
-            $_G['controller'] = 'Controller_' . ucfirst($c);
+            $_F['controller'] = 'Controller_' . ucfirst($c);
         }
 
-        $_G['action'] = $a;
-
+        $_F['action'] = $a;
     }
 
     public static function dispatch() {
-        global $_G;
+        global $_F;
 
-        if (!$_G['controller'] || !$_G['action']) {
+        if (!$_F['controller'] || !$_F['action']) {
             if (RUN_MODE == 'sync') {
                 return ;
             }
-            throw new Exception("访问路径不正确，没有找到 {$_G['uri']} 。", 404);exit;
+            throw new Exception("访问路径不正确，没有找到 {$_F['uri']} 。", 404);exit;
         }
 
 
-        if (!class_exists($_G['controller'])) {
+        if (!class_exists($_F['controller'])) {
             if (RUN_MODE == 'sync') {
                 return ;
             }
-            throw new Exception("找不到控制器：{$_G['controller']}",  404);exit;
+            throw new Exception("找不到控制器：{$_F['controller']}",  404);exit;
         }
 
-        $controller = new $_G['controller'];
-        $action = $_G['action'].'Action';
+        $controller = new $_F['controller'];
+        $action = $_F['action'].'Action';
         if (method_exists($controller, 'beforeAction')) {
             $controller->beforeAction();
         }
@@ -91,13 +90,13 @@ class FDispatcher {
             if (RUN_MODE == 'sync') {
                 //return ;
             }
-            throw new Exception("找不到 {$_G['action']}Action ", 404);exit;
-            //throw new Exception($_G['controller'] . ".{$_G['action']} not exists");exit;
+            throw new Exception("找不到 {$_F['action']}Action ", 404);exit;
+            //throw new Exception($_F['controller'] . ".{$_F['action']} not exists");exit;
         }
     }
 
     private function _checkRouter(&$c, &$a) {
-        global $_G;
+        global $_F;
 
         if (!defined('ROUTER')) {
             $router_config_file = APP_ROOT . "config/router.php";
@@ -105,8 +104,8 @@ class FDispatcher {
             $router_config_file = APP_ROOT . "config/router." . ROUTER . ".php";
         }
 
-        if ($_G['cname']) {
-            $_router_config_file = APP_ROOT . "config/router.{$_G['cname']}.php";
+        if ($_F['cname']) {
+            $_router_config_file = APP_ROOT . "config/router.{$_F['cname']}.php";
             if (file_exists($_router_config_file)) {
                 $router_config_file = $_router_config_file;
             }
@@ -118,7 +117,7 @@ class FDispatcher {
 
         require $router_config_file;
 
-        $uri = strtolower($_G['uri']);
+        $uri = strtolower($_F['uri']);
 
         if (isset($_config['router'][$uri])) {
 
@@ -137,7 +136,7 @@ class FDispatcher {
                     continue;
                 }
 
-                if (preg_match("#^{$key}$#i", $_G['uri'], $res)) {
+                if (preg_match("#^{$key}$#i", $_F['uri'], $res)) {
 
                     if ($_config['router'][$uri]['url']) {
                         redirect($_config['router'][$uri]['url']);
@@ -162,21 +161,21 @@ class FDispatcher {
     }
 
     public static function getURI() {
-        global $_G;
+        global $_F;
 
-        $_G['uri'] = $_SERVER['HTTP_X_ORIGINAL_URL'];
-        if (!$_G['uri']) {
-            $_G['uri'] = $_SERVER['REQUEST_URI'];
+        $_F['uri'] = $_SERVER['HTTP_X_ORIGINAL_URL'];
+        if (!$_F['uri']) {
+            $_F['uri'] = $_SERVER['REQUEST_URI'];
         }
 
-        $_G['uri'] = preg_replace('/\?.*$/', '', $_G['uri']);
+        $_F['uri'] = preg_replace('/\?.*$/', '', $_F['uri']);
 
-        if ($_G['uri']) {
-            $_G['uri'] = rtrim($_G['uri'], '/');
+        if ($_F['uri']) {
+            $_F['uri'] = rtrim($_F['uri'], '/');
         }
 
-        if (!$_G['uri']) {
-            $_G['uri'] = '/';
+        if (!$_F['uri']) {
+            $_F['uri'] = '/';
         }
     }
 }

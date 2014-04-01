@@ -92,7 +92,7 @@ class Smarty extends Smarty_Internal_Data {
 	const SCOPE_LOCAL = 0;
 	const SCOPE_PARENT = 1;
 	const SCOPE_ROOT = 2;
-	const SCOPE_GLOBAL = 3;
+	const SCOPE_FLOBAL = 3;
 	// define caching modes
 	const CACHING_OFF = 0;
 	const CACHING_LIFETIME_CURRENT = 1;
@@ -326,9 +326,9 @@ class Smarty extends Smarty_Internal_Data {
         if ($this->cache_modified_check && $this->caching && $display) {
             $_isCached = $_template->isCached() && !$_template->has_nocache_code;
             if ($_isCached) {
-                $_gmt_mtime = gmdate('D, d M Y H:i:s', $_template->getCachedTimestamp()) . ' GMT';
+                $_Fmt_mtime = gmdate('D, d M Y H:i:s', $_template->getCachedTimestamp()) . ' GMT';
             } else {
-                $_gmt_mtime = '';
+                $_Fmt_mtime = '';
             } 
         } 
         // return rendered template
@@ -345,7 +345,7 @@ class Smarty extends Smarty_Internal_Data {
         if ($display) {
             if ($this->caching && $this->cache_modified_check) {
                 $_last_modified_date = @substr($_SERVER['HTTP_IF_MODIFIED_SINCE'], 0, strpos($_SERVER['HTTP_IF_MODIFIED_SINCE'], 'GMT') + 3);
-                if ($_isCached && $_gmt_mtime == $_last_modified_date) {
+                if ($_isCached && $_Fmt_mtime == $_last_modified_date) {
                     if (php_sapi_name() == 'cgi')
                         header('Status: 304 Not Modified');
                     else

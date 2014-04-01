@@ -11,7 +11,7 @@
 /**
  * Smarty Internal Read Include Path Class
  */
-class Smarty_Internal_Get_Include_Path {
+class Smarty_Internal_GET_Include_Path {
     /**
      * Return full file path from PHP include_path
      * 
@@ -23,7 +23,7 @@ class Smarty_Internal_Get_Include_Path {
     static $_path_array = null;
 
     if(!isset($_path_array)) {
-        $_ini_include_path = ini_get('include_path');
+        $_ini_include_path = ini_GET('include_path');
 
         if(strstr($_ini_include_path,';')) {
             // windows pathnames

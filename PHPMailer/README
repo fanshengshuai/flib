@@ -88,7 +88,7 @@ A quick note on E_STRICT:
   date_default_timezone_set('America/Toronto');
 
   * do NOT try to use
-  $myVar = date_default_timezone_get();
+  $myVar = date_default_timezone_GET();
   as a test, it will throw an error.
 
 We have also included more example files to show the use of "sendmail", "mail()",

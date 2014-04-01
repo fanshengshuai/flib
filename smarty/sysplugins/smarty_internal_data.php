@@ -466,7 +466,7 @@ class Smarty_Variable {
  */
 class Undefined_Smarty_Variable {
     // return always false
-    public function __get ($name)
+    public function __GET ($name)
     {
         if ($name == 'nocache') {
             return false;

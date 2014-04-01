@@ -22,11 +22,20 @@ if (!class_exists('Smarty')) {
 class FView extends Smarty {
 
     public function __construct() {
+        global $_F;
         parent::__construct();
 
-        $this->cache_dir = APP_ROOT . "data/cache";
-        $this->compile_dir = APP_ROOT . 'data/template/';
-        $this->template_dir = APP_ROOT . 'template/';
+        if ($_F['module']) {
+
+            $this->cache_dir = APP_ROOT . "data/{$_F['module']}/cache";
+            $this->compile_dir = APP_ROOT . "data/{$_F['module']}/template/";
+            $this->template_dir = APP_ROOT . "modules/{$_F['module']}/templates/";
+        } else {
+
+            $this->cache_dir = APP_ROOT . "data/cache";
+            $this->compile_dir = APP_ROOT . 'data/template/';
+            $this->template_dir = APP_ROOT . 'template/';
+        }
 
         $this->caching = false;
         $this->debugging = false;
@@ -51,12 +60,12 @@ class FView extends Smarty {
     }
 
     public function displaySysPage($tpl) {
-        global $_G;
+        global $_F;
 
         $this->template_dir = FLIB_ROOT . 'View/';
         $content = $this->fetch($tpl);
 
-        if (!$_G['uri']) {
+        if (!$_F['uri']) {
             $content = str_replace(array('<br />', '</p>', '</tr>'), "\n", $content);
             $content = str_replace(array('&nbsp;'), " ", $content);
             $content = preg_replace('/<head>.+?<\/head>/si', '', $content);
@@ -64,7 +73,7 @@ class FView extends Smarty {
             $content = preg_replace("/\n\s+/i", "\n", $content);
         }
 
-        if ($_G['debug'] && !$_G['in_ajax']) {
+        if ($_F['debug'] && !$_F['in_ajax']) {
             $content .= $this->getDebugInfo();
         }
 
@@ -72,14 +81,20 @@ class FView extends Smarty {
         exit;
     }
 
-    public function disp($tpl = '') {
-        global $_G;
+    public function disp($tpl = null) {
+        global $_F;
 
         if (!$tpl) {
-            if ($_G['app']) {
-                $c = str_replace('Controller_' . ucfirst($_G['app']) . '_', '', $_G['controller']);
+            if ($_F['app']) {
+                $c = str_replace('Controller_' . ucfirst($_F['app']) . '_', '', $_F['controller']);
                 $c = strtolower($c);
-                $tpl = "{$_G['app']}/{$c}/{$_G['action']}";
+                $tpl = "{$_F['app']}/{$c}/{$_F['action']}";
+            } else {
+                $c = strtolower(str_replace('Controller_', '', $_F['controller']));
+                $a = $_F['action'];
+                $a = preg_replace('#([A-Z])#e', "_\\1", $a);
+                $a = strtolower($a);
+                $tpl = "{$c}/{$a}";
             }
         }
 
@@ -89,7 +104,7 @@ class FView extends Smarty {
             $contents = $this->load($tpl . '.tpl');
         }
 
-//        if (!$_G['uid']) {
+//        if (!$_F['uid']) {
 //            FCache::save($contents);
 //        }
 
@@ -97,9 +112,10 @@ class FView extends Smarty {
     }
 
     public function load($tpl) {
-        global $_G;
+        global $_F;
 
-        $this->set('_G', $_G);
+        $this->set('_F', $_F);
+        $this->set('_F', $_F);
 
         $view_compress = Config::get('view.compress');
         $contents = $this->fetch($tpl);
@@ -112,7 +128,7 @@ class FView extends Smarty {
             $contents = preg_replace('/>\s+/im', '>', $contents);
         }
 
-        if ($_G['debug'] && !$_G['in_ajax']) {
+        if ($_F['debug'] && !$_F['in_ajax']) {
             $contents .= $this->getDebugInfo();
         }
 
@@ -120,7 +136,7 @@ class FView extends Smarty {
     }
 
     public function getDebugInfo() {
-        global $_G;
+        global $_F;
 
 
         if (RUN_MODE == 'cli') {
@@ -131,7 +147,7 @@ class FView extends Smarty {
 
         // SQL DEBUG
         $debug_contents .= '<table class="debug_table" rules="none" cellspacing="0" cellpadding="5"><tr><td colspan="2">SQL：</td></tr>';
-        foreach ($_G['debug_info']['sql'] as $key => $item) {
+        foreach ($_F['debug_info']['sql'] as $key => $item) {
             $debug_contents .= "<tr><th>{$key}</th><td>{$item}</td></tr>";
         }
         $debug_contents .= '</table><br />';
@@ -145,26 +161,26 @@ class FView extends Smarty {
 
         // ERRORS
         $debug_contents .= '<table class="debug_table" rules="none" cellspacing="0" cellpadding="5"><tr><td colspan="2"><span style="background: #ff0000; color: #fff; padding:5px;"> ERRORS：</span></td></tr>';
-        foreach ($_G['errors'] as $key => $item) {
+        foreach ($_F['errors'] as $key => $item) {
             foreach ($item as $skey => $sItem) {
                 $debug_contents .= "<tr><th>{$key}</th><td>{$sItem}</td></tr>";
             }
         }
         $debug_contents .= '</table><br />';
-        unset($_G['errors']);
+        unset($_F['errors']);
 
-        // $_G DEBUG
-        $debug_g = $_G;
-        unset($debug_g['debug_info']);
-        $debug_contents .= '<table class="debug_table" rules="none" cellspacing="0" cellpadding="5"><tr><td colspan="2">$_G：</td></tr>';
-        foreach ($debug_g as $key => $item) {
+        // $_F DEBUG
+        $debug_F = $_F;
+        unset($debug_F['debug_info']);
+        $debug_contents .= '<table class="debug_table" rules="none" cellspacing="0" cellpadding="5"><tr><td colspan="2">$_F：</td></tr>';
+        foreach ($debug_F as $key => $item) {
             $debug_contents .= "<tr><th>{$key}</th><td>" . var_export($item, true) . "</td></tr>";
         }
         $debug_contents .= '</table><br />';
 
         // FILE DEBUG
         $debug_contents .= '<table class="debug_table" rules="none" cellspacing="0" cellpadding="5"><tr><td colspan="2">引用文件：</td></tr>';
-        foreach ($_G['debug_info']['autoload_files'] as $key => $item) {
+        foreach ($_F['debug_info']['autoload_files'] as $key => $item) {
             $debug_contents .= "<tr><th>{$key}</th><td>{$item}</td></tr>";
         }
         $debug_contents .= '</table>';

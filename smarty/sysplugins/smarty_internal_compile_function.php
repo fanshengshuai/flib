@@ -30,7 +30,7 @@ class Smarty_Internal_Compile_Function extends Smarty_Internal_CompileBase {
     {
         $this->compiler = $compiler;
         // check and get attributes
-        $_attr = $this->_get_attributes($args);
+        $_attr = $this->_GET_attributes($args);
 
         if ($_attr['nocache'] === true) {
         	$this->compiler->trigger_template_error('nocache option not allowed', $this->compiler->lex->taglineno);
@@ -83,7 +83,7 @@ class Smarty_Internal_Compile_Functionclose extends Smarty_Internal_CompileBase 
     public function compile($args, $compiler, $parameter)
     {
         $this->compiler = $compiler;
-        $_attr = $this->_get_attributes($args);
+        $_attr = $this->_GET_attributes($args);
         $saved_data = $this->_close_tag(array('function'));
         $_name = trim($saved_data[0]['name'], "'\""); 
         // build plugin include code

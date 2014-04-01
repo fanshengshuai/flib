@@ -13,7 +13,7 @@ $pop->Authorise('pop3.yourdomain.com', 110, 30, 'username', 'password', 1);
 
 $mail = new PHPMailer();
 
-$body             = file_get_contents('contents.html');
+$body             = file_GET_contents('contents.html');
 $body             = eregi_replace("[\]",'',$body);
 
 $mail->IsSMTP();

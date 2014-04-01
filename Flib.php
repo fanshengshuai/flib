@@ -18,7 +18,7 @@ class Flib {
      * @access public
      */
     static public function Start() {
-        global $_G, $_F;
+        global $_F, $_F;
 
         // 加载函数类
         require_once FLIB_ROOT . "functions/function_core.php";
@@ -30,10 +30,33 @@ class Flib {
             include_once(APP_ROOT . "data/_flib_min.php");
         }
 
-        if (!$_G ['uri']) {
+        if (!$_F ['uri']) {
             FDispatcher::getURI();
         }
 
+        $sub_domain_status = Config::get('global.sub_domain.status');
+        $sub_keep_domains = Config::get('global.sub_domain.keep_domains');
+
+        // 是否开了子域名
+        if ($sub_domain_status == 'on' && in_array($_F['cname'], $sub_keep_domains)) {
+            foreach (Config::get('global.sub_domain.sub_domain_rewrite') as $key => $value) {
+                if ($key == $_F['cname']) {
+                    $_F['module'] = $value;
+                }
+
+                if ($key == '*') {
+                    $default_module = $value;
+                }
+            }
+
+            if (!$_F['module']) {
+                $_F['module'] = $default_module;
+            }
+
+            if ($_F['cname'] != 'www') {
+                define('ROUTER', $_F['module']);
+            }
+        }
 
         if (FLIB_RUN_MODE != 'manual') {
             self::StartApp();
@@ -43,28 +66,9 @@ class Flib {
     }
 
     public static function StartApp() {
-        global $_G;
+        global $_F;
 
-        // 是否开了子域名
-        if (Config::get('global.sub_domain.status') == 'on' && $_G['cname'] != Config::get('global.sub_domain.default')) {
-            foreach (Config::get('global.sub_domain.sub_domain_rewrite') as $key => $value) {
-                if ($key == $_G['cname']) {
-                    $_G['module'] = $value;
-                }
 
-                if ($key == '*') {
-                    $default_module = $value;
-                }
-            }
-
-            if (!$_G['module']) {
-                $_G['module'] = $default_module;
-            }
-
-            if ($_G['cname'] != 'www') {
-                define('ROUTER', $_G['module']);
-            }
-        }
 
         App::run();
     }
@@ -76,7 +80,7 @@ class Flib {
      *            对象类名
      */
     public static function autoLoad($className) {
-        global $_G;
+        global $_F;
 
         // if autoload Smarty, return false;
         if (strpos($className, 'Smarty') === 0) {
@@ -100,21 +104,21 @@ class Flib {
         // 查是不是 flib 的 class
         $inc_file = FLIB_ROOT . $file;
         if (file_exists($inc_file)) {
-            if ($_G ['debug']) {
-                $_G ['debug_info'] ['autoload_files'] [] = $inc_file;
+            if ($_F ['debug']) {
+                $_F ['debug_info'] ['autoload_files'] [] = $inc_file;
             }
 
             return require_once($inc_file);
         }
 
         // 查是不是 App 的 class
-        if ($_G['module']) {
-            $inc_file = APP_ROOT . 'modules/' .$_G['module'] . '/' . $file;
+        if ($_F['module']) {
+            $inc_file = APP_ROOT . 'modules/' . $_F['module'] . '/' . $file;
         }
 
         if (file_exists($inc_file)) {
-            if ($_G ['debug']) {
-                $_G ['debug_info'] ['autoload_files'] [] = $inc_file;
+            if ($_F ['debug']) {
+                $_F ['debug_info'] ['autoload_files'] [] = $inc_file;
             }
 
             return require_once($inc_file);
@@ -123,11 +127,11 @@ class Flib {
         if (count(spl_autoload_functions()) == 1) {
             throw new Exception('File no found: ' . $inc_file);
 
-            if ($_G ['debug']) {
-                $_G ['debug_info'] ['autoload_files'] [] = "<span style='color:red'>{$inc_file} <strong>[ FAILED ]</strong></span><br /> Class: {$className}";
+            if ($_F ['debug']) {
+                $_F ['debug_info'] ['autoload_files'] [] = "<span style='color:red'>{$inc_file} <strong>[ FAILED ]</strong></span><br /> Class: {$className}";
             }
         } else {
-            spl_autoload_unregister(array('Flib', 'autoLoad'));
+//            spl_autoload_unregister(array('Flib', 'autoLoad'));
         }
     }
 
@@ -160,7 +164,7 @@ class Flib {
      *            错误行数
      */
     static public function appError($err_no, $err_str, $err_file, $err_line) {
-        global $_G;
+        global $_F;
 
         switch ($err_no) {
             case E_ERROR :
@@ -171,18 +175,18 @@ class Flib {
                 $exception->printMessage($errorStr);
                 break;
             case E_STRICT :
-                $_G['errors']['STRICT'][] = "[$err_no] $err_str " . basename($err_file) . " 第 $err_line 行.";
+                $_F['errors']['STRICT'][] = "[$err_no] $err_str " . basename($err_file) . " 第 $err_line 行.";
                 break;
             case E_WARNING:
             case E_USER_WARNING :
-                $_G['errors']['WARNING'][] = "[$err_no] $err_str " . basename($err_file) . " 第 $err_line 行.";
+                $_F['errors']['WARNING'][] = "[$err_no] $err_str " . basename($err_file) . " 第 $err_line 行.";
                 break;
             case E_NOTICE:
             case E_USER_NOTICE :
-                $_G['errors']['NOTICE'][] = "[$err_no] $err_str " . basename($err_file) . " 第 $err_line 行.";
+                $_F['errors']['NOTICE'][] = "[$err_no] $err_str " . basename($err_file) . " 第 $err_line 行.";
                 break;
             default :
-                $_G['errors']['OTHER'][] = "[$err_no] $err_str " . basename($err_file) . " 第 $err_line 行.";
+                $_F['errors']['OTHER'][] = "[$err_no] $err_str " . basename($err_file) . " 第 $err_line 行.";
                 break;
         }
     }
@@ -194,7 +198,7 @@ class Flib {
         $flib_str = '';
         foreach ($files as $f) {
             $f = FLIB_ROOT . trim($f) . '.php';
-            $_content = file_get_contents($f);
+            $_content = file_GET_contents($f);
             $flib_str .= $_content;
         }
 
@@ -207,9 +211,9 @@ class Flib {
     }
 
     public static function init() {
-        global $_G;
+        global $_F;
 
-        $_G ['config'] = array();
+        $_F ['config'] = array();
         header("Content-type: text/html; charset=utf-8");
         header("Access-Control-Allow-Origin: *");
 
@@ -228,16 +232,16 @@ class Flib {
         set_error_handler(array('Flib', 'appError'));
         set_exception_handler(array('Flib', 'appException'));
 
-        $_G ['user_agent'] = $_SERVER ['HTTP_USER_AGENT'];
-        $_G ['query_string'] = $_SERVER ['QUERY_STRING'];
-        $_G ['http_host'] = $_SERVER ['HTTP_HOST'];
-        $_G ['top_domain'] = substr($_G ['domain'], strpos($_G ['domain'], '.') + 1);
-        $_G ['cookie_domain'] = substr($_G ['http_host'], strpos($_G ['http_host'], '.'));
-        $_G ['cname'] = substr($_G ['http_host'], 0, strpos($_G ['http_host'], '.'));
+        $_F ['user_agent'] = $_SERVER ['HTTP_USER_AGENT'];
+        $_F ['query_string'] = $_SERVER ['QUERY_STRING'];
+        $_F ['http_host'] = $_SERVER ['HTTP_HOST'];
+        $_F ['top_domain'] = substr($_F ['domain'], strpos($_F ['domain'], '.') + 1);
+        $_F ['cookie_domain'] = substr($_F ['http_host'], strpos($_F ['http_host'], '.'));
+        $_F ['cname'] = substr($_F ['http_host'], 0, strpos($_F ['http_host'], '.'));
 
-        $_G ['refer'] = $_REQUEST ['refer'] ? $_REQUEST ['refer'] : $_SERVER ['HTTP_REFERER'];
+        $_F ['refer'] = $_REQUEST ['refer'] ? $_REQUEST ['refer'] : $_SERVER ['HTTP_REFERER'];
 
-        $_G ['in_ajax'] = ($_REQUEST['in_ajax'] || $_GET ['in_ajax'] || $_POST ['in_ajax']) ? true : false;
+        $_F ['in_ajax'] = ($_REQUEST['in_ajax'] || $_GET ['in_ajax'] || $_POST ['in_ajax']) ? true : false;
 
 //        define('IS_CGI',substr(PHP_SAPI, 0,3)=='cgi' ? 1 : 0 );
 //        define('IS_WIN',strstr(PHP_OS, 'WIN') ? 1 : 0 );

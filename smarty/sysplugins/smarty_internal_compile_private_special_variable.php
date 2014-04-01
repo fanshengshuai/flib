@@ -35,7 +35,7 @@ class Smarty_Internal_Compile_Private_Special_Variable extends Smarty_Internal_C
             case 'now':
                 return 'time()';
             case 'cookies':
-                if (isset($compiler->smarty->security_policy) && !$compiler->smarty->security_policy->allow_super_globals) {
+                if (isset($compiler->smarty->security_policy) && !$compiler->smarty->security_policy->allow_super_Flobals) {
                     $compiler->trigger_template_error("(secure mode) super globals not permitted");
                     break;
                 } 
@@ -48,7 +48,7 @@ class Smarty_Internal_Compile_Private_Special_Variable extends Smarty_Internal_C
             case 'server':
             case 'session':
             case 'request':
-                if (isset($compiler->smarty->security_policy) && !$compiler->smarty->security_policy->allow_super_globals) {
+                if (isset($compiler->smarty->security_policy) && !$compiler->smarty->security_policy->allow_super_Flobals) {
                     $compiler->trigger_template_error("(secure mode) super globals not permitted");
                     break;
                 } 

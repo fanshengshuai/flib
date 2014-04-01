@@ -30,7 +30,7 @@ class Smarty_Internal_Compile_Insert extends Smarty_Internal_CompileBase {
     {
         $this->compiler = $compiler;
         // check and get attributes
-        $_attr = $this->_get_attributes($args); 
+        $_attr = $this->_GET_attributes($args);
         // never compile as nocache code
         $this->compiler->suppressNocacheProcessing = true;
         $this->compiler->tag_nocache = true;

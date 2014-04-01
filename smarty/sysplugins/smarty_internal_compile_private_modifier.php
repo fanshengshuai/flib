@@ -26,7 +26,7 @@ class Smarty_Internal_Compile_Private_Modifier extends Smarty_Internal_CompileBa
         $this->compiler = $compiler;
         $this->smarty = $this->compiler->smarty;
         // check and get attributes
-        $_attr = $this->_get_attributes($args);
+        $_attr = $this->_GET_attributes($args);
         $output = $parameter['value']; 
         // loop over list of modifiers
         foreach ($parameter['modifierlist'] as $single_modifier) {

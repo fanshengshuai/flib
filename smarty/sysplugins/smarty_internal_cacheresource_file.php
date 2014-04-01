@@ -84,7 +84,7 @@ class Smarty_Internal_CacheResource_File {
         if ($no_render) {
         	return null;
         } else {
-          return ob_get_clean();
+          return ob_GET_clean();
         }
     } 
 

@@ -222,7 +222,7 @@ class Smarty_Internal_Template extends Smarty_Internal_Data {
                 $this->compileTemplateSource();
             } else {
                 if ($this->compiled_template === null) {
-                    $this->compiled_template = !$this->resource_object->isEvaluated && $this->resource_object->usesCompiler ? file_get_contents($this->getCompiledFilepath()) : false;
+                    $this->compiled_template = !$this->resource_object->isEvaluated && $this->resource_object->usesCompiler ? file_GET_contents($this->getCompiledFilepath()) : false;
                 } 
             } 
         } 
@@ -452,7 +452,7 @@ class Smarty_Internal_Template extends Smarty_Internal_Data {
                         } 
                         if ($this->mustCompile) {
                             // recompile and render again
-                            ob_get_clean();
+                            ob_GET_clean();
                             $this->compileTemplateSource();
                             ob_start();
                             include($this->getCompiledFilepath ());
@@ -471,7 +471,7 @@ class Smarty_Internal_Template extends Smarty_Internal_Data {
                 throw new SmartyException("Resource '$this->resource_type' must have 'renderUncompiled' methode");
             } 
         } 
-        $this->rendered_content = ob_get_clean();
+        $this->rendered_content = ob_GET_clean();
         if (!$this->resource_object->isEvaluated && empty($this->properties['file_dependency'][$this->templateUid])) {
             $this->properties['file_dependency'][$this->templateUid] = array($this->getTemplateFilepath(), $this->getTemplateTimestamp(),$this->resource_type);
         } 
@@ -516,7 +516,7 @@ class Smarty_Internal_Template extends Smarty_Internal_Data {
             $_smarty_tpl = $this;
             ob_start();
             eval("?>" . $output);
-            $this->rendered_content = ob_get_clean(); 
+            $this->rendered_content = ob_GET_clean();
             // write cache file content
             $this->writeCachedContent('<?php if (!$no_render) {?>'. $output. '<?php } ?>');
             if ($this->smarty->debugging) {
@@ -615,7 +615,7 @@ class Smarty_Internal_Template extends Smarty_Internal_Data {
             	}
         		if (!preg_match('/^([\/\\\\]|[a-zA-Z]:[\/\\\\])/', $_template_dir)) {
         			// try PHP include_path
-        			if (($_filepath = Smarty_Internal_Get_Include_Path::getIncludePath($_filepath)) !== false) {
+        			if (($_filepath = Smarty_Internal_GET_Include_Path::getIncludePath($_filepath)) !== false) {
         				return $_filepath;
         			}
         		}
@@ -682,7 +682,7 @@ class Smarty_Internal_Template extends Smarty_Internal_Data {
                     $root_ptr->tpl_vars[$_key]->scope = Smarty::SCOPE_LOCAL;
                 } 
             } 
-            if ($scope == Smarty::SCOPE_GLOBAL || $_variable_scope == Smarty::SCOPE_GLOBAL) {
+            if ($scope == Smarty::SCOPE_FLOBAL || $_variable_scope == Smarty::SCOPE_FLOBAL) {
                 if (isset(Smarty::$global_tpl_vars[$_key])) {
                     // variable is already defined in root, copy value
                     Smarty::$global_tpl_vars[$_key]->value = $this->tpl_vars[$_key]->value;
@@ -746,7 +746,7 @@ class Smarty_Internal_Template extends Smarty_Internal_Data {
                     } 
                 } else {
                     // try streams
-                    $_known_stream = stream_get_wrappers();
+                    $_known_stream = stream_GET_wrappers();
                     if (in_array($resource_type, $_known_stream)) {
                         // is known stream
                         if (is_object($this->smarty->security_policy)) {
@@ -932,7 +932,7 @@ class Smarty_Internal_Template extends Smarty_Internal_Data {
      * get Smarty property in template context      
      * @param string $property_name property name
      */
-    public function __get($property_name)
+    public function __GET($property_name)
     {
     	if ($property_name == 'resource_object') {
     		// load template resource

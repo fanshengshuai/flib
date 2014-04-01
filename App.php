@@ -33,11 +33,11 @@ class App {
      */
     static public function run() {
 
-        global $_G;
+        global $_F;
 
         App::init();
 
-        if ($_G['uri']) {
+        if ($_F['uri']) {
 
             FDispatcher::init();
         }

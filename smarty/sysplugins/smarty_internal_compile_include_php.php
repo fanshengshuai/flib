@@ -33,7 +33,7 @@ class Smarty_Internal_Compile_Include_Php extends Smarty_Internal_CompileBase {
     	} 
         $this->compiler = $compiler;
         // check and get attributes
-        $_attr = $this->_get_attributes($args);
+        $_attr = $this->_GET_attributes($args);
 
         $_output = '<?php '; 
 
@@ -80,7 +80,7 @@ class Smarty_Internal_Compile_Include_Php extends Smarty_Internal_CompileBase {
         } 
 
         if (isset($_assign)) {
-            return "<?php ob_start(); include{$_once} ('{$_filepath}'); \$_smarty_tpl->assign({$_assign},ob_get_contents()); ob_end_clean();?>";
+            return "<?php ob_start(); include{$_once} ('{$_filepath}'); \$_smarty_tpl->assign({$_assign},ob_GET_contents()); ob_end_clean();?>";
         } else {
             return "<?php include{$_once} ('{$_filepath}');?>\n";
         } 

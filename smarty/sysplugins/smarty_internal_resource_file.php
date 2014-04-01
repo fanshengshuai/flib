@@ -80,7 +80,7 @@ class Smarty_Internal_Resource_File {
     { 
         // read template file
         if (file_exists($_tfp = $_template->getTemplateFilepath())) {
-            $_template->template_source = file_get_contents($_tfp);
+            $_template->template_source = file_GET_contents($_tfp);
             return true;
         } else {
             return false;

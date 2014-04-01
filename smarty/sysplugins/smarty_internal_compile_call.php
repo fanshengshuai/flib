@@ -32,7 +32,7 @@ class Smarty_Internal_Compile_Call extends Smarty_Internal_CompileBase {
         $this->compiler = $compiler;
         $this->smarty = $compiler->smarty;
         // check and get attributes
-        $_attr = $this->_get_attributes($args); 
+        $_attr = $this->_GET_attributes($args);
         // save possible attributes
         if (isset($_attr['assign'])) {
             // output will be stored in a smarty variable instead of beind displayed
@@ -90,9 +90,9 @@ class Smarty_Internal_Compile_Call extends Smarty_Internal_CompileBase {
         // was there an assign attribute
         if (isset($_assign)) {
             if ($compiler->template->caching) {
-                $_output = "<?php ob_start(); Smarty_Internal_Function_Call_Handler::call ({$call_cache},\$_smarty_tpl,{$_params},'{$_hash}',{$_nocache}); \$_smarty_tpl->assign({$_assign}, ob_get_clean());?>\n";
+                $_output = "<?php ob_start(); Smarty_Internal_Function_Call_Handler::call ({$call_cache},\$_smarty_tpl,{$_params},'{$_hash}',{$_nocache}); \$_smarty_tpl->assign({$_assign}, ob_GET_clean());?>\n";
             } else {
-                $_output = "<?php ob_start(); {$call_function}(\$_smarty_tpl,{$_params}); \$_smarty_tpl->assign({$_assign}, ob_get_clean());?>\n";
+                $_output = "<?php ob_start(); {$call_function}(\$_smarty_tpl,{$_params}); \$_smarty_tpl->assign({$_assign}, ob_GET_clean());?>\n";
             } 
         } else {
             if ($compiler->template->caching) {

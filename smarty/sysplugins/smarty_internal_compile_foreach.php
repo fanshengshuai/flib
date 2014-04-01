@@ -31,7 +31,7 @@ class Smarty_Internal_Compile_Foreach extends Smarty_Internal_CompileBase {
         $this->compiler = $compiler;
         $tpl = $compiler->template; 
         // check and get attributes
-        $_attr = $this->_get_attributes($args);
+        $_attr = $this->_GET_attributes($args);
 
         $from = $_attr['from'];
         $item = $_attr['item'];
@@ -172,7 +172,7 @@ class Smarty_Internal_Compile_Foreachelse extends Smarty_Internal_CompileBase {
     {
         $this->compiler = $compiler; 
         // check and get attributes
-        $_attr = $this->_get_attributes($args);
+        $_attr = $this->_GET_attributes($args);
 
         list($_open_tag, $nocache, $item, $key) = $this->_close_tag(array('foreach'));
         $this->_open_tag('foreachelse', array('foreachelse', $nocache, $item, $key));
@@ -197,7 +197,7 @@ class Smarty_Internal_Compile_Foreachclose extends Smarty_Internal_CompileBase {
     {
         $this->compiler = $compiler; 
         // check and get attributes
-        $_attr = $this->_get_attributes($args); 
+        $_attr = $this->_GET_attributes($args);
         // must endblock be nocache?
         if ($this->compiler->nocache) {
             $this->compiler->tag_nocache = true;

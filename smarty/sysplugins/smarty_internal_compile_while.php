@@ -25,7 +25,7 @@ class Smarty_Internal_Compile_While extends Smarty_Internal_CompileBase {
     {
         $this->compiler = $compiler;
         // check and get attributes
-        $_attr = $this->_get_attributes($args);
+        $_attr = $this->_GET_attributes($args);
         $this->_open_tag('while', $this->compiler->nocache);
 
         // maybe nocache because of nocache variables

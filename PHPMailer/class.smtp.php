@@ -272,7 +272,7 @@ class SMTP {
    */
   public function Connected() {
     if(!empty($this->smtp_conn)) {
-      $sock_status = socket_get_status($this->smtp_conn);
+      $sock_status = socket_GET_status($this->smtp_conn);
       if($sock_status["eof"]) {
         // the socket is valid but we are not connected
         if($this->do_debug >= 1) {

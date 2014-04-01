@@ -31,7 +31,7 @@ class Smarty_Internal_Compile_Private_Registered_Block extends Smarty_Internal_C
         if (strlen($tag) < 6 || substr($tag,-5) != 'close') {
             // opening tag of block plugin
         	// check and get attributes
-        	$_attr = $this->_get_attributes($args); 
+        	$_attr = $this->_GET_attributes($args);
         	if ($_attr['nocache']) {
             	$this->compiler->tag_nocache = true;
         	}
@@ -78,14 +78,14 @@ class Smarty_Internal_Compile_Private_Registered_Block extends Smarty_Internal_C
             	$mod_pre = $mod_post ='';
             } else {
             	$mod_pre = ' ob_start(); ';
-            	$mod_post = 'echo '.$this->compiler->compileTag('private_modifier',array(),array('modifierlist'=>$parameter['modifier_list'],'value'=>'ob_get_clean()')).';';
+            	$mod_post = 'echo '.$this->compiler->compileTag('private_modifier',array(),array('modifierlist'=>$parameter['modifier_list'],'value'=>'ob_GET_clean()')).';';
             }
             if (!is_array($function)) {
-                $output = "<?php \$_block_content = ob_get_clean(); \$_block_repeat=false;".$mod_pre." echo {$function}({$_params}, \$_block_content, \$_smarty_tpl, \$_block_repeat);".$mod_post." } array_pop(\$_smarty_tpl->smarty->_tag_stack);?>";
+                $output = "<?php \$_block_content = ob_GET_clean(); \$_block_repeat=false;".$mod_pre." echo {$function}({$_params}, \$_block_content, \$_smarty_tpl, \$_block_repeat);".$mod_post." } array_pop(\$_smarty_tpl->smarty->_tag_stack);?>";
             } else if (is_object($function[0])) {
-                $output = "<?php \$_block_content = ob_get_clean(); \$_block_repeat=false;".$mod_pre." echo \$_smarty_tpl->smarty->registered_plugins['block']['{$base_tag}'][0][0]->{$function[1]}({$_params}, \$_block_content, \$_smarty_tpl, \$_block_repeat); ".$mod_post."} array_pop(\$_smarty_tpl->smarty->_tag_stack);?>";
+                $output = "<?php \$_block_content = ob_GET_clean(); \$_block_repeat=false;".$mod_pre." echo \$_smarty_tpl->smarty->registered_plugins['block']['{$base_tag}'][0][0]->{$function[1]}({$_params}, \$_block_content, \$_smarty_tpl, \$_block_repeat); ".$mod_post."} array_pop(\$_smarty_tpl->smarty->_tag_stack);?>";
             } else {
-                $output = "<?php \$_block_content = ob_get_clean(); \$_block_repeat=false;".$mod_pre." echo {$function[0]}::{$function[1]}({$_params}, \$_block_content, \$_smarty_tpl, \$_block_repeat); ".$mod_post."} array_pop(\$_smarty_tpl->smarty->_tag_stack);?>";
+                $output = "<?php \$_block_content = ob_GET_clean(); \$_block_repeat=false;".$mod_pre." echo {$function[0]}::{$function[1]}({$_params}, \$_block_content, \$_smarty_tpl, \$_block_repeat); ".$mod_post."} array_pop(\$_smarty_tpl->smarty->_tag_stack);?>";
             } 
         } 
         return $output."\n";

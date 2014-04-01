@@ -2,16 +2,16 @@
 
 class FCache {
     public static function getContent() {
-        global $_G;
+        global $_F;
 
-        $content = file_get_contents($_G['cache_file']);
+        $content = file_GET_contents($_F['cache_file']);
         $content .= "<!-- hit from fcache -->";
 
         return $content;
     }
 
     public static function check() {
-        global $_G;
+        global $_F;
 
         if (!Config::get('fcache.enable')) {
             return false;
@@ -26,10 +26,10 @@ class FCache {
             $str_query .= "_{$_k}_{$_v}";
         }
 
-        $_G['cache_file'] = APP_ROOT . "data/fcache/{$_G['controller']}_{$_G['action']}{$str_query}.html";
-        $_G['cache_file'] = strtolower(APP_ROOT . "data/fcache/{$_G['controller']}_{$_G['action']}{$str_query}.html");
+        $_F['cache_file'] = APP_ROOT . "data/fcache/{$_F['controller']}_{$_F['action']}{$str_query}.html";
+        $_F['cache_file'] = strtolower(APP_ROOT . "data/fcache/{$_F['controller']}_{$_F['action']}{$str_query}.html");
 
-        if (!file_exists($_G['cache_file'])) {
+        if (!file_exists($_F['cache_file'])) {
             return false;
         }
 
@@ -41,7 +41,7 @@ class FCache {
             return false;
         }
 
-        $cache_mtime = filemtime($_G['cache_file']);
+        $cache_mtime = filemtime($_F['cache_file']);
         if (time() - $cache_mtime > 600) {
             return false;
         }
@@ -50,7 +50,7 @@ class FCache {
     }
 
     public static function save($content) {
-        global $_G;
+        global $_F;
 
         if (!Config::get('fcache.enable')) {
             return ;
@@ -60,15 +60,15 @@ class FCache {
             return ;
         }
 
-        $res = file_put_contents($_G['cache_file'], $content);
-        if ($_G['debug'] && $res === FALSE) throw new Exception("前端缓存写入失败! 没有目录，或者权限对？文件：" . $_G['cache_file']);
+        $res = file_put_contents($_F['cache_file'], $content);
+        if ($_F['debug'] && $res === FALSE) throw new Exception("前端缓存写入失败! 没有目录，或者权限对？文件：" . $_F['cache_file']);
         return true;
     }
 
     public static function checkCacheUri() {
-        global $_G;
+        global $_F;
 
-        if ($_G['controller'] == 'Controller_Index' && $_G['action'] == 'default') {
+        if ($_F['controller'] == 'Controller_Index' && $_F['action'] == 'default') {
             return true;
         }
 

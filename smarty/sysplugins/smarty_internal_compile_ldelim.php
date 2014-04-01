@@ -24,7 +24,7 @@ class Smarty_Internal_Compile_Ldelim extends Smarty_Internal_CompileBase {
     public function compile($args, $compiler)
     {
         $this->compiler = $compiler; 
-        $_attr = $this->_get_attributes($args);
+        $_attr = $this->_GET_attributes($args);
         if ($_attr['nocache'] === true) {
         	$this->compiler->trigger_template_error('nocache option not allowed', $this->compiler->lex->taglineno);
         }

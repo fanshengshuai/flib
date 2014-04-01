@@ -71,7 +71,7 @@ class.phpmailer.php:
 * Changed processing functionality of Sendmail and Qmail so they cannot be
   inadvertently used
 * removed getFile() function, just became a simple wrapper for
-  file_get_contents()
+  file_GET_contents()
 * added check for PHP version (will gracefully exit if not at least PHP 5.0)
 class.phpmailer.php enhancements
 * enhanced code to check if an attachment source is the same as an embedded or
@@ -146,7 +146,7 @@ Version 2.1 (Wed, June 04 2008)
     In your PHP script, add
     date_default_timezone_set('America/Toronto');
     - do not try to use
-    $myVar = date_default_timezone_get();
+    $myVar = date_default_timezone_GET();
     as a test, it will throw an error.
 * added ability to define path (mainly for embedded images)
   function MsgHTML($message,$basedir='') ... where:

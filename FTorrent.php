@@ -6,19 +6,19 @@ error_reporting(E_ALL & ~ E_NOTICE);
 session_start();
 $sKey = sha1(session_id());
 if($sKey!=$_POST['key']){
-    echo '<script type="text/javascript">alert("ÇëË¢ÐÂÒ³ÃæºóÖØÊÔ");</script>';
+    echo '<script type="text/javascript">alert("ï¿½ï¿½Ë¢ï¿½ï¿½Ò³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");</script>';
 }else if($_FILES["filepath"]["size"]<=2097152){
     $torrent = new Torrent($_FILES["filepath"]["tmp_name"]);
     echo '<script type="text/javascript">parent.playBT("'.$torrent->hash_info().'");</script>';
 }else{
-    echo '<script type="text/javascript">parent.$("#error_box").show();parent.$("#error_tip").html("ÎÄ¼þ²»ÄÜ´óÓÚ2M");</script>';
+    echo '<script type="text/javascript">parent.$("#error_box").show();parent.$("#error_tip").html("ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½Ü´ï¿½ï¿½ï¿½2M");</script>';
 }
  */
 
 /**
  * Torrent
  *
- * PHP °æ±¾ 5.2ÒÔÉÏ (ÐèÒª¿ªÆô cURL À©Õ¹)
+ * PHP ï¿½æ±¾ 5.2ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ cURL ï¿½ï¿½Õ¹)
  *
  * LICENSE: This source file is subject to version 3 of the GNU GPL
  * that is available through the world-wide-web at the following URI:
@@ -26,17 +26,17 @@ if($sKey!=$_POST['key']){
  * the GNU GPL License and are unable to obtain it through the web, please
  * send a note to adrien.gibrat@gmail.com so I can mail you a copy.
  *
- * 1) ¹¦ÄÜ:
- * - ½âÎö±¾µØÎÄ¼þ»òÔ¶³ÌµØÖ·µÄ torrent ÎÄ¼þ»òÊý¾Ý
- * - ´ÓÎÄ¼þ¼Ð¡¢ÎÄ¼þ»òÔ¶³ÌµØÖ·ÖÐ´´½¨ torrent ÎÄ¼þ
- * - ³¬¼òµ¥µÄÓÃ·¨ºÍÓï·¨
- * - Silent Exception ´íÎóÏµÍ³
+ * 1) ï¿½ï¿½ï¿½ï¿½:
+ * - ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Ô¶ï¿½Ìµï¿½Ö·ï¿½ï¿½ torrent ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ * - ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ð¡ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Ô¶ï¿½Ìµï¿½Ö·ï¿½Ð´ï¿½ï¿½ï¿½ torrent ï¿½Ä¼ï¿½
+ * - ï¿½ï¿½ï¿½òµ¥µï¿½ï¿½Ã·ï¿½ï¿½ï¿½ï¿½ï·¨
+ * - Silent Exception ï¿½ï¿½ï¿½ï¿½ÏµÍ³
  *
- * 2) Ê¹ÓÃ·¶Àý
+ * 2) Ê¹ï¿½Ã·ï¿½ï¿½ï¿½
  * <code>
  require_once 'Torrent.php';
 
-// »ñÈ¡ torrent ÎÄ¼þÐÅÏ¢
+// ï¿½ï¿½È¡ torrent ï¿½Ä¼ï¿½ï¿½ï¿½Ï¢
 $torrent = new Torrent( './test.torrent' );
 echo '<br>private: ', $torrent->is_private() ? 'yes' : 'no', 
     '<br>annonce: ', $torrent->announce(), 
@@ -52,37 +52,37 @@ var_dump( $torrent->content() );
 echo '<br>source: ',
     $torrent;
 
-// »ñµÃ magnet (´ÅÁ¦Á´½Ó)
-$torrent->magnet(); // Ê¹ÓÃ $torrent->magnet( false ); Î´ HTML ±àÂëÁ´½Ó
+// ï¿½ï¿½ï¿½ magnet (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
+$torrent->magnet(); // Ê¹ï¿½ï¿½ $torrent->magnet( false ); Î´ HTML ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-// ´´½¨ torrent ÎÄ¼þ
+// ï¿½ï¿½ï¿½ï¿½ torrent ï¿½Ä¼ï¿½
 $torrent = new Torrent( array( 'test.mp3', 'test.jpg' ), 'http://torrent.tracker/annonce' );
-$torrent->save('test.torrent'); // ±£´æµ½±¾µØ
+$torrent->save('test.torrent'); // ï¿½ï¿½ï¿½æµ½ï¿½ï¿½ï¿½ï¿½
 
-// ÐÞ¸Ä torrent ÎÄ¼þ
-$torrent->announce('http://alternate-torrent.tracker/annonce'); // Ìí¼Ó tracker
-$torrent->announce(false); // Çå³ý announce trackers
-$torrent->announce(array('http://torrent.tracker/annonce', 'http://alternate-torrent.tracker/annonce')); // ÉèÖÃ¶à¸ö tracker, Ö§³Öµ¥¸ö tracker µÄ Array (Êý×é)...
-$torrent->announce(array(array('http://torrent.tracker/annonce', 'http://alternate-torrent.tracker/annonce'), 'http://another-torrent.tracker/annonce')); // ÉèÖÃ¶à¼¶ trackers
+// ï¿½Þ¸ï¿½ torrent ï¿½Ä¼ï¿½
+$torrent->announce('http://alternate-torrent.tracker/annonce'); // ï¿½ï¿½ï¿½ tracker
+$torrent->announce(false); // ï¿½ï¿½ï¿½ announce trackers
+$torrent->announce(array('http://torrent.tracker/annonce', 'http://alternate-torrent.tracker/annonce')); // ï¿½ï¿½ï¿½Ã¶ï¿½ï¿½ tracker, Ö§ï¿½Öµï¿½ï¿½ï¿½ tracker ï¿½ï¿½ Array (ï¿½ï¿½ï¿½ï¿½)...
+$torrent->announce(array(array('http://torrent.tracker/annonce', 'http://alternate-torrent.tracker/annonce'), 'http://another-torrent.tracker/annonce')); // ï¿½ï¿½ï¿½Ã¶à¼¶ trackers
 $torrent->comment('hello world');
 $torrent->name('test torrent');
 $torrent->is_private(true);
 $torrent->httpseeds('http://file-hosting.domain/path/'); // Bittornado implementation
 $torrent->url_list(array('http://file-hosting.domain/path/','http://another-file-hosting.domain/path/')); // GetRight implementation
 
-// ´íÎó¸ú×Ù
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 if ( $errors = $torrent->errors() )
     var_dump( $errors );
 
-// ÏÂÔØ
+// ï¿½ï¿½ï¿½ï¿½
 $torrent->send();
 * </code>
 *
-* @×÷Õß     Adrien Gibrat <adrien.gibrat@gmail.com>
-* @²âÊÔÈËÔ± Jeong, Anton, dokcharlie, official testers ;) ¸ÐÐ»ÄãÃÇ±¦¹óµÄÒâ¼û
+* @ï¿½ï¿½ï¿½ï¿½     Adrien Gibrat <adrien.gibrat@gmail.com>
+* @ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô± Jeong, Anton, dokcharlie, official testers ;) ï¿½ï¿½Ð»ï¿½ï¿½ï¿½Ç±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 * @CopyLeft 2010 - Just use it!
-* @Ðí¿É     http://www.gnu.org/licenses/gpl.html GNU Í¨ÓÃ¹«¹²Ðí¿ÉÖ¤ version 3
-* @°æ±¾     Release: 1.2 (6 july 2010)
+* @ï¿½ï¿½ï¿½     http://www.gnu.org/licenses/gpl.html GNU Í¨ï¿½Ã¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¤ version 3
+* @ï¿½æ±¾     Release: 1.2 (6 july 2010)
  */
 
 class FTorrent {
@@ -336,7 +336,7 @@ null;
             if( $state != CURLM_OK )
                 continue;
             while ( $done = curl_multi_info_read( $curl ) ) {
-                $info = curl_getinfo( $done['handle'] );
+                $info = curl_GETinfo( $done['handle'] );
                 $tracker = explode( '?', $info['url'], 2 );
                 $tracker = array_shift( $tracker );
                 if ( empty( $info['http_code'] ) ) {
@@ -346,7 +346,7 @@ null;
                     $scrape[$tracker] = self::set_error( new Exception( 'Tracker request failed (' . $info['http_code'] . ' code)' ), true );
                     continue;
                 }
-                $data = curl_multi_getcontent( $done['handle'] );
+                $data = curl_multi_GETcontent( $done['handle'] );
                 $stats = self::decode_data( $data );
                 curl_multi_remove_handle( $curl, $done['handle'] );
                 $scrape[$tracker] = empty( $stats['files'] ) ?
@@ -451,7 +451,7 @@ null;
      */
     static protected function decode ( $string ) {
         $data = is_file( $string ) || self::url_exists( $string ) ?
-            self::file_get_contents( $string ) :
+            self::file_GET_contents( $string ) :
             $string;
         return (array) self::decode_data( $data );
     }
@@ -768,7 +768,7 @@ null;
     static public function filesize ( $file ) {
         if ( is_file( $file ) )
             return (double) sprintf( '%u', @filesize( $file ) );
-        else if ( $content_length = preg_grep( $pattern = '#^Content-Length:\s+(\d+)$#i', (array) @get_headers( $file ) ) )
+        else if ( $content_length = preg_Frep( $pattern = '#^Content-Length:\s+(\d+)$#i', (array) @get_headers( $file ) ) )
             return (int) preg_replace( $pattern, '$1', reset( $content_length ) );
     }
 
@@ -809,7 +809,7 @@ null;
      */
     static public function url_exists ( $url ) {
         return preg_match( '#^http(s)?://[a-z0-9-]+(.[a-z0-9-]+)*(:[0-9]+)?(/.*)?$#i', $url ) ?
-            (bool) preg_grep( '#^HTTP/.*\s(200|304)\s#', (array) @get_headers( $url ) ) :
+            (bool) preg_Frep( '#^HTTP/.*\s(200|304)\s#', (array) @get_headers( $url ) ) :
 false;
     }
 
@@ -819,7 +819,7 @@ false;
      * @return boolean is the file a torrent or not
      */
     static public function is_torrent ( $file, $timeout = self::timeout ) {
-        return self::file_get_contents( $file, $timeout, 0, 11 ) === 'd8:announce' || self::file_get_contents( $file, $timeout, 0, 14 ) === 'd10:created by';
+        return self::file_GET_contents( $file, $timeout, 0, 11 ) === 'd8:announce' || self::file_GET_contents( $file, $timeout, 0, 14 ) === 'd10:created by';
     }
 
     /** Helper to get (distant) file content
@@ -829,15 +829,15 @@ false;
      * @param integer content length (optional, default to null)
      * @return string|boolean file content or false if error
      */
-    static public function file_get_contents ( $file, $timeout = self::timeout, $offset = null, $length = null ) {
-        if ( is_file( $file ) || ini_get( 'allow_url_fopen' ) ) {
+    static public function file_GET_contents ( $file, $timeout = self::timeout, $offset = null, $length = null ) {
+        if ( is_file( $file ) || ini_GET( 'allow_url_fopen' ) ) {
             $context = ! is_file( $file ) && $timeout ? 
                 stream_context_create( array( 'http' => array( 'timeout' => $timeout ) ) ) : 
 null;
 return ! is_null( $offset ) ? $length ?
-@file_get_contents( $file, false, $context, $offset, $length ) : 
-@file_get_contents( $file, false, $context, $offset ) : 
-@file_get_contents( $file, false, $context );
+@file_GET_contents( $file, false, $context, $offset, $length ) :
+@file_GET_contents( $file, false, $context, $offset ) :
+@file_GET_contents( $file, false, $context );
         } elseif ( ! function_exists( 'curl_init' ) )
             return self::set_error( new Exception( 'Install CURL or enable "allow_url_fopen"' ) );
         $handle = curl_init( $file );
@@ -847,7 +847,7 @@ return ! is_null( $offset ) ? $length ?
             curl_setopt( $handle, CURLOPT_RANGE, $offset . '-' . ( $length ? $offset + $length -1 : null ) );
         curl_setopt( $handle, CURLOPT_RETURNTRANSFER, 1 );
         $content = curl_exec( $handle );
-        $size = curl_getinfo( $handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD );
+        $size = curl_GETinfo( $handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD );
         curl_close( $handle );
         return ( $offset && $size == -1 ) || ( $length && $length != $size ) ? $length ?
             substr( $content, $offset, $length) :

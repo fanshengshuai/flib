@@ -31,7 +31,7 @@ class Smarty_Internal_Compile_Break extends Smarty_Internal_CompileBase {
         $this->compiler = $compiler;
         $this->smarty = $compiler->smarty;
         // check and get attributes
-        $_attr = $this->_get_attributes($args);
+        $_attr = $this->_GET_attributes($args);
 
         if ($_attr['nocache'] === true) {
         	$this->compiler->trigger_template_error('nocache option not allowed', $this->compiler->lex->taglineno);

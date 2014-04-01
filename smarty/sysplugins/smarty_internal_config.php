@@ -115,7 +115,7 @@ class Smarty_Internal_Config {
     { 
         // read source file
         if (file_exists($this->getConfigFilepath())) {
-            $this->config_source = file_get_contents($this->getConfigFilepath());
+            $this->config_source = file_GET_contents($this->getConfigFilepath());
             return true;
         } else {
             return false;
@@ -194,7 +194,7 @@ class Smarty_Internal_Config {
             if ($this->mustCompile()) {
                 $this->compileConfigSource();
             } else {
-                $this->compiled_config = file_get_contents($this->getCompiledFilepath());
+                $this->compiled_config = file_GET_contents($this->getCompiledFilepath());
             } 
         } 
         return $this->compiled_config;

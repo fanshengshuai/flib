@@ -29,7 +29,7 @@ class Smarty_Internal_Compile_Section extends Smarty_Internal_CompileBase {
     {
         $this->compiler = $compiler;
         // check and get attributes
-        $_attr = $this->_get_attributes($args);
+        $_attr = $this->_GET_attributes($args);
 
         $this->_open_tag('section', array('section',$this->compiler->nocache));
         // maybe nocache because of nocache variables
@@ -130,7 +130,7 @@ class Smarty_Internal_Compile_Sectionelse extends Smarty_Internal_CompileBase {
     {
         $this->compiler = $compiler; 
         // check and get attributes
-        $_attr = $this->_get_attributes($args);
+        $_attr = $this->_GET_attributes($args);
 
         list($_open_tag, $nocache) = $this->_close_tag(array('section'));
         $this->_open_tag('sectionelse',array('sectionelse', $nocache));
@@ -154,7 +154,7 @@ class Smarty_Internal_Compile_Sectionclose extends Smarty_Internal_CompileBase {
     {
         $this->compiler = $compiler; 
         // check and get attributes
-        $_attr = $this->_get_attributes($args);
+        $_attr = $this->_GET_attributes($args);
 
         // must endblock be nocache?
         if ($this->compiler->nocache) {

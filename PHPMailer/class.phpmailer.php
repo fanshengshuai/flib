@@ -407,7 +407,7 @@ class PHPMailer {
    * @return void
    */
   public function IsSendmail() {
-    if (!stristr(ini_get('sendmail_path'), 'sendmail')) {
+    if (!stristr(ini_GET('sendmail_path'), 'sendmail')) {
       $this->Sendmail = '/var/qmail/bin/sendmail';
     }
     $this->Mailer = 'sendmail';
@@ -418,7 +418,7 @@ class PHPMailer {
    * @return void
    */
   public function IsQmail() {
-    if (stristr(ini_get('sendmail_path'), 'qmail')) {
+    if (stristr(ini_GET('sendmail_path'), 'qmail')) {
       $this->Sendmail = '/var/qmail/bin/sendmail';
     }
     $this->Mailer = 'sendmail';
@@ -741,8 +741,8 @@ class PHPMailer {
     } else {
       $params = sprintf("-oi -f %s", $this->Sender);
     }
-    if ($this->Sender != '' and !ini_get('safe_mode')) {
-      $old_from = ini_get('sendmail_from');
+    if ($this->Sender != '' and !ini_GET('safe_mode')) {
+      $old_from = ini_GET('sendmail_from');
       ini_set('sendmail_from', $this->Sender);
       if ($this->SingleTo === true && count($toArr) > 1) {
         foreach ($toArr as $key => $val) {
@@ -1409,7 +1409,7 @@ class PHPMailer {
         $signed = tempnam("", "signed");
         if (@openssl_pkcs7_sign($file, $signed, "file://".$this->sign_cert_file, array("file://".$this->sign_key_file, $this->sign_key_pass), NULL)) {
           @unlink($file);
-          $body = file_get_contents($signed);
+          $body = file_GET_contents($signed);
           @unlink($signed);
         } else {
           @unlink($file);
@@ -1646,7 +1646,7 @@ class PHPMailer {
 		  ini_set('magic_quotes_runtime', 0); 
 		}
 	  }
-      $file_buffer  = file_get_contents($path);
+      $file_buffer  = file_GET_contents($path);
       $file_buffer  = $this->EncodeString($file_buffer, $encoding);
 	  if ($magic_quotes) {
         if (version_compare(PHP_VERSION, '5.3.0', '<')) {
@@ -1875,7 +1875,7 @@ class PHPMailer {
     if (function_exists('quoted_printable_encode')) { //Use native function if it's available (>= PHP5.3)
       return quoted_printable_encode($string);
     }
-    $filters = stream_get_filters();
+    $filters = stream_GET_filters();
     if (!in_array('convert.*', $filters)) { //Got convert stream filter?
       return $this->EncodeQPphp($string, $line_max, $space_conv); //Fall back to old implementation
     }
@@ -1885,7 +1885,7 @@ class PHPMailer {
     $s = stream_filter_append($fp, 'convert.quoted-printable-encode', STREAM_FILTER_READ, $params);
     fputs($fp, $string);
     rewind($fp);
-    $out = stream_get_contents($fp);
+    $out = stream_GET_contents($fp);
     stream_filter_remove($s);
     $out = preg_replace('/^\./m', '=2E', $out); //Encode . if it is first char on a line, workaround for bug in Exchange
     fclose($fp);
@@ -2424,9 +2424,9 @@ class PHPMailer {
    * @param string $s Header
    */
   public function DKIM_Sign($s) {
-    $privKeyStr = file_get_contents($this->DKIM_private);
+    $privKeyStr = file_GET_contents($this->DKIM_private);
     if ($this->DKIM_passphrase != '') {
-      $privKey = openssl_pkey_get_private($privKeyStr, $this->DKIM_passphrase);
+      $privKey = openssl_pkey_GET_private($privKeyStr, $this->DKIM_passphrase);
     } else {
       $privKey = $privKeyStr;
     }

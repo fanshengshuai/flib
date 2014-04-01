@@ -27,7 +27,7 @@ class Smarty_Internal_Compile_Block extends Smarty_Internal_CompileBase {
     {
         $this->compiler = $compiler;
         // check and get attributes
-        $_attr = $this->_get_attributes($args);
+        $_attr = $this->_GET_attributes($args);
         $save = array($_attr, $compiler->parser->current_buffer, $this->compiler->nocache, $this->compiler->smarty->merge_compiled_includes, $compiler->smarty->inheritance);
         $this->_open_tag('block', $save);
         if ($_attr['nocache'] == true) {
@@ -165,7 +165,7 @@ class Smarty_Internal_Compile_Blockclose extends Smarty_Internal_CompileBase {
         $this->smarty = $compiler->smarty;
         $this->compiler->has_code = true; 
         // check and get attributes
-        $_attr = $this->_get_attributes($args);
+        $_attr = $this->_GET_attributes($args);
         $saved_data = $this->_close_tag(array('block'));
         $_name = trim($saved_data[0]['name'], "\"'");
         if (isset($compiler->template->block_data[$_name]) && !isset($compiler->template->block_data[$_name]['compiled'])) {

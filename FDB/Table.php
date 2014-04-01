@@ -39,10 +39,10 @@ class FDB_Table {
      *  + value 与字段对应的值
      */
     public function __construct($table, $shardKey = array()) {
-        global $_G;
+        global $_F;
 
         $this->_dbh = FDB::connect();
-        $this->_table = $_G['db']['config']['table_pre'] . $table;
+        $this->_table = $_F['db']['config']['table_pre'] . $table;
     }
 
     /**
@@ -348,13 +348,13 @@ class FDB_Table {
      */
     public function exec($sql, $params = array()) {
 
-        global $_G;
+        global $_F;
 
         try {
             $sql = $this->_rewriteSql($sql);
 
-            if ($_G['debug']) {
-                $_G['debug_info']['sql'][] = $sql;
+            if ($_F['debug']) {
+                $_F['debug_info']['sql'][] = $sql;
             }
 
             $result = $this->_dbh->exec($sql, $params);

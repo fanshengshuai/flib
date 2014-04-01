@@ -30,7 +30,7 @@ class Smarty_Internal_Compile_Append extends Smarty_Internal_Compile_Assign {
         $this->shorttag_order = array('var', 'value');
         $this->optional_attributes = array('scope','index');
         // check and get attributes
-        $_attr = $this->_get_attributes($args); 
+        $_attr = $this->_GET_attributes($args);
         // map to compile assign attributes
         if (isset($_attr['index'])) {
             $_params['smarty_internal_index'] = '[' . $_attr['index'] . ']';

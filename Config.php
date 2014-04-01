@@ -39,7 +39,7 @@ class Config {
     public static function get($key, $defaultValue = null) {
 
         $config =& Config::getInstance();
-        $value = $config->_get($key);
+        $value = $config->_GET($key);
         if (!$value){
             return $defaultValue;
         }
@@ -75,13 +75,13 @@ class Config {
     }
 
     /**
-     * _get
+     * _GET
      * 获取一个配置的值
      *
      * @param string $key 配置的key
      * @return mixed
      */
-    protected function _get($key) {
+    protected function _GET($key) {
 
         if ($this->_values[$key]) {
             return $this->_values[$key];

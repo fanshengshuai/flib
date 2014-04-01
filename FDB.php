@@ -72,10 +72,10 @@ class FDB {
      * @return DB 实例
      */
     public static function connect() {
-        global $_G;
+        global $_F;
 
-        if ($_G ['db'] ['default']) {
-			return $_G ['db'] ['default'];
+        if ($_F ['db'] ['default']) {
+			return $_F ['db'] ['default'];
 		}
 
 		if (! include (APP_ROOT . "config/db.php")) {
@@ -92,7 +92,7 @@ class FDB {
 
         $config_db = $_config['db'][$db];
 
-        $_G['db']['config'] = $config_db;
+        $_F['db']['config'] = $config_db;
 
         if (!array_key_exists($dsn, self::$_conns)) {
             self::$_conns[$dsn] = new FDB(
@@ -105,7 +105,7 @@ class FDB {
                 $config_db['timeout']
             );
         }
-        $_G['db'][$db] = self::$_conns[$dsn];
+        $_F['db'][$db] = self::$_conns[$dsn];
 
         return self::$_conns[$dsn];
     }
@@ -141,10 +141,10 @@ class FDB {
      * @param array $params
      */
     public function fetchRow($query, $params = array()) {
-        global $_G;
+        global $_F;
 
-        if ($_G['debug']) {
-            $_G['debug_info']['sql'][] = $query;
+        if ($_F['debug']) {
+            $_F['debug_info']['sql'][] = $query;
         }
 
         $stmt = $this->_dbh->prepare($query);
@@ -162,10 +162,10 @@ class FDB {
      * @return array
      */
     public function fetchAll($query, $from_cache=false) {
-        global $_G;
+        global $_F;
 
-        if ($_G['debug']) {
-            $_G['debug_info']['sql'][] = $query;
+        if ($_F['debug']) {
+            $_F['debug_info']['sql'][] = $query;
         }
 
         $stmt = $this->_dbh->prepare($query);
@@ -181,10 +181,10 @@ class FDB {
      * @param array $params
      */
     public function fetchOne($query, $params = array()) {
-        global $_G;
+        global $_F;
 
-        if ($_G['debug']) {
-            $_G['debug_info']['sql'][] = $query;
+        if ($_F['debug']) {
+            $_F['debug_info']['sql'][] = $query;
         }
 
         $stmt = $this->_dbh->prepare($query);
@@ -204,10 +204,10 @@ class FDB {
      */
 
     public function exec($query, $params = array()) {
-        global $_G;
+        global $_F;
 
-        if ($_G['debug']) {
-            $_G['debug_info']['sql'][] = $query;
+        if ($_F['debug']) {
+            $_F['debug_info']['sql'][] = $query;
         }
 
         $stmt = $this->_dbh->prepare($query);
@@ -237,14 +237,14 @@ class FDB {
 
 
     public static function query($sql) {
-        global $_G;
+        global $_F;
 
     	$_dbh = FDB::connect();
         return $_dbh->exec($sql);
     }
 
     public static function fetch($sql) {
-        global $_G;
+        global $_F;
 
         $_dbh = FDB::connect();
 
@@ -264,7 +264,7 @@ class FDB {
     }
 
     public static function fetchFirst($sql, $from_cache=false) {
-        global $_G;
+        global $_F;
 
         $_dbh = FDB::connect();
 
@@ -296,9 +296,9 @@ class FDB {
     }
 
     public static function update($table, $data, $condition) {
-        global $_G;
+        global $_F;
 
-        if (!$data['update_time'] && $_G['upate_from'] != 'gather') {
+        if (!$data['update_time'] && $_F['upate_from'] != 'gather') {
             $data['update_time'] = date('Y-m-d H:i:s');
         }
 

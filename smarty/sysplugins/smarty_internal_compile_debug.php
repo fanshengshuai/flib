@@ -24,7 +24,7 @@ class Smarty_Internal_Compile_Debug extends Smarty_Internal_CompileBase {
     {
         $this->compiler = $compiler; 
         // check and get attributes
-        $_attr = $this->_get_attributes($args);
+        $_attr = $this->_GET_attributes($args);
 
 		// compile always as nocache
 		$this->compiler->tag_nocache = true;

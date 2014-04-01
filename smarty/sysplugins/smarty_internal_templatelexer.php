@@ -149,10 +149,10 @@ class Smarty_Internal_Templatelexer
         if ($this->counter >= strlen($this->data)) {
             return false; // end of input
         }
-        $yy_global_pattern = "/^(".$this->ldel."[$]smarty\\.block\\.child".$this->rdel.")|^(\\{\\})|^(".$this->ldel."\\*([\S\s]*?)\\*".$this->rdel.")|^([\t ]*[\r\n]+[\t ]*)|^(".$this->ldel."strip".$this->rdel.")|^(".$this->ldel."\\s{1,}strip\\s{1,}".$this->rdel.")|^(".$this->ldel."\/strip".$this->rdel.")|^(".$this->ldel."\\s{1,}\/strip\\s{1,}".$this->rdel.")|^(".$this->ldel."\\s*literal\\s*".$this->rdel.")|^(".$this->ldel."\\s{1,}\/)|^(".$this->ldel."\\s*(if|elseif|else if|while)(?![^\s]))|^(".$this->ldel."\\s*for(?![^\s]))|^(".$this->ldel."\\s*foreach(?![^\s]))|^(".$this->ldel."\\s{1,})|^(".$this->ldel."\/)|^(".$this->ldel.")|^(<\\?(?:php\\w+|=|[a-zA-Z]+)?)|^(\\?>)|^(<%)|^(%>)|^(([\S\s]*?)(?=([\t ]*[\r\n]+[\t ]*|".$this->ldel."|<\\?|\\?>|<%|%>)))|^([\S\s]+)|^(.)/iS";
+        $yy_Flobal_pattern = "/^(".$this->ldel."[$]smarty\\.block\\.child".$this->rdel.")|^(\\{\\})|^(".$this->ldel."\\*([\S\s]*?)\\*".$this->rdel.")|^([\t ]*[\r\n]+[\t ]*)|^(".$this->ldel."strip".$this->rdel.")|^(".$this->ldel."\\s{1,}strip\\s{1,}".$this->rdel.")|^(".$this->ldel."\/strip".$this->rdel.")|^(".$this->ldel."\\s{1,}\/strip\\s{1,}".$this->rdel.")|^(".$this->ldel."\\s*literal\\s*".$this->rdel.")|^(".$this->ldel."\\s{1,}\/)|^(".$this->ldel."\\s*(if|elseif|else if|while)(?![^\s]))|^(".$this->ldel."\\s*for(?![^\s]))|^(".$this->ldel."\\s*foreach(?![^\s]))|^(".$this->ldel."\\s{1,})|^(".$this->ldel."\/)|^(".$this->ldel.")|^(<\\?(?:php\\w+|=|[a-zA-Z]+)?)|^(\\?>)|^(<%)|^(%>)|^(([\S\s]*?)(?=([\t ]*[\r\n]+[\t ]*|".$this->ldel."|<\\?|\\?>|<%|%>)))|^([\S\s]+)|^(.)/iS";
 
         do {
-            if (preg_match($yy_global_pattern, substr($this->data, $this->counter), $yymatches)) {
+            if (preg_match($yy_Flobal_pattern, substr($this->data, $this->counter), $yymatches)) {
                 $yysubmatches = $yymatches;
                 $yymatches = array_filter($yymatches, 'strlen'); // remove empty sub-patterns
                 if (!count($yymatches)) {
@@ -448,10 +448,10 @@ class Smarty_Internal_Templatelexer
         if ($this->counter >= strlen($this->data)) {
             return false; // end of input
         }
-        $yy_global_pattern = "/^('[^'\\\\]*(?:\\\\.[^'\\\\]*)*')|^(".$this->ldel."\\s{1,}\/)|^(".$this->ldel."\\s*(if|elseif|else if|while)(?![^\s]))|^(".$this->ldel."\\s*for(?![^\s]))|^(".$this->ldel."\\s*foreach(?![^\s]))|^(".$this->ldel."\\s{1,})|^(\\s{1,}".$this->rdel.")|^(".$this->ldel."\/)|^(".$this->ldel.")|^(".$this->rdel.")|^(\\s+is\\s+in\\s+)|^(\\s+as\\s+)|^(\\s+to\\s+)|^(\\s+step\\s+)|^(\\s+instanceof\\s+)|^(\\s*===\\s*)|^(\\s*!==\\s*)|^(\\s*==\\s*|\\s+eq\\s+)|^(\\s*!=\\s*|\\s*<>\\s*|\\s+(ne|neq)\\s+)|^(\\s*>=\\s*|\\s+(ge|gte)\\s+)|^(\\s*<=\\s*|\\s+(le|lte)\\s+)|^(\\s*>\\s*|\\s+gt\\s+)|^(\\s*<\\s*|\\s+lt\\s+)|^(\\s+mod\\s+)|^(!\\s*|not\\s+)|^(\\s*&&\\s*|\\s*and\\s+)|^(\\s*\\|\\|\\s*|\\s*or\\s+)|^(\\s*xor\\s+)|^(\\s+is\\s+odd\\s+by\\s+)|^(\\s+is\\s+not\\s+odd\\s+by\\s+)|^(\\s+is\\s+odd)|^(\\s+is\\s+not\\s+odd)|^(\\s+is\\s+even\\s+by\\s+)|^(\\s+is\\s+not\\s+even\\s+by\\s+)|^(\\s+is\\s+even)|^(\\s+is\\s+not\\s+even)|^(\\s+is\\s+div\\s+by\\s+)|^(\\s+is\\s+not\\s+div\\s+by\\s+)|^(\\((int(eger)?|bool(ean)?|float|double|real|string|binary|array|object)\\)\\s*)|^(\\(\\s*)|^(\\s*\\))|^(\\[\\s*)|^(\\s*\\])|^(\\s*->\\s*)|^(\\s*=>\\s*)|^(\\s*=\\s*)|^(\\+\\+|--)|^(\\s*(\\+|-)\\s*)|^(\\s*(\\*|\/|%)\\s*)|^(\\$)|^(\\s*;)|^(::)|^(\\s*:\\s*)|^(@)|^(#)|^(\")|^(`)|^(\\|)|^(\\.)|^(\\s*,\\s*)|^(\\s*&\\s*)|^(\\s*\\?\\s*)|^(0[xX][0-9a-fA-F]+)|^([0-9]*[a-zA-Z_]\\w*)|^(\\d+)|^(\\s+)|^(.)/iS";
+        $yy_Flobal_pattern = "/^('[^'\\\\]*(?:\\\\.[^'\\\\]*)*')|^(".$this->ldel."\\s{1,}\/)|^(".$this->ldel."\\s*(if|elseif|else if|while)(?![^\s]))|^(".$this->ldel."\\s*for(?![^\s]))|^(".$this->ldel."\\s*foreach(?![^\s]))|^(".$this->ldel."\\s{1,})|^(\\s{1,}".$this->rdel.")|^(".$this->ldel."\/)|^(".$this->ldel.")|^(".$this->rdel.")|^(\\s+is\\s+in\\s+)|^(\\s+as\\s+)|^(\\s+to\\s+)|^(\\s+step\\s+)|^(\\s+instanceof\\s+)|^(\\s*===\\s*)|^(\\s*!==\\s*)|^(\\s*==\\s*|\\s+eq\\s+)|^(\\s*!=\\s*|\\s*<>\\s*|\\s+(ne|neq)\\s+)|^(\\s*>=\\s*|\\s+(ge|gte)\\s+)|^(\\s*<=\\s*|\\s+(le|lte)\\s+)|^(\\s*>\\s*|\\s+gt\\s+)|^(\\s*<\\s*|\\s+lt\\s+)|^(\\s+mod\\s+)|^(!\\s*|not\\s+)|^(\\s*&&\\s*|\\s*and\\s+)|^(\\s*\\|\\|\\s*|\\s*or\\s+)|^(\\s*xor\\s+)|^(\\s+is\\s+odd\\s+by\\s+)|^(\\s+is\\s+not\\s+odd\\s+by\\s+)|^(\\s+is\\s+odd)|^(\\s+is\\s+not\\s+odd)|^(\\s+is\\s+even\\s+by\\s+)|^(\\s+is\\s+not\\s+even\\s+by\\s+)|^(\\s+is\\s+even)|^(\\s+is\\s+not\\s+even)|^(\\s+is\\s+div\\s+by\\s+)|^(\\s+is\\s+not\\s+div\\s+by\\s+)|^(\\((int(eger)?|bool(ean)?|float|double|real|string|binary|array|object)\\)\\s*)|^(\\(\\s*)|^(\\s*\\))|^(\\[\\s*)|^(\\s*\\])|^(\\s*->\\s*)|^(\\s*=>\\s*)|^(\\s*=\\s*)|^(\\+\\+|--)|^(\\s*(\\+|-)\\s*)|^(\\s*(\\*|\/|%)\\s*)|^(\\$)|^(\\s*;)|^(::)|^(\\s*:\\s*)|^(@)|^(#)|^(\")|^(`)|^(\\|)|^(\\.)|^(\\s*,\\s*)|^(\\s*&\\s*)|^(\\s*\\?\\s*)|^(0[xX][0-9a-fA-F]+)|^([0-9]*[a-zA-Z_]\\w*)|^(\\d+)|^(\\s+)|^(.)/iS";
 
         do {
-            if (preg_match($yy_global_pattern, substr($this->data, $this->counter), $yymatches)) {
+            if (preg_match($yy_Flobal_pattern, substr($this->data, $this->counter), $yymatches)) {
                 $yysubmatches = $yymatches;
                 $yymatches = array_filter($yymatches, 'strlen'); // remove empty sub-patterns
                 if (!count($yymatches)) {
@@ -636,7 +636,7 @@ class Smarty_Internal_Templatelexer
     function yy_r2_22($yy_subpatterns)
     {
 
-  $this->token = Smarty_Internal_Templateparser::TP_GREATEREQUAL;
+  $this->token = Smarty_Internal_Templateparser::TP_FREATEREQUAL;
     }
     function yy_r2_24($yy_subpatterns)
     {
@@ -646,7 +646,7 @@ class Smarty_Internal_Templatelexer
     function yy_r2_26($yy_subpatterns)
     {
 
-  $this->token = Smarty_Internal_Templateparser::TP_GREATERTHAN;
+  $this->token = Smarty_Internal_Templateparser::TP_FREATERTHAN;
     }
     function yy_r2_27($yy_subpatterns)
     {
@@ -894,10 +894,10 @@ class Smarty_Internal_Templatelexer
         if ($this->counter >= strlen($this->data)) {
             return false; // end of input
         }
-        $yy_global_pattern = "/^(".$this->ldel."\\s*literal\\s*".$this->rdel.")|^(".$this->ldel."\\s*\/literal\\s*".$this->rdel.")|^([\t ]*[\r\n]+[\t ]*)|^(<\\?(?:php\\w+|=|[a-zA-Z]+)?)|^(\\?>)|^(<%)|^(%>)|^(([\S\s]*?)(?=([\t ]*[\r\n]+[\t ]*|".$this->ldel."\/?literal".$this->rdel."|<\\?|<%)))|^(.)/iS";
+        $yy_Flobal_pattern = "/^(".$this->ldel."\\s*literal\\s*".$this->rdel.")|^(".$this->ldel."\\s*\/literal\\s*".$this->rdel.")|^([\t ]*[\r\n]+[\t ]*)|^(<\\?(?:php\\w+|=|[a-zA-Z]+)?)|^(\\?>)|^(<%)|^(%>)|^(([\S\s]*?)(?=([\t ]*[\r\n]+[\t ]*|".$this->ldel."\/?literal".$this->rdel."|<\\?|<%)))|^(.)/iS";
 
         do {
-            if (preg_match($yy_global_pattern, substr($this->data, $this->counter), $yymatches)) {
+            if (preg_match($yy_Flobal_pattern, substr($this->data, $this->counter), $yymatches)) {
                 $yysubmatches = $yymatches;
                 $yymatches = array_filter($yymatches, 'strlen'); // remove empty sub-patterns
                 if (!count($yymatches)) {
@@ -1019,10 +1019,10 @@ class Smarty_Internal_Templatelexer
         if ($this->counter >= strlen($this->data)) {
             return false; // end of input
         }
-        $yy_global_pattern = "/^(".$this->ldel."\\s{1,}\/)|^(".$this->ldel."\\s*(if|elseif|else if|while)(?![^\s]))|^(".$this->ldel."\\s*for(?![^\s]))|^(".$this->ldel."\\s*foreach(?![^\s]))|^(".$this->ldel."\\s{1,})|^(".$this->ldel."\/)|^(".$this->ldel.")|^(\")|^(`\\$)|^(\\$[0-9]*[a-zA-Z_]\\w*)|^(\\$)|^(([^\"\\\\]*?)((?:\\\\.[^\"\\\\]*?)*?)(?=(".$this->ldel."|\\$|`\\$|\")))|^([\S\s]+)|^(.)/iS";
+        $yy_Flobal_pattern = "/^(".$this->ldel."\\s{1,}\/)|^(".$this->ldel."\\s*(if|elseif|else if|while)(?![^\s]))|^(".$this->ldel."\\s*for(?![^\s]))|^(".$this->ldel."\\s*foreach(?![^\s]))|^(".$this->ldel."\\s{1,})|^(".$this->ldel."\/)|^(".$this->ldel.")|^(\")|^(`\\$)|^(\\$[0-9]*[a-zA-Z_]\\w*)|^(\\$)|^(([^\"\\\\]*?)((?:\\\\.[^\"\\\\]*?)*?)(?=(".$this->ldel."|\\$|`\\$|\")))|^([\S\s]+)|^(.)/iS";
 
         do {
-            if (preg_match($yy_global_pattern, substr($this->data, $this->counter), $yymatches)) {
+            if (preg_match($yy_Flobal_pattern, substr($this->data, $this->counter), $yymatches)) {
                 $yysubmatches = $yymatches;
                 $yymatches = array_filter($yymatches, 'strlen'); // remove empty sub-patterns
                 if (!count($yymatches)) {

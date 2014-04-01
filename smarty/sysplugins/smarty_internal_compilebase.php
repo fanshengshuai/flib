@@ -30,7 +30,7 @@ class Smarty_Internal_CompileBase {
      * @param array $attributes attributes applied to the tag
      * @return array of mapped attributes for further processing
      */
-    function _get_attributes ($attributes)
+    function _GET_attributes ($attributes)
     {
         $_indexed_attr = array(); 
         // loop over attributes

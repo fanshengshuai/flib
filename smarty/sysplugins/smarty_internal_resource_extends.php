@@ -101,7 +101,7 @@ class Smarty_Internal_Resource_Extends {
                 $_template->properties['file_dependency'][sha1($_filepath)] = array($_filepath, filemtime($_filepath),'file');
             } 
             $_template->template_filepath = $_filepath;
-            $_content = file_get_contents($_filepath);
+            $_content = file_GET_contents($_filepath);
             if ($_filepath != $_last) {
                 if (preg_match_all("!({$this->_ldl}block\s(.+?){$this->_rdl})!", $_content, $_open) !=
                         preg_match_all("!({$this->_ldl}/block{$this->_rdl})!", $_content, $_close)) {

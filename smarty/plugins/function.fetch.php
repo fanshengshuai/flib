@@ -20,7 +20,7 @@
  * @return string|null if the assign parameter is passed, Smarty assigns the
  *                     result to a template variable
  */
-function smarty_function_fetch($params, $template)
+function smarty_function_GETch($params, $template)
 {
     if (empty($params['file'])) {
         trigger_error("[plugin] fetch parameter 'file' cannot be empty",E_USER_NOTICE);

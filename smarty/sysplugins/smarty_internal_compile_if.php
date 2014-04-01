@@ -25,7 +25,7 @@ class Smarty_Internal_Compile_If extends Smarty_Internal_CompileBase {
     {
         $this->compiler = $compiler;
         // check and get attributes
-        $_attr = $this->_get_attributes($args);
+        $_attr = $this->_GET_attributes($args);
         $this->_open_tag('if',array(1,$this->compiler->nocache));
         // must whole block be nocache ?
         $this->compiler->nocache = $this->compiler->nocache | $this->compiler->tag_nocache; 
@@ -93,7 +93,7 @@ class Smarty_Internal_Compile_Elseif extends Smarty_Internal_CompileBase {
     {
         $this->compiler = $compiler;
         // check and get attributes
-        $_attr = $this->_get_attributes($args);
+        $_attr = $this->_GET_attributes($args);
 
         list($nesting, $compiler->tag_nocache) = $this->_close_tag(array('if', 'elseif'));
 

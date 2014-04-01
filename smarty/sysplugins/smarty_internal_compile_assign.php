@@ -32,7 +32,7 @@ class Smarty_Internal_Compile_Assign extends Smarty_Internal_CompileBase {
         $_nocache = 'null';
         $_scope = 'null'; 
         // check and get attributes
-        $_attr = $this->_get_attributes($args); 
+        $_attr = $this->_GET_attributes($args);
 		// nocache ?
         if ($this->compiler->tag_nocache || $this->compiler->nocache) {
             $_nocache = 'true'; 
@@ -47,7 +47,7 @@ class Smarty_Internal_Compile_Assign extends Smarty_Internal_CompileBase {
             } elseif ($_attr['scope'] == 'root') {
                 $_scope = Smarty::SCOPE_ROOT;
             } elseif ($_attr['scope'] == 'global') {
-                $_scope = Smarty::SCOPE_GLOBAL;
+                $_scope = Smarty::SCOPE_FLOBAL;
             } else {
                 $this->compiler->trigger_template_error('illegal value for "scope" attribute', $this->compiler->lex->taglineno);
             } 

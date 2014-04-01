@@ -10,7 +10,7 @@ require '../class.phpmailer.php';
 try {
 	$mail = new PHPMailer(true); //New instance, with exceptions enabled
 
-	$body             = file_get_contents('contents.html');
+	$body             = file_GET_contents('contents.html');
 	$body             = preg_replace('/\\\\/','', $body); //Strip backslashes
 
 	$mail->IsSMTP();                           // tell the class to use SMTP
