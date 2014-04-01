@@ -44,11 +44,11 @@ class FDB {
                     $this->_dbh = new PDO($failover, $user, $password, $attr);
                     $this->_dbh->exec("SET NAMES '" . $charset . "'");
                 } catch (PDOException $e){
-                    throw new DB_Exception("can't connect to the server because:" . $e->getMessage());
+                    throw new FDB_Exception("can't connect to the server because:" . $e->getMessage());
                 }
             } else {
 
-                throw new DB_Exception("can't connect to the server because:" . $e->getMessage());
+                throw new FDB_Exception("can't connect to the server because:" . $e->getMessage());
             }
         }
     }
