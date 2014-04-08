@@ -40,19 +40,24 @@ class FDispatcher {
 
                 $path_info = explode('/', $_F['uri']);
 
-                if ($path_info[3]) {
+                if (isset($path_info[3])) {
                     $_F['app'] = $app = $path_info[1];
                     $c = $path_info[2];
                     $a = $path_info[3];
-                } else {
+                } elseif (isset($path_info[2])) {
                     $c = $path_info[1];
                     $a = $path_info[2];
+                } elseif (isset($path_info[1])) {
+                    $c = $path_info[1];
+                    $a = 'default';
                 }
             }
         }
 
         if ($_F['app']) {
             $_F['controller'] = 'Controller_' . ucfirst($_F['app']) . '_' . ucfirst($c);
+        } elseif ($_F['module']) {
+            $_F['controller'] = 'Controller_' . ucfirst($_F['module']) . '_' . ucfirst($c);
         } else {
             $_F['controller'] = 'Controller_' . ucfirst($c);
         }
@@ -75,7 +80,16 @@ class FDispatcher {
             if (RUN_MODE == 'sync') {
                 return ;
             }
-            throw new Exception("找不到控制器：{$_F['controller']}",  404);exit;
+
+            $c_backup = str_replace(ucfirst($_F['module']) . '_', '', $_F['controller']);
+//            echo $c_backup;
+            if (class_exists($c_backup)) {
+//                echo 'use backup c';
+                $_F['controller'] = $c_backup;
+            } else {
+
+                throw new Exception("找不到控制器：{$_F['controller']}",  404);exit;
+            }
         }
 
         $controller = new $_F['controller'];
@@ -98,20 +112,17 @@ class FDispatcher {
     private function _checkRouter(&$c, &$a) {
         global $_F;
 
-        if (!defined('ROUTER')) {
-            $router_config_file = APP_ROOT . "config/router.php";
-        } else {
-            $router_config_file = APP_ROOT . "config/router." . ROUTER . ".php";
-        }
+        $router_config_file = APP_ROOT . "config/router.php";
 
-        if ($_F['cname']) {
-            $_router_config_file = APP_ROOT . "config/router.{$_F['cname']}.php";
+        if ($_F['module']) {
+            $_router_config_file = APP_ROOT . "config/router.{$_F['module']}.php";
             if (file_exists($_router_config_file)) {
                 $router_config_file = $_router_config_file;
             }
         }
 
         if (!file_exists($router_config_file)) {
+            return false;
             throw new Exception("$router_config_file not found !");
         }
 

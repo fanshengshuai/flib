@@ -18,7 +18,7 @@ class Flib {
      * @access public
      */
     static public function Start() {
-        global $_F, $_F;
+        global $_F;
 
         // 加载函数类
         require_once FLIB_ROOT . "functions/function_core.php";
@@ -38,7 +38,8 @@ class Flib {
         $sub_keep_domains = Config::get('global.sub_domain.keep_domains');
 
         // 是否开了子域名
-        if ($sub_domain_status == 'on' && in_array($_F['cname'], $sub_keep_domains)) {
+// && in_array($_F['cname'], $sub_keep_domains)
+        if ($sub_domain_status == 'on') {
             foreach (Config::get('global.sub_domain.sub_domain_rewrite') as $key => $value) {
                 if ($key == $_F['cname']) {
                     $_F['module'] = $value;
@@ -53,9 +54,9 @@ class Flib {
                 $_F['module'] = $default_module;
             }
 
-            if ($_F['cname'] != 'www') {
-                define('ROUTER', $_F['module']);
-            }
+//            if ($_F['cname'] != 'www') {
+//                define('ROUTER', $_F['module']);
+//            }
         }
 
         if (FLIB_RUN_MODE != 'manual') {
@@ -67,7 +68,6 @@ class Flib {
 
     public static function StartApp() {
         global $_F;
-
 
 
         App::run();
@@ -98,7 +98,7 @@ class Flib {
 
         $file = str_replace(
             array('service/', 'dao/', 'controller/'),
-            array('services/', 'dao/', 'c/'),
+            array('s/', 'd/', 'c/'),
             $class_file);
 
         // 查是不是 flib 的 class
@@ -113,7 +113,10 @@ class Flib {
 
         // 查是不是 App 的 class
         if ($_F['module']) {
+            $file = str_replace(strtolower($_F['module']) . '/', '', $file);
             $inc_file = APP_ROOT . 'modules/' . $_F['module'] . '/' . $file;
+        } else {
+            $inc_file = APP_ROOT . $file;
         }
 
         if (file_exists($inc_file)) {
@@ -232,16 +235,16 @@ class Flib {
         set_error_handler(array('Flib', 'appError'));
         set_exception_handler(array('Flib', 'appException'));
 
-        $_F ['user_agent'] = $_SERVER ['HTTP_USER_AGENT'];
-        $_F ['query_string'] = $_SERVER ['QUERY_STRING'];
-        $_F ['http_host'] = $_SERVER ['HTTP_HOST'];
-        $_F ['top_domain'] = substr($_F ['domain'], strpos($_F ['domain'], '.') + 1);
-        $_F ['cookie_domain'] = substr($_F ['http_host'], strpos($_F ['http_host'], '.'));
-        $_F ['cname'] = substr($_F ['http_host'], 0, strpos($_F ['http_host'], '.'));
+        $_F['user_agent'] = $_SERVER ['HTTP_USER_AGENT'];
+        $_F['query_string'] = $_SERVER ['QUERY_STRING'];
+        $_F['http_host'] = $_SERVER ['HTTP_HOST'];
+        $_F['top_domain'] = substr($_F ['domain'], strpos($_F ['domain'], '.') + 1);
+        $_F['cookie_domain'] = substr($_F ['http_host'], strpos($_F ['http_host'], '.'));
+        $_F['cname'] = substr($_F ['http_host'], 0, strpos($_F ['http_host'], '.'));
 
-        $_F ['refer'] = $_REQUEST ['refer'] ? $_REQUEST ['refer'] : $_SERVER ['HTTP_REFERER'];
+        $_F['refer'] = $_REQUEST ['refer'] ? $_REQUEST ['refer'] : $_SERVER ['HTTP_REFERER'];
 
-        $_F ['in_ajax'] = ($_REQUEST['in_ajax'] || $_GET ['in_ajax'] || $_POST ['in_ajax']) ? true : false;
+        $_F['in_ajax'] = ($_REQUEST['in_ajax'] || $_GET ['in_ajax'] || $_POST ['in_ajax']) ? true : false;
 
 //        define('IS_CGI',substr(PHP_SAPI, 0,3)=='cgi' ? 1 : 0 );
 //        define('IS_WIN',strstr(PHP_OS, 'WIN') ? 1 : 0 );
