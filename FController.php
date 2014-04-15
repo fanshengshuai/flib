@@ -202,4 +202,8 @@ class FController {
     protected function display($tpl = null) {
         $this->view->disp($tpl);
     }
+
+    protected function set($key, $value) {
+        $this->view->set($key, $value);
+    }
 }

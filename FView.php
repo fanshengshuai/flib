@@ -91,6 +91,7 @@ class FView extends Smarty {
                 $tpl = "{$_F['app']}/{$c}/{$_F['action']}";
             } else {
                 $c = strtolower(str_replace('Controller_', '', $_F['controller']));
+                $c = str_replace($_F['module'].'_', '', $c);
                 $a = $_F['action'];
                 $a = preg_replace('#([A-Z])#e', "_\\1", $a);
                 $a = strtolower($a);

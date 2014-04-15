@@ -19,7 +19,8 @@ class FException extends Exception {
 
         //if ($e->code) { redirect('/e404'); }
 
-        $exception_message = $e->getMessage() . '<br /> 异常出现在：' . $e->getFile() . '&nbsp;&nbsp;&nbsp;&nbsp; 第 ' . $e->getLine() . ' 行';
+        $exception_message = $e->getMessage()
+            . '<br /> 异常出现在：' . $e->getFile() . '&nbsp;&nbsp;&nbsp;&nbsp; 第 ' . $e->getLine() . ' 行';
         $exception_trace = nl2br($e->__toString());
 
         $exception_message = str_replace(APP_ROOT, '', $exception_message);

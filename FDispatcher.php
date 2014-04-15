@@ -72,9 +72,8 @@ class FDispatcher {
             if (RUN_MODE == 'sync') {
                 return ;
             }
-            throw new Exception("访问路径不正确，没有找到 {$_F['uri']} 。", 404);exit;
+            throw new Exception("访问路径不正确，没有找到 {$_F['uri']}", 404);
         }
-
 
         if (!class_exists($_F['controller'])) {
             if (RUN_MODE == 'sync') {
@@ -82,12 +81,9 @@ class FDispatcher {
             }
 
             $c_backup = str_replace(ucfirst($_F['module']) . '_', '', $_F['controller']);
-//            echo $c_backup;
             if (class_exists($c_backup)) {
-//                echo 'use backup c';
                 $_F['controller'] = $c_backup;
             } else {
-
                 throw new Exception("找不到控制器：{$_F['controller']}",  404);exit;
             }
         }
@@ -105,7 +101,6 @@ class FDispatcher {
                 //return ;
             }
             throw new Exception("找不到 {$_F['action']}Action ", 404);exit;
-            //throw new Exception($_F['controller'] . ".{$_F['action']} not exists");exit;
         }
     }
 
