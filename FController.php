@@ -142,7 +142,12 @@ class FController {
         if ($_F['in_ajax']) {
             $this->_ajaxSuccessMessage($message, $url, $close_time);
         } else {
-            $this->showMessage($message, $url);
+
+            if (method_exists(self, 'showMessage')) {
+                $this->showMessage($message, $url);
+            } else {
+                $this->_successAction($message, $url);
+            }
         }
     }
 
@@ -205,5 +210,10 @@ class FController {
 
     protected function set($key, $value) {
         $this->view->set($key, $value);
+    }
+
+    protected function _successAction() {
+        echo 'please write _successAction';
+        exit;
     }
 }

@@ -346,4 +346,9 @@ class FDB {
         $table = new FDB_Table($table);
         $table->incr($field, $conditions, array(), $unit);
     }
+
+    public static function count($table, $conditions = null) {
+        $table = new FDB_Table($table);
+        return $table->count($conditions);
+    }
 }

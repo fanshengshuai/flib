@@ -330,11 +330,11 @@ class FDB_Table {
             if ($conditions) {
                 $sql .= ' WHERE ' . $conditions;
             }
-            return  $this->_dbh->fetchOne($sql, $params);
+
+            return $this->_dbh->fetchOne($sql, $params);
 
         } catch (PDOException  $e) {
             throw new DB_Exception($e);
-
         }
     }
 
