@@ -76,7 +76,7 @@ class Smarty_Internal_Compile_Flist extends Smarty_Internal_CompileBase {
 
         // generate output code
         $output = "<?php
-        \$_F = &\$GLOBALS[_F];
+        global \$_F;
         \$limit = {$_attr['limit']};
         if (!\$limit) \$limit=10;
         ";
@@ -94,13 +94,10 @@ class Smarty_Internal_Compile_Flist extends Smarty_Internal_CompileBase {
             \$news_count = FDB::count(\"{\$table}\",\"eid={\$eid} and status=1\");
             \$page_info = FPager::build(\$news_count,{$pagesize});
 
-            \$_F['page_info'] = \$page_info;
-
             \$_smarty_tpl->tpl_vars->pager_html = \$page_info['html'];
             \$sql=\"select * from yp_\".\$table. \$where. \$page_info['sql_limit'];
             \$from = FDB::fetch(\$sql); ";
             $output .= " \$_smarty_tpl->assign('page_info', \$page_info);\n";
-
         }
 
 
@@ -253,5 +250,3 @@ class Smarty_Internal_Compile_Flistclose extends Smarty_Internal_CompileBase {
             return "<?php }} ?>";
     }
 }
-
-?>
