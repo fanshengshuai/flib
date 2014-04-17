@@ -16,6 +16,10 @@ class FPager {
 			return array ();
 		}
 
+        if ($page == -1) {
+            $page = intval($_GET['page']);
+        }
+
 		$page = max ( 1, $page );
 		$page_option ['start'] = ($page - 1) * $page_option ['per_page'];
 

@@ -103,7 +103,7 @@ class FDB_Table {
         try {
             $data = $this->_dbh->fetchRow($sql, $params);
         } catch (PDOException $e) {
-            throw new DB_Exception($e);
+            throw new FDB_Exception($e);
         }
 
         return $data;
