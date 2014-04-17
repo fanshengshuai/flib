@@ -2,7 +2,7 @@
 class Smarty_Internal_Compile_Flist extends Smarty_Internal_CompileBase {
     // attribute definitions
     public $required_attributes = array('item');
-    public $optional_attributes = array('from', 'type', 'limit', 'name', 'key', 'sql', 'eid');
+    public $optional_attributes = array('from', 'type', 'limit', 'name', 'key', 'sql', 'eid','table','page');
     public $shorttag_order = array('sql', 'item', 'key', 'name');
 
     /**
@@ -73,18 +73,34 @@ class Smarty_Internal_Compile_Flist extends Smarty_Internal_CompileBase {
 
         $_attr['limit'] = $_attr['limit'] > 0 ? $_attr['limit'] : 1;
 
+
         // generate output code
         $output = "<?php
-        global \$_F;
+        \$_F = &\$GLOBALS[_F];
         \$limit = {$_attr['limit']};
         if (!\$limit) \$limit=10;
         ";
 
         if (isset($_attr['eid'])) {
-
             $output .= "
                 \$eid = {$_attr['eid']};
                 \$where = \" where eid='{\$eid}' \";";
+        }
+        if($_attr['page']){
+            $pagesize=1;
+            if(!isset($_attr['page']))$page=1;
+            $output .= "
+            \$table = {$_attr['table']};
+            \$news_count = FDB::count(\"{\$table}\",\"eid={\$eid} and status=1\");
+            \$page_info = FPager::build(\$news_count,{$pagesize});
+
+            \$_F['page_info'] = \$page_info;
+
+            \$_smarty_tpl->tpl_vars->pager_html = \$page_info['html'];
+            \$sql=\"select * from yp_\".\$table. \$where. \$page_info['sql_limit'];
+            \$from = FDB::fetch(\$sql); ";
+            $output .= " \$_smarty_tpl->assign('page_info', \$page_info);\n";
+
         }
 
 
@@ -98,12 +114,13 @@ class Smarty_Internal_Compile_Flist extends Smarty_Internal_CompileBase {
 
         } elseif (isset($_attr['type']) && ($_attr['type'] == '\'news\'')) {
             $output .= "
-            \$sql = \"select subject as title, news_id, create_time from yp_enterprise_news \$where limit \$limit\";
-            \$from = FDB::fetch(\$sql); ";
+            \$sql = \"select subject as title, news_id, create_time from yp_enterprise_news \$where limit \$limit\";\n
+            \$from = FDB::fetch(\$sql); \n";
         }
 
 
-        $output .= " \$_smarty_tpl->tpl_vars[$item] = new Smarty_Variable;\n";
+       $output .= " \$_smarty_tpl->tpl_vars[$item] = new Smarty_Variable;\n";
+
         $compiler->local_var[$item] = true;
         if ($key != null) {
             $output .= " \$_smarty_tpl->tpl_vars[$key] = new Smarty_Variable;\n";

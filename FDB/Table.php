@@ -334,7 +334,7 @@ class FDB_Table {
             return $this->_dbh->fetchOne($sql, $params);
 
         } catch (PDOException  $e) {
-            throw new DB_Exception($e);
+            throw new FDB_Exception($e);
         }
     }
 
