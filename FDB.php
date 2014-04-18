@@ -347,7 +347,7 @@ class FDB {
         $table->incr($field, $conditions, array(), $unit);
     }
 
-    public function decr($field, $conditions = null, $params = array(), $unit = 1) {
+    public static function decr($table, $field, $conditions = null, $params = array(), $unit = 1) {
         $table = new FDB_Table($table);
         $table->decr($field, $conditions, array(), $unit);
     }

@@ -50,25 +50,10 @@ class Flib {
             return;
         }
 
-//        if ($className == 'FDB_Table') {
-//            require FLIB_ROOT . "FDB/Table.php";
-//        }
-
-        $class_explode = explode('_', $className);
-        $class_explode_len = sizeof($class_explode);
-        foreach ($class_explode as $key => $item) {
-            if ($key < ($class_explode_len - 1)) {
-                $class_explode [$key] = strtolower($item);
-            }
-        }
-        $class_file = join('/', $class_explode) . ".php";
-
-        $file = str_replace(
-            array('service/', 'dao/', 'controller/'),
-            array('services/', 'dao/', 'c/'),
-            $class_file);
+        $class_path = str_replace('_', '/', $className) . ".php";
 
         // 查是不是 flib 的 class
+        $file = $class_path;
         $inc_file = FLIB_ROOT . $file;
         if (file_exists($inc_file)) {
             if ($_F ['debug']) {
@@ -77,6 +62,21 @@ class Flib {
 
             return require_once($inc_file);
         }
+
+        // 检查项目文件
+        $className = str_replace(
+            array('Service/', 'DAO/', 'Controller/'),
+            array('services/', 'dao/', 'c/'),
+            $class_path);
+
+        $class_explode = explode('/', $className);
+        $class_explode_len = sizeof($class_explode);
+        foreach ($class_explode as $key => $item) {
+            if ($key < ($class_explode_len - 1)) {
+                $class_explode [$key] = strtolower($item);
+            }
+        }
+        $file = join('/', $class_explode);
 
         // 查是不是 App 的 class
         if ($_F['module']) {
