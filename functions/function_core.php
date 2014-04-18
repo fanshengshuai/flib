@@ -251,9 +251,9 @@ function is_mobile() {
 	return $is_mobile;
 }
 
-if (! function_exists ( 'T' )) {
-	function T($table) {
-		return new DB_Table ( $table );
+if (! function_exists ( 'D' )) {
+	function D($table) {
+		return new FDB_Table ( $table );
 	}
 }
 function xml2arr($xml) {

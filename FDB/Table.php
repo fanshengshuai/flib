@@ -33,7 +33,7 @@ class FDB_Table {
      * - 本程序负责分表时：
      *   $db = new DB_Table('table_name');
      *
-     * @param string $table
+     * @param string  $table
      * @param integer $shardKey 分库标志
      *  + key 数据库字段
      *  + value 与字段对应的值
@@ -66,7 +66,8 @@ class FDB_Table {
      * 在配置文件conf/db.php中，指定$conf['MODULE.siteTables.TABLE.num']的值，可实现所有数据库上TABLE的分表
      *
      * @param string $table 表名
-     * @param array $shardKey   切分关键字
+     * @param array  $shardKey 切分关键字
+     *
      * @return array
      *           + db 数据库相关配置
      *           + table 物理表名
@@ -79,6 +80,7 @@ class FDB_Table {
         if (!$shardKey || !array_key_exists($table, $tables)) {
             $result['db'] = 'onsby_com';
             $result['table'] = $table;
+
             return $result;
         }
     }
@@ -87,11 +89,12 @@ class FDB_Table {
      * 获取一条记录
      *
      * @param string $conditions
-     * @param array $param
-     * @param array columns 列
+     * @param array  $param
+     * @param        array columns 列
+     *
      * @return array || null
      */
-    public function find($conditions = null, $params = array(), $columns = array('*')) {
+    public function find($conditions = null, $columns = array('*'), $params = array()) {
 
         $columns = implode(',', $columns);
         $sql = "SELECT $columns FROM $this->_table";
@@ -112,14 +115,15 @@ class FDB_Table {
     /**
      * 取得所有的记录
      *
-     * @param array $conditions
-     * @param array $params
-     * @param array $columns
+     * @param array   $conditions
+     * @param array   $params
+     * @param array   $columns
      * @param integer $start
      * @param integer $limit
-     * @param string $order
+     * @param string  $order
      *   fieldName1 => [ASC|DESC]
      *   fieldName2 => [ASC|DESC]
+     *
      * @return array
      */
     public function findAll($conditions = null, $params = array(), $columns = array('*'),
@@ -148,9 +152,10 @@ class FDB_Table {
 
         try {
             $rows = $this->_dbh->fetchAll($sql, $params);
-        } catch (PDOException $e){
-            throw new DB_Exception($e);
+        } catch (PDOException $e) {
+            throw new FDB_Exception($e);
         }
+
         return $rows;
     }
 
@@ -158,7 +163,8 @@ class FDB_Table {
      * findBySql
      *
      * @param  string $sql
-     * @param  array $params
+     * @param  array  $params
+     *
      * @return array
      */
     public function findBySql($sql, $params = array()) {
@@ -166,9 +172,10 @@ class FDB_Table {
         try {
             $sql = $this->_rewriteSql($sql);
             $data = $this->_dbh->fetchAll($sql, $params);
-        } catch (PDOException $e){
-            throw new DB_Exception($e);
+        } catch (PDOException $e) {
+            throw new FDB_Exception($e);
         }
+
         return $data;
     }
 
@@ -176,7 +183,8 @@ class FDB_Table {
      * 删除记录
      *
      * @param string $conditions
-     * @param array $param
+     * @param array  $param
+     *
      * @return int affect rows
      */
     public function remove($conditions, $params = array()) {
@@ -184,20 +192,21 @@ class FDB_Table {
         $sql = "DELETE FROM $this->_table WHERE $conditions ";
         try {
             return $this->_dbh->exec($sql, $params);
-        } catch (PDOException $e){
-            throw new DB_Exception($e);
+        } catch (PDOException $e) {
+            throw new FDB_Exception($e);
         }
     }
 
     /**
      * 插入一条记录 或更新表记录
      *
-     * @param array $data
+     * @param array  $data
      * @param string $conditions
-     * @param array $param
+     * @param array  $param
+     *
      * @return bool || int
      */
-    public function save($data, $conditions = NULL, $params = array()) {
+    public function save($data, $conditions = null, $params = array()) {
 
         $tempParams = array();
         $set = array();
@@ -208,19 +217,20 @@ class FDB_Table {
 
         if ($conditions) {
             // 更新
-            $sql = "UPDATE $this->_table SET " . join(',',$set) . " WHERE $conditions";
-            $params = array_merge($tempParams,$params);
+            $sql = "UPDATE $this->_table SET " . join(',', $set) . " WHERE $conditions";
+            $params = array_merge($tempParams, $params);
         } else {
             // 插入
-            $sql = "INSERT INTO  $this->_table SET ". join(',', $set);
+            $sql = "INSERT INTO  $this->_table SET " . join(',', $set);
             $params = $tempParams;
         }
 
-        // 捕获PDOException后 抛出DB_Exception
-        try{
+        // 捕获PDOException后 抛出FDB_Exception
+        try {
             $this->_dbh->exec($sql, $params);
+
             return $this->lastInsertId();
-        } catch (PDOException $e){
+        } catch (PDOException $e) {
             throw new FDB_Exception($e);
         }
     }
@@ -230,6 +240,7 @@ class FDB_Table {
      * 根据主键替换或保存
      *
      * @param array $data
+     *
      * @return mixed
      */
     public function replace($data) {
@@ -241,12 +252,12 @@ class FDB_Table {
             array_push($tempParams, $v);
         }
 
-        $sql = "REPLACE INTO $this->_table SET ". join(',', $set);
+        $sql = "REPLACE INTO $this->_table SET " . join(',', $set);
 
-        try{
+        try {
             return $this->_dbh->exec($sql, $tempParams);
-        } catch (PDOException $e){
-            throw new DB_Exception($e);
+        } catch (PDOException $e) {
+            throw new FDB_Exception($e);
         }
     }
 
@@ -257,10 +268,10 @@ class FDB_Table {
      */
     public function lastInsertId() {
 
-        try{
+        try {
             return $this->_dbh->lastInsertId();
-        } catch (PDOException $e){
-            throw new DB_Exception($e);
+        } catch (PDOException $e) {
+            throw new FDB_Exception($e);
         }
     }
 
@@ -278,14 +289,14 @@ class FDB_Table {
 
         // 构造问号表达式
         $tmpArr = array();
-        for($i=0;$i< $countKeys;$i++) {
+        for ($i = 0; $i < $countKeys; $i++) {
             $tmpArr[] = '?';
         }
         $tmpStr = implode(',', $tmpArr);
-        $tmpStr = '(' . $tmpStr. ')';
+        $tmpStr = '(' . $tmpStr . ')';
         $tmpArr2 = array();
         $mergeArr = array();
-        for ($i=0;$i < $count; $i++){
+        for ($i = 0; $i < $count; $i++) {
             $tmpArr2[] = $tmpStr;
             $mergeArr = array_merge($mergeArr, array_values($data[$i]));
         }
@@ -293,9 +304,9 @@ class FDB_Table {
         $tmpStr2 = implode(',', $tmpArr2);
         $conditions = "INSERT INTO $this->_table ($columns) VALUES $tmpStr2";
         try {
-            return  $this->_dbh->exec($conditions,$mergeArr);
+            return $this->_dbh->exec($conditions, $mergeArr);
         } catch (PDOException  $e) {
-            throw new DB_Exception($e);
+            throw new FDB_Exception($e);
         }
     }
 
@@ -304,14 +315,15 @@ class FDB_Table {
      *
      * @param array $array
      */
-    public function keyMap($array){
+    public function keyMap($array) {
 
         $outArray = array();
         foreach ($array as $key => $value) {
-            $keyArr = explode('_',$key);
+            $keyArr = explode('_', $key);
             $outKey = ucfirst($keyArr[1]) . ucfirst(@$keyArr[2]) . ucfirst(@$keyArr[3]);
             $outArray[$outKey] = $value;
         }
+
         return $outArray;
     }
 
@@ -320,12 +332,13 @@ class FDB_Table {
      * 计算行数
      *
      * @param  string $conditions
-     * @param  array $params
+     * @param  array  $params
+     *
      * @return integer
      */
-    public function count($conditions = NULL, $params = array()) {
+    public function count($conditions = null, $params = array()) {
 
-        $sql = 'SELECT COUNT(*) FROM ' . $this->_table ;
+        $sql = 'SELECT COUNT(*) FROM ' . $this->_table;
         try {
             if ($conditions) {
                 $sql .= ' WHERE ' . $conditions;
@@ -344,6 +357,7 @@ class FDB_Table {
      *
      * @param  string $sql
      * @param  string $params
+     *
      * @return void
      */
     public function exec($sql, $params = array()) {
@@ -359,13 +373,13 @@ class FDB_Table {
 
             $result = $this->_dbh->exec($sql, $params);
         } catch (PDOException $e) {
-            throw new DB_Exception($e);
+            throw new FDB_Exception($e);
         }
 
         return $result;
     }
 
-    public function incr($field, $conditions = null, $params = array(),  $unit = 1) {
+    public function incr($field, $conditions = null, $params = array(), $unit = 1) {
 
         $sql = 'UPDATE ' . $this->_table . " SET `$field` = `$field` + $unit";
         if ($conditions) {
@@ -374,12 +388,13 @@ class FDB_Table {
         try {
             $result = $this->_dbh->exec($sql, $params);
         } catch (PDOException $e) {
-            throw new DB_Exception($e->getMessage, $e->getCode());
+            throw new FDB_Exception($e->getMessage, $e->getCode());
         }
+
         return $result;
     }
 
-    public function decr($field , $conditions = null, $params = array(), $unit = 1) {
+    public function decr($field, $conditions = null, $params = array(), $unit = 1) {
 
         $sql = 'UPDATE ' . $this->_table . " SET $field = IF($field > $unit,  $field - $unit, 0)";
         if ($conditions) {
@@ -389,8 +404,9 @@ class FDB_Table {
         try {
             $result = $this->_dbh->exec($sql, $params);
         } catch (PDOException $e) {
-            throw new DB_Exception($e);
+            throw new FDB_Exception($e);
         }
+
         return $result;
     }
 
@@ -402,7 +418,7 @@ class FDB_Table {
         try {
             return $this->_dbh->exec($sql, $params);
         } catch (PDOException $e) {
-            throw new DB_Exception($e);
+            throw new FDB_Exception($e);
         }
     }
 
@@ -427,6 +443,7 @@ class FDB_Table {
             return $sql;
         } else {
             $pattern = '/((?:select.*?from|insert into|delete from|update|replace into|truncate table|describe|alter table)\s+)`?(\w+)`?/i';
+
             return preg_replace($pattern, '\1' . $this->_table, $sql);
         }
     }
