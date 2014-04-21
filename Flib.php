@@ -191,7 +191,8 @@ class Flib {
 
         $_F['user_agent'] = $_SERVER ['HTTP_USER_AGENT'];
         $_F['query_string'] = $_SERVER ['QUERY_STRING'];
-        $_F['http_host'] = $_SERVER ['HTTP_HOST'];
+
+        $_F['http_host'] ? $_F['http_host'] : $_F['http_host'] = $_SERVER ['HTTP_HOST'];
         $_F['top_domain'] = substr($_F ['domain'], strpos($_F ['domain'], '.') + 1);
         $_F['cookie_domain'] = substr($_F ['http_host'], strpos($_F ['http_host'], '.'));
         $_F['cname'] = substr($_F ['http_host'], 0, strpos($_F ['http_host'], '.'));
@@ -243,6 +244,12 @@ class Flib {
 //        define('IS_CGI',substr(PHP_SAPI, 0,3)=='cgi' ? 1 : 0 );
 //        define('IS_WIN',strstr(PHP_OS, 'WIN') ? 1 : 0 );
 //        define('IS_CLI',PHP_SAPI=='cli'? 1   :   0);
+    }
+
+    public static function resetAll() {
+        global $_F;
+
+        $_F = array();
     }
 }
 
