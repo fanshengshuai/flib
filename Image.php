@@ -13,13 +13,13 @@ class Image {
 
     var $source = '';
     var $target = '';
-    var $imginfo = array();
-    var $imagecreatefromfunc = '';
-    var $imagefunc = '';
-    var $tmpfile = '';
-    var $libmethod = 0;
+    var $img_info = array();
+    var $imageCreateFromFunc = '';
+    var $imageFunc = '';
+    var $tmp_file = '';
+    var $lib_method = 0;
     var $param = array();
-    var $errorcode = 0;
+    var $error_code = 0;
 
     function image() {
         global $_F;
@@ -49,14 +49,14 @@ class Image {
             return $this->returncode($return);
         }
 
-        if($this->imginfo['animated']) {
+        if($this->img_info['animated']) {
             return $this->returncode(0);
         }
         $this->param['thumbwidth'] = $thumbwidth;
         $this->param['thumbheight'] = $thumbheight;
         $this->param['thumbtype'] = $thumbtype;
 
-        $return = !$this->libmethod ? $this->Thumb_FD() : $this->Thumb_IM();
+        $return = !$this->lib_method ? $this->Thumb_GD() : $this->Thumb_IM();
         $return = !$nosuffix ? $return : 0;
 
         return $this->sleep($return);
@@ -95,7 +95,7 @@ class Image {
             $this->param['watermarktype'] = 'png';
         }
 
-        if(!$this->param['watermarkstatus'] || ($this->param['watermarkminwidth'] && $this->imginfo['width'] <= $this->param['watermarkminwidth'] && $this->param['watermarkminheight'] && $this->imginfo['height'] <= $this->param['watermarkminheight'])) {
+        if(!$this->param['watermarkstatus'] || ($this->param['watermarkminwidth'] && $this->img_info['width'] <= $this->param['watermarkminwidth'] && $this->param['watermarkminheight'] && $this->img_info['height'] <= $this->param['watermarkminheight'])) {
             return $this->returncode(0);
         }
         $this->param['watermarkfile'] = APP_ROOT. '/images/watermark.png';
@@ -104,19 +104,19 @@ class Image {
             return $this->returncode(-3);
         }
 
-        $return = !$this->libmethod ? $this->Watermark_FD() : $this->Watermark_IM();
+        $return = !$this->lib_method ? $this->Watermark_GD() : $this->Watermark_IM();
 
         return $this->sleep($return);
     }
 
     function error() {
-        return $this->errorcode;
+        return $this->error_code;
     }
 
     function init($method, $source, $target, $nosuffix = 0) {
         global $_F;
 
-        $this->errorcode = 0;
+        $this->error_code = 0;
         if (empty($source)) {
 
             return -2;
@@ -129,7 +129,7 @@ class Image {
                 return -2;
             }
             $data = dfsockopen($source);
-            $this->tmpfile = $source = tempnam($_F['setting']['attachdir'].'./temp/', 'tmpimg_');
+            $this->tmp_file = $source = tempnam($_F['setting']['attachdir'].'./temp/', 'tmpimg_');
             file_put_contents($source, $data);
             if(!$data || $source === FALSE) {
 
@@ -152,59 +152,59 @@ class Image {
             return -2;
         }
 
-        $imginfo = getimagesize($source);
-        if($imginfo === FALSE) {
+        $img_info = getimagesize($source);
+        if($img_info === FALSE) {
             return -1;
         }
 
         $this->source = $source;
         $this->target = $target;
-        $this->imginfo['width'] = $imginfo[0];
-        $this->imginfo['height'] = $imginfo[1];
-        $this->imginfo['mime'] = $imginfo['mime'];
-        $this->imginfo['size'] = filesize($source);
-        $this->libmethod = $this->param['imagelib'] && $this->param['imageimpath'];
+        $this->img_info['width'] = $img_info[0];
+        $this->img_info['height'] = $img_info[1];
+        $this->img_info['mime'] = $img_info['mime'];
+        $this->img_info['size'] = filesize($source);
+        $this->lib_method = $this->param['imagelib'] && $this->param['imageimpath'];
 
-        if(!$this->libmethod) {
-            switch($this->imginfo['mime']) {
+        if(!$this->lib_method) {
+            switch($this->img_info['mime']) {
             case 'image/jpeg':
-                $this->imagecreatefromfunc = function_exists('imagecreatefromjpeg') ? 'imagecreatefromjpeg' : '';
-                $this->imagefunc = function_exists('imagejpeg') ? 'imagejpeg' : '';
+                $this->imageCreateFromFunc = function_exists('imagecreatefromjpeg') ? 'imagecreatefromjpeg' : '';
+                $this->imageFunc = function_exists('imagejpeg') ? 'imagejpeg' : '';
                 break;
             case 'image/gif':
-                $this->imagecreatefromfunc = function_exists('imagecreatefromgif') ? 'imagecreatefromgif' : '';
-                $this->imagefunc = function_exists('imagegif') ? 'imagegif' : '';
+                $this->imageCreateFromFunc = function_exists('imagecreatefromgif') ? 'imagecreatefromgif' : '';
+                $this->imageFunc = function_exists('imagegif') ? 'imagegif' : '';
                 break;
             case 'image/png':
-                $this->imagecreatefromfunc = function_exists('imagecreatefrompng') ? 'imagecreatefrompng' : '';
-                $this->imagefunc = function_exists('imagepng') ? 'imagepng' : '';
+                $this->imageCreateFromFunc = function_exists('imagecreatefrompng') ? 'imagecreatefrompng' : '';
+                $this->imageFunc = function_exists('imagepng') ? 'imagepng' : '';
                 break;
             }
         } else {
-            $this->imagecreatefromfunc = $this->imagefunc = TRUE;
+            $this->imageCreateFromFunc = $this->imageFunc = TRUE;
         }
 
-        if(!$this->libmethod && $this->attachinfo['mime'] == 'image/gif') {
-            if($this->imagecreatefromfunc && !$this->imagecreatefromfunc($source)) {
+        if(!$this->lib_method && $this->attachinfo['mime'] == 'image/gif') {
+            if($this->imageCreateFromFunc && !$this->imageCreateFromFunc($source)) {
                 return -4;
             }
             if(!($fp = fopen($source, 'rb'))) {
                 return -2;
             }
-            $content = fread($fp, $this->imginfo['size']);
+            $content = fread($fp, $this->img_info['size']);
             fclose($fp);
-            $this->imginfo['animated'] = strpos($content, 'NETSCAPE2.0') === FALSE ? 0 : 1;
+            $this->img_info['animated'] = strpos($content, 'NETSCAPE2.0') === FALSE ? 0 : 1;
         }
 
-        return $this->imagecreatefromfunc ? 1 : 0;
+        return $this->imageCreateFromFunc ? 1 : 0;
     }
 
     function sleep($return) {
-        if($this->tmpfile) {
-            unlink($this->tmpfile);
+        if($this->tmp_file) {
+            unlink($this->tmp_file);
         }
         if (file_exists($this->target)) {
-            $this->imginfo['size'] = filesize($this->target);
+            $this->img_info['size'] = filesize($this->target);
             return $this->returncode($return);
         } else {
             return false;
@@ -215,7 +215,7 @@ class Image {
         if($return > 0 && file_exists($this->target)) {
             return true;
         } else {
-            $this->errorcode = $return;
+            $this->error_code = $return;
             return false;
         }
     }
@@ -230,24 +230,24 @@ class Image {
     function sizevalue($method) {
         $x = $y = $w = $h = 0;
         if($method > 0) {
-            $imgratio = $this->imginfo['width'] / $this->imginfo['height'];
+            $imgratio = $this->img_info['width'] / $this->img_info['height'];
             $thumbratio = $this->param['thumbwidth'] / $this->param['thumbheight'];
             if($imgratio >= 1 && $imgratio >= $thumbratio || $imgratio < 1 && $imgratio > $thumbratio) {
-                $h = $this->imginfo['height'];
+                $h = $this->img_info['height'];
                 $w = $h * $thumbratio;
-                $x = ($this->imginfo['width'] - $thumbratio * $this->imginfo['height']) / 2;
+                $x = ($this->img_info['width'] - $thumbratio * $this->img_info['height']) / 2;
             } elseif($imgratio >= 1 && $imgratio <= $thumbratio || $imgratio < 1 && $imgratio < $thumbratio) {
-                $w = $this->imginfo['width'];
+                $w = $this->img_info['width'];
                 $h = $w / $thumbratio;
             }
         } else {
-            $x_ratio = $this->param['thumbwidth'] / $this->imginfo['width'];
-            $y_ratio = $this->param['thumbheight'] / $this->imginfo['height'];
-            if(($x_ratio * $this->imginfo['height']) < $this->param['thumbheight']) {
-                $h = ceil($x_ratio * $this->imginfo['height']);
+            $x_ratio = $this->param['thumbwidth'] / $this->img_info['width'];
+            $y_ratio = $this->param['thumbheight'] / $this->img_info['height'];
+            if(($x_ratio * $this->img_info['height']) < $this->param['thumbheight']) {
+                $h = ceil($x_ratio * $this->img_info['height']);
                 $w = $this->param['thumbwidth'];
             } else {
-                $w = ceil($y_ratio * $this->imginfo['width']);
+                $w = ceil($y_ratio * $this->img_info['width']);
                 $h = $this->param['thumbheight'];
             }
         }
@@ -255,8 +255,8 @@ class Image {
     }
 
     function loadsource() {
-        $imagecreatefromfunc = &$this->imagecreatefromfunc;
-        $im = $imagecreatefromfunc($this->source);
+        $imageCreateFromFunc = &$this->imageCreateFromFunc;
+        $im = $imageCreateFromFunc($this->source);
         if(!$im) {
             if(!function_exists('imagecreatefromstring')) {
                 return -4;
@@ -272,27 +272,27 @@ class Image {
         return $im;
     }
 
-    function Thumb_FD() {
+    function Thumb_GD() {
         global $_F;
 
         if(!function_exists('imagecreatetruecolor') || !function_exists('imagecopyresampled') || !function_exists('imagejpeg') || !function_exists('imagecopymerge')) {
             return -4;
         }
 
-        $imagefunc = &$this->imagefunc;
+        $imageFunc = &$this->imageFunc;
 
         switch($this->param['thumbtype']) {
         case 'fixnone':
         case 1:
-                if($this->imginfo['width'] >= $this->param['thumbwidth'] || $this->imginfo['height'] >= $this->param['thumbheight']) {
+                if($this->img_info['width'] >= $this->param['thumbwidth'] || $this->img_info['height'] >= $this->param['thumbheight']) {
                     $attach_photo = $this->loadsource();
                     if($attach_photo < 0) {
                         return $attach_photo;
                     }
                     $thumb = array();
                     list(,,$thumb['width'], $thumb['height']) = $this->sizevalue(0);
-                    $cx = $this->imginfo['width'];
-                    $cy = $this->imginfo['height'];
+                    $cx = $this->img_info['width'];
+                    $cy = $this->img_info['height'];
                     $thumb_photo = imagecreatetruecolor($thumb['width'], $thumb['height']);
                     imagecopyresampled($thumb_photo, $attach_photo ,0, 0, 0, 0, $thumb['width'], $thumb['height'], $cx, $cy);
                 }
@@ -303,7 +303,7 @@ class Image {
                     if($attach_photo < 0) {
                         return $attach_photo;
                     }
-                    if(!($this->imginfo['width'] < $this->param['thumbwidth'] || $this->imginfo['height'] < $this->param['thumbheight'])) {
+                    if(!($this->img_info['width'] < $this->param['thumbwidth'] || $this->img_info['height'] < $this->param['thumbheight'])) {
                         list($startx, $starty, $cutw, $cuth) = $this->sizevalue(1);
                         $dst_photo = imagecreatetruecolor($cutw, $cuth);
                         imagecopymerge($dst_photo, $attach_photo, 0, 0, $startx, $starty, $cutw, $cuth, 100);
@@ -313,21 +313,21 @@ class Image {
                         $thumb_photo = imagecreatetruecolor($this->param['thumbwidth'], $this->param['thumbheight']);
                         $bgcolor = imagecolorallocate($thumb_photo, 255, 255, 255);
                         imagefill($thumb_photo, 0, 0, $bgcolor);
-                        $startx = ($this->param['thumbwidth'] - $this->imginfo['width']) / 2;
-                        $starty = ($this->param['thumbheight'] - $this->imginfo['height']) / 2;
-                        imagecopymerge($thumb_photo, $attach_photo, $startx, $starty, 0, 0, $this->imginfo['width'], $this->imginfo['height'], 100);
+                        $startx = ($this->param['thumbwidth'] - $this->img_info['width']) / 2;
+                        $starty = ($this->param['thumbheight'] - $this->img_info['height']) / 2;
+                        imagecopymerge($thumb_photo, $attach_photo, $startx, $starty, 0, 0, $this->img_info['width'], $this->img_info['height'], 100);
                     }
                     break;
             case 3:
-                if($this->imginfo['width'] >= $this->param['thumbwidth'] || $this->imginfo['height'] >= $this->param['thumbheight']) {
+                if($this->img_info['width'] >= $this->param['thumbwidth'] || $this->img_info['height'] >= $this->param['thumbheight']) {
                     $attach_photo = $this->loadsource();
                     if($attach_photo < 0) {
                         return $attach_photo;
                     }
                     $thumb = array();
                     list(,,$thumb['width'], $thumb['height']) = $this->sizevalue(0);
-                    $cx = $this->imginfo['width'];
-                    $cy = $this->imginfo['height'];
+                    $cx = $this->img_info['width'];
+                    $cy = $this->img_info['height'];
                     $thumb_photo = imagecreatetruecolor($this->param['thumbwidth'], $this->param['thumbheight']);
                     $bgcolor = imagecolorallocate($thumb_photo, 255, 255, 255);
                     imagefill($thumb_photo, 0, 0, $bgcolor);
@@ -353,7 +353,7 @@ class Image {
                 $src_info = array('x' => 0, 'y' => 0, 'w' => 0, 'h' => 0);
                 $desc_info = array('x' => 0, 'y' =>0, 'w' => 0, 'h' => 0);
 
-                $pic_info = array('w' => $this->imginfo['width'], 'h' => $this->imginfo['height']);
+                $pic_info = array('w' => $this->img_info['width'], 'h' => $this->img_info['height']);
                 $canvas_info = array('w' => $this->param['thumbwidth'], 'h' => $this->param['thumbheight']);
 
                 $pic_bl = $pic_info['w'] / $pic_info['h'];
@@ -396,15 +396,15 @@ class Image {
                 break;
         }
         clearstatcache();
-        if($this->imginfo['mime'] == 'image/jpeg') {
+        if($this->img_info['mime'] == 'image/jpeg') {
             if ($thumb_photo) {
-                $imagefunc($thumb_photo, $this->target, $this->param['thumbquality']);
+                $imageFunc($thumb_photo, $this->target, $this->param['thumbquality']);
             } else {
                 copy($this->source, $this->target);
             }
         } else {
             if ($thumb_photo) {
-                $imagefunc($thumb_photo, $this->target);
+                $imageFunc($thumb_photo, $this->target);
             } else {
                 copy($this->source, $this->target);
             }
@@ -427,7 +427,7 @@ class Image {
                 break;
             case 'fixwr':
                 case 2:
-                    if(!($this->imginfo['width'] < $this->param['thumbwidth'] || $this->imginfo['height'] < $this->param['thumbheight'])) {
+                    if(!($this->img_info['width'] < $this->param['thumbwidth'] || $this->img_info['height'] < $this->param['thumbheight'])) {
                         list($startx, $starty, $cutw, $cuth) = $this->sizevalue(1);
                         $exec_str = $this->param['imageimpath'].'/convert -quality '.intval($this->param['thumbquality']).' -crop '.$cutw.'x'.$cuth.'+'.$startx.'+'.$starty.' '.$this->source.' '.$this->target;
                         $return = $this->exec($exec_str);
@@ -440,8 +440,8 @@ class Image {
                             return $return;
                         }
                     } else {
-                        $startx = -($this->param['thumbwidth'] - $this->imginfo['width']) / 2;
-                        $starty = -($this->param['thumbheight'] - $this->imginfo['height']) / 2;
+                        $startx = -($this->param['thumbwidth'] - $this->img_info['width']) / 2;
+                        $starty = -($this->param['thumbheight'] - $this->img_info['height']) / 2;
                         $exec_str = $this->param['imageimpath'].'/convert -quality '.intval($this->param['thumbquality']).' -crop '.$this->param['thumbwidth'].'x'.$this->param['thumbheight'].'+'.$startx.'+'.$starty.' '.$this->source.' '.$this->target;
                         $return = $this->exec($exec_str);
                         if($return < 0) {
@@ -458,14 +458,14 @@ class Image {
         return 1;
     }
 
-    function Watermark_FD() {
+    function Watermark_GD() {
         global $_F;
 
         if(!function_exists('imagecreatetruecolor')) {
             return -4;
         }
 
-        $imagefunc = &$this->imagefunc;
+        $imageFunc = &$this->imageFunc;
 
         if ($this->param['watermarktype'] != 'text') {
             if(!function_exists('imagecopy') || !function_exists('imagecreatefrompng') || !function_exists('imagecreatefromgif') || !function_exists('imagealphablending') || !function_exists('imagecopymerge')) {
@@ -494,59 +494,59 @@ class Image {
             $ax = min($box[0], $box[6]) * -1;
             $ay = min($box[5], $box[7]) * -1;
         }
-        $wmwidth = $this->imginfo['width'] - $logo_w;
-        $wmheight = $this->imginfo['height'] - $logo_h;
+        $wmwidth = $this->img_info['width'] - $logo_w;
+        $wmheight = $this->img_info['height'] - $logo_h;
 
         //var_dump($wmwidth, $wmheight);
          //   echo 'asdfasdf';exit;
         // 不管 图片多小都打logo
-        if (1 || $wmwidth > 10 && $wmheight > 10 && !$this->imginfo['animated']) {
+        if (1 || $wmwidth > 10 && $wmheight > 10 && !$this->img_info['animated']) {
             switch($this->param['watermarkstatus']) {
             case 1:
                 $x = 5;
                 $y = 5;
                 break;
             case 2:
-                $x = ($this->imginfo['width'] - $logo_w) / 2;
+                $x = ($this->img_info['width'] - $logo_w) / 2;
                 $y = 5;
                 break;
             case 3:
-                $x = $this->imginfo['width'] - $logo_w - 5;
+                $x = $this->img_info['width'] - $logo_w - 5;
                 $y = 5;
                 break;
             case 4:
                 $x = 5;
-                $y = ($this->imginfo['height'] - $logo_h) / 2;
+                $y = ($this->img_info['height'] - $logo_h) / 2;
                 break;
             case 5:
-                $x = ($this->imginfo['width'] - $logo_w) / 2;
-                $y = ($this->imginfo['height'] - $logo_h) / 2;
+                $x = ($this->img_info['width'] - $logo_w) / 2;
+                $y = ($this->img_info['height'] - $logo_h) / 2;
                 break;
             case 6:
-                $x = $this->imginfo['width'] - $logo_w;
-                $y = ($this->imginfo['height'] - $logo_h) / 2;
+                $x = $this->img_info['width'] - $logo_w;
+                $y = ($this->img_info['height'] - $logo_h) / 2;
                 break;
             case 7:
                 $x = 5;
-                $y = $this->imginfo['height'] - $logo_h - 5;
+                $y = $this->img_info['height'] - $logo_h - 5;
                 break;
             case 8:
-                $x = ($this->imginfo['width'] - $logo_w) / 2;
-                $y = $this->imginfo['height'] - $logo_h - 5;
+                $x = ($this->img_info['width'] - $logo_w) / 2;
+                $y = $this->img_info['height'] - $logo_h - 5;
                 break;
             case 9:
-                $x = $this->imginfo['width'] - $logo_w - 5;
-                $y = $this->imginfo['height'] - $logo_h - 5;
+                $x = $this->img_info['width'] - $logo_w - 5;
+                $y = $this->img_info['height'] - $logo_h - 5;
                 break;
             }
 
-            $dst_photo = imagecreatetruecolor($this->imginfo['width'], $this->imginfo['height']);
+            $dst_photo = imagecreatetruecolor($this->img_info['width'], $this->img_info['height']);
             $target_photo = $this->loadsource();
             if($target_photo < 0) {
                 return $target_photo;
             }
 
-            imageCopy($dst_photo, $target_photo, 0, 0, 0, 0, $this->imginfo['width'], $this->imginfo['height']);
+            imageCopy($dst_photo, $target_photo, 0, 0, 0, 0, $this->img_info['width'], $this->img_info['height']);
 
             if($this->param['watermarktype'] == 'png') {
                 imageCopy($dst_photo, $watermark_logo, $x, $y, 0, 0, $logo_w, $logo_h);
@@ -565,10 +565,10 @@ class Image {
             }
 
             clearstatcache();
-            if($this->imginfo['mime'] == 'image/jpeg') {
-                $imagefunc($dst_photo, $this->target, $this->param['watermarkquality']);
+            if($this->img_info['mime'] == 'image/jpeg') {
+                $imageFunc($dst_photo, $this->target, $this->param['watermarkquality']);
             } else {
-                $imagefunc($dst_photo, $this->target);
+                $imageFunc($dst_photo, $this->target);
             }
         }
         return 1;
