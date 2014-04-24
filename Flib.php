@@ -122,10 +122,10 @@ class Flib {
     /**
      * 自定义错误处理
      *
-     * @param int $errno 错误类型
-     * @param string $errstr 错误信息
-     * @param string $errfile 错误文件
-     * @param int $errline 错误行数
+     * @param $err_no 错误类型
+     * @param $err_str 错误信息
+     * @param $err_file 错误文件
+     * @param $err_line 错误行数
      */
     static public function appError($err_no, $err_str, $err_file, $err_line) {
         global $_F;

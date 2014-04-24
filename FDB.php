@@ -48,7 +48,7 @@ class FDB {
                 }
             } else {
 
-                throw new FDB_Exception("can't connect to the server because:" . $e->getMessage());
+                throw new FDB_Exception("连接数据库失败：" . $e->getMessage());
             }
         }
     }
@@ -88,7 +88,7 @@ class FDB {
         } else {
             $db = 'default';
         }
-        $dsn = $config_db['dsn'];
+//        $dsn = $config_db['dsn'];
 
         $config_db = $_config['db'][$db];
 

@@ -107,7 +107,17 @@ class Smarty_Internal_Compile_Flist extends Smarty_Internal_CompileBase {
 
             $output .= "
             \$sql = \"select * from yp_goods \$where limit \$limit\";
-            \$from = FDB::fetch(\$sql); ";
+            \$from = FDB::fetch(\$sql);
+            foreach (\$from as \$_g_k => \$_g_item) {
+//            echo APP_ROOT . 'attachments/goods/' . \$_g_item['pic'];
+                if (file_exists(APP_ROOT . 'attachments/goods/' . \$_g_item['pic'])) {
+                    \$from[\$_g_k]['pic_url'] = \$_F['s_url'] . 'attachments/goods/' . \$_g_item['pic'];
+                } elseif (file_exists(APP_ROOT . 'uploads/' . \$_g_item['pic'] . '.100x100.jpg')) {
+                    \$from[\$_g_k]['pic_url'] = \$_F['s_url'] . 'uploads/' . \$_g_item['pic'] . '.100x100.jpg';
+                } else {
+                    \$from[\$_g_k]['pic_url'] = \$_F['s_url'] . 'uploads/' . \$_g_item['pic'] . '';
+                }
+            } ";
 
         } elseif (isset($_attr['type']) && ($_attr['type'] == '\'news\'')) {
             $output .= "
