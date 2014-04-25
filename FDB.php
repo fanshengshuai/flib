@@ -62,13 +62,14 @@ class FDB {
     /**
      * 获取数据库连接类
      *
-     * @param string $dsn
-     * @param string $user
-     * @param string $password
-     * @param string $charset
-     * @param string $failover
-     * @param boolean $persistent
-     * @param integer $timeout
+     * @throws Exception
+     * @internal param string $dsn
+     * @internal param string $user
+     * @internal param string $password
+     * @internal param string $charset
+     * @internal param string $failover
+     * @internal param bool $persistent
+     * @internal param int $timeout
      * @return DB 实例
      */
     public static function connect() {
