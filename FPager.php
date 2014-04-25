@@ -101,8 +101,10 @@ class FPager {
 	 * @return string
 	 */
 	public static function getUrl($url) {
+        global $_F;
+
 		if (! $url) {
-			$url = $_F ['uri'];
+			$url = $_SERVER ['REQUEST_URI'];
 		}
 		$url = preg_replace ( '#&*page=\d*#i', '', $url );
 		$url = trim ( $url, '?' );
