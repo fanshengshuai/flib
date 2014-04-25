@@ -2,7 +2,7 @@
 class Smarty_Internal_Compile_Flist extends Smarty_Internal_CompileBase {
     // attribute definitions
     public $required_attributes = array('item');
-    public $optional_attributes = array('from', 'type', 'limit', 'name', 'key', 'sql', 'eid','table','page');
+    public $optional_attributes = array('from', 'type', 'limit', 'name', 'key', 'sql', 'eid','table','page','pagesize','condition');
     public $shorttag_order = array('sql', 'item', 'key', 'name');
 
     /**
@@ -86,12 +86,22 @@ class Smarty_Internal_Compile_Flist extends Smarty_Internal_CompileBase {
                 \$eid = {$_attr['eid']};
                 \$where = \" where eid='{\$eid}' \";";
         }
+        if(isset($_attr['condition'])){
+            $output .= "
+                \$condition={$_attr['condition']};
+                \$where =\$where.' and user_cat_id='.\$condition;";
+        }
         if($_attr['page']){
-            $pagesize=1;
+            $pagesize=$_attr['pagesize']?$_attr['pagesize']:12;
             if(!isset($_attr['page']))$page=1;
             $output .= "
             \$table = {$_attr['table']};
-            \$news_count = FDB::count(\"{\$table}\",\"eid={\$eid} and status=1\");
+            if(\$_GET['id']){
+                \$news_count = FDB::count(\"{\$table}\",\"eid={\$eid} and user_cat_id={\$condition}  and status=1\");
+            }else{
+                \$news_count = FDB::count(\"{\$table}\",\"eid={\$eid} and status=1\");
+            }
+
             \$page_info = FPager::build(\$news_count,{$pagesize});
 
             \$_smarty_tpl->tpl_vars->pager_html = \$page_info['html'];
