@@ -25,20 +25,16 @@ class FDB_Table {
      *
      * @var string
      */
-    private $_table;
+    protected $_table;
 
     /**
      * 构建数据操作实例
      *
-     * - 本程序负责分表时：
-     *   $db = new DB_Table('table_name');
+     * @param string $table
      *
-     * @param string  $table
-     * @param integer $shardKey 分库标志
-     *  + key 数据库字段
-     *  + value 与字段对应的值
+     * @internal param array
      */
-    public function __construct($table, $shardKey = array()) {
+    public function __construct($table) {
         global $_F;
 
         $this->_dbh = FDB::connect();
@@ -89,8 +85,12 @@ class FDB_Table {
      * 获取一条记录
      *
      * @param string $conditions
-     * @param array  $param
-     * @param        array columns 列
+     * @param array $columns
+     * @param array $params
+     *
+     * @throws FDB_Exception
+     * @internal param array $param
+     * @internal param \columns $array 列
      *
      * @return array || null
      */
@@ -115,15 +115,16 @@ class FDB_Table {
     /**
      * 取得所有的记录
      *
-     * @param array   $conditions
-     * @param array   $params
-     * @param array   $columns
+     * @param array $conditions
+     * @param array $params
+     * @param array $columns
      * @param integer $start
      * @param integer $limit
-     * @param string  $order
+     * @param array|string $order
      *   fieldName1 => [ASC|DESC]
      *   fieldName2 => [ASC|DESC]
      *
+     * @throws FDB_Exception
      * @return array
      */
     public function findAll($conditions = null, $params = array(), $columns = array('*'),
@@ -163,8 +164,9 @@ class FDB_Table {
      * findBySql
      *
      * @param  string $sql
-     * @param  array  $params
+     * @param  array $params
      *
+     * @throws FDB_Exception
      * @return array
      */
     public function findBySql($sql, $params = array()) {
@@ -183,7 +185,10 @@ class FDB_Table {
      * 删除记录
      *
      * @param string $conditions
-     * @param array  $param
+     * @param array $params
+     *
+     * @throws FDB_Exception
+     * @internal param array $param
      *
      * @return int affect rows
      */
@@ -200,9 +205,12 @@ class FDB_Table {
     /**
      * 插入一条记录 或更新表记录
      *
-     * @param array  $data
+     * @param array $data
      * @param string $conditions
-     * @param array  $param
+     * @param array $params
+     *
+     * @throws FDB_Exception
+     * @internal param array $param
      *
      * @return bool || int
      */
@@ -241,6 +249,7 @@ class FDB_Table {
      *
      * @param array $data
      *
+     * @throws FDB_Exception
      * @return mixed
      */
     public function replace($data) {
@@ -264,6 +273,7 @@ class FDB_Table {
     /**
      * 获取刚刚写入记录的ID
      *
+     * @throws FDB_Exception
      * @return int
      */
     public function lastInsertId() {
@@ -279,6 +289,9 @@ class FDB_Table {
      * 一次插入多条记录
      *
      * @param  $data
+     *
+     * @throws FDB_Exception
+     * @return bool
      */
     public function multiInsert($data) {
 
@@ -314,6 +327,8 @@ class FDB_Table {
      * 数据表列名到缓存列名的转换
      *
      * @param array $array
+     *
+     * @return array
      */
     public function keyMap($array) {
 
@@ -332,8 +347,9 @@ class FDB_Table {
      * 计算行数
      *
      * @param  string $conditions
-     * @param  array  $params
+     * @param  array $params
      *
+     * @throws FDB_Exception
      * @return integer
      */
     public function count($conditions = null, $params = array()) {
@@ -356,8 +372,9 @@ class FDB_Table {
      * 执行sql语句
      *
      * @param  string $sql
-     * @param  string $params
+     * @param array|string $params
      *
+     * @throws FDB_Exception
      * @return void
      */
     public function exec($sql, $params = array()) {

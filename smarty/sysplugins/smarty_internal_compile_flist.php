@@ -97,7 +97,7 @@ class Smarty_Internal_Compile_Flist extends Smarty_Internal_CompileBase {
             $output .= "
             \$table = {$_attr['table']};
             if(\$_GET['id']){
-                \$news_count = FDB::count(\"{\$table}\",\"eid={\$eid} and user_cat_id={\$condition}  and status=1\");
+                \$news_count = FDB::count(\"{\$table}\",\"eid={\$eid} and user_cat_id='{\$condition}'  and status=1\");
             }else{
                 \$news_count = FDB::count(\"{\$table}\",\"eid={\$eid} and status=1\");
             }
@@ -110,12 +110,12 @@ class Smarty_Internal_Compile_Flist extends Smarty_Internal_CompileBase {
             $output .= " \$_smarty_tpl->assign('page_info', \$page_info);\n";
         }
 
-
         if (isset($_attr['sql'])) {
             $output .= "\$from = FDB::fetch({$_attr['sql']});";
         } elseif (isset($_attr['type']) && ($_attr['type'] == '\'goods\'')) {
 
             $output .= "
+            \$where = \$where . ' and goods_type <> 2';
             \$sql = \"select * from yp_goods \$where limit \$limit\";
             \$from = FDB::fetch(\$sql);
             foreach (\$from as \$_g_k => \$_g_item) {
