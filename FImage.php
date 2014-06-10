@@ -176,4 +176,28 @@ class FImage{
         $this->img->text($text, $font, $size, $color, $locate, $offset, $angle);
         return $this;
     }
+
+    public static function getThumbPicUrl($pic_file, $size = '100x100') {
+
+        $full_pic_file = UPLOAD_DIR . $pic_file;
+        $thumb_file = UPLOAD_DIR . "cache/{$pic_file}.{$size}.jpg";
+        $thumb_pic_url = "/uploads/cache/{$pic_file}.{$size}.jpg";
+
+        if (file_exists($thumb_file)) {
+            return $thumb_pic_url;
+        }
+
+        list($w, $h) = explode('x', $size);
+        if (!$w || !$h) throw new Exception("size 参数错误！必须是 100x100 这样的形式。");
+
+        if (!file_exists($full_pic_file)) {
+            return 'thumb_error_for_src_pic_not_exits';
+        }
+
+        FFile::mkdir(dirname($thumb_file));
+        $fImage = new FImage();
+        $fImage->open($full_pic_file)->thumb($w, $h, FImage::THUMB_CENTER)->save($thumb_file);
+
+        return $thumb_pic_url;
+    }
 }

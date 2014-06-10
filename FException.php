@@ -17,12 +17,22 @@ class FException extends Exception {
 
     public function traceError($e) {
 
-        //if ($e->code) { redirect('/e404'); }
+        if (is_array($e)) {
+            $error_message = $e['message'];
+            $error_file = $e['file'];
+            $error_line = $e['line'];
+        } else {
+            $error_message = $e->getMessage();
+            $error_file = $e->getFile();
+            $error_line = $e->getLine();
+            $exception_trace = nl2br($e->__toString());
+        }
 
-        $exception_message = $e->getMessage()
-            . '<br /> 异常出现在：' . $e->getFile() . '&nbsp;&nbsp;&nbsp;&nbsp; 第 ' . $e->getLine() . ' 行';
-        $exception_trace = nl2br($e->__toString());
+        $exception_message = $error_message
+            . '<br /> 异常出现在：' . $error_file . '&nbsp;&nbsp;&nbsp;&nbsp; 第 ' . $error_line . ' 行';
 
+        header('HTTP/1.1 500 FLib Error');
+        header('status: 500 FLib Error');
         $exception_message = str_replace(APP_ROOT, '', $exception_message);
         $exception_trace = str_replace(APP_ROOT, '', $exception_trace);
 
@@ -30,6 +40,7 @@ class FException extends Exception {
         $this->view->set('exception_trace', $exception_trace);
         $this->view->displaySysPage('exception.tpl');
     }
+
     public function printMessage($exception_message) {
 
     	header('HTTP/1.1 500 FLib Error');

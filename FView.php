@@ -37,6 +37,10 @@ class FView extends Smarty {
             $this->template_dir = APP_ROOT . 'template/';
         }
 
+        if (defined('TPL_ROOT')) {
+            $this->template_dir = TPL_ROOT;
+        }
+
         $this->caching = false;
         $this->debugging = false;
         $this->cache_lifetime = 300;
@@ -65,7 +69,7 @@ class FView extends Smarty {
         $this->template_dir = FLIB_ROOT . 'View/';
         $content = $this->fetch($tpl);
 
-        if (!$_F['uri']) {
+        if ($_F['run_in'] == 'shell') {
             $content = str_replace(array('<br />', '</p>', '</tr>'), "\n", $content);
             $content = str_replace(array('&nbsp;'), " ", $content);
             $content = preg_replace('/<head>.+?<\/head>/si', '', $content);
@@ -91,7 +95,7 @@ class FView extends Smarty {
                 $tpl = "{$_F['app']}/{$c}/{$_F['action']}";
             } else {
                 $c = strtolower(str_replace('Controller_', '', $_F['controller']));
-                $c = str_replace($_F['module'].'_', '', $c);
+                $c = str_replace($_F['module'] . '_', '', $c);
                 $a = $_F['action'];
                 $a = preg_replace('#([A-Z])#e', "_\\1", $a);
                 $a = strtolower($a);
@@ -116,9 +120,8 @@ class FView extends Smarty {
         global $_F;
 
         $this->set('_F', $_F);
-        $this->set('_F', $_F);
 
-        $view_compress = Config::get('view.compress');
+        $view_compress = FConfig::get('view.compress');
         $contents = $this->fetch($tpl);
 
         if ($view_compress) {
@@ -140,18 +143,25 @@ class FView extends Smarty {
         global $_F;
 
 
-        if (RUN_MODE == 'cli') {
+        if ($_F['run_in'] == 'shell') {
             $debug_contents = "DEBUG INFO:\n";
         } else {
             $debug_contents = '<style> .debug_table { margin-left:20px; border:1px solid #000;} .debug_table th, .debug_table td { padding:5px; border:1px solid #000; } </style>';
         }
 
         // SQL DEBUG
-        $debug_contents .= '<table class="debug_table" rules="none" cellspacing="0" cellpadding="5"><tr><td colspan="2">SQL：</td></tr>';
-        foreach ($_F['debug_info']['sql'] as $key => $item) {
-            $debug_contents .= "<tr><th>{$key}</th><td>{$item}</td></tr>";
+        if ($_F['debug_info']['sql']) {
+
+            $debug_contents .= '<table class="debug_table" rules="none" cellspacing="0" cellpadding="5"><tr><td colspan="2">SQL：</td></tr>';
+            foreach ($_F['debug_info']['sql'] as $key => $item) {
+                if (is_array($item)) {
+                    $debug_contents .= "<tr><th>{$key}</th><td>{$item['sql']}<br/>{$item['params']}</td></tr>";
+                } else {
+                    $debug_contents .= "<tr><th>{$key}</th><td>{$item}</td></tr>";
+                }
+            }
+            $debug_contents .= '</table><br />';
         }
-        $debug_contents .= '</table><br />';
 
         // COOKIES DEBUG
         $debug_contents .= '<table class="debug_table" rules="none" cellspacing="0" cellpadding="5"><tr><td colspan="2">COOKIES：</td></tr>';
@@ -186,7 +196,7 @@ class FView extends Smarty {
         }
         $debug_contents .= '</table>';
 
-        if (RUN_MODE == 'cli') {
+        if ($_F['run_in'] == 'shell') {
             $debug_contents = str_replace('</tr>', "\n", $debug_contents);
             $debug_contents = preg_match('/<.+?>/', '', $debug_contents);
         }

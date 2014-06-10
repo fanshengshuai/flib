@@ -65,7 +65,7 @@ class FController {
         if (is_array($items)) {
             $result['items'] = $items;
         } else {
-            $result['message'] = $items;
+            $result['content'] = $items;
         }
 
         ob_clean();
@@ -200,14 +200,13 @@ class FController {
         return $post_data;
     }
 
-    protected function disp($tpl = null) {
-        $this->view->disp($tpl);
-    }
-
     protected function display($tpl = null) {
         $this->view->disp($tpl);
     }
 
+    protected function assign($key, $value) {
+        $this->view->set($key, $value);
+    }
     protected function set($key, $value) {
         $this->view->set($key, $value);
     }
@@ -215,5 +214,9 @@ class FController {
     protected function _successAction() {
         echo 'please write _successAction';
         exit;
+    }
+
+    protected function ajaxReturn(){
+
     }
 }

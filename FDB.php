@@ -8,28 +8,29 @@
  * vim: set expandtab sw=4 ts=4 sts=4
  * $Id: DB.php 273 2012-08-22 10:37:34Z fanshengshuai $
  */
-
 class FDB {
 
-    private static $_conns = array();
+    private static $_connects = array();
 
     private $_dbh;
 
     /**
-     * db 构造函数
+     * FDB 构造函数
      *
      * @param string $dsn
      * @param string $user
      * @param string $password
      * @param string $charset
-     * @param string $failover
+     * @param string $failOver
      * @param boolean $persistent
      * @param integer $timeout
+     *
+     * @throws FDB_Exception
      */
-    private function __construct($dsn, $user, $password, $charset, $failover = '', $persistent = false, $timeout = 0) {
+    private function __construct($dsn, $user, $password, $charset, $failOver = '', $persistent = false, $timeout = 0) {
 
         $attr = array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                      PDO::ATTR_PERSISTENT => $persistent);
+            PDO::ATTR_PERSISTENT => $persistent);
         if (0 < $timeout) {
             $attr[PDO::ATTR_TIMEOUT] = $timeout;
         }
@@ -37,13 +38,13 @@ class FDB {
         try {
             $this->_dbh = new PDO($dsn, $user, $password, $attr);
             $this->_dbh->exec("SET NAMES '" . $charset . "'");
-        } catch (PDOException $e){
+        } catch (PDOException $e) {
 
-            if ($failover) {
+            if ($failOver) {
                 try {
-                    $this->_dbh = new PDO($failover, $user, $password, $attr);
+                    $this->_dbh = new PDO($failOver, $user, $password, $attr);
                     $this->_dbh->exec("SET NAMES '" . $charset . "'");
-                } catch (PDOException $e){
+                } catch (PDOException $e) {
                     throw new FDB_Exception("can't connect to the server because:" . $e->getMessage());
                 }
             } else {
@@ -67,48 +68,41 @@ class FDB {
      * @internal param string $user
      * @internal param string $password
      * @internal param string $charset
-     * @internal param string $failover
+     * @internal param string $failOver
      * @internal param bool $persistent
      * @internal param int $timeout
-     * @return DB 实例
+     * @return FDB 实例
      */
     public static function connect() {
         global $_F;
 
-        if ($_F ['db'] ['default']) {
-			return $_F ['db'] ['default'];
-		}
-
-		if (! include (APP_ROOT . "config/db.php")) {
-			throw new Exception ( 'NO DB CONFIG EXIST ! PLEASE CHECK config/db.php' );
-		}
-
-        if (strpos($table, '.')) {
-            $db = substr($table, 0, strpos($table, '.'));
-            $table = substr($table, strpos($table, '.') + 1);
-        } else {
+        if (!$_F['db']['config']) {
             $db = 'default';
+            $_F['db']['config'] = FConfig::get('db.' . $db);
+        } else {
+            // check db.php
+            if (!include(APP_ROOT . "config/db.php")) {
+                throw new Exception ('NO DB CONFIG EXIST ! PLEASE CHECK config/db.php');
+            }
         }
-//        $dsn = $config_db['dsn'];
 
-        $config_db = $_config['db'][$db];
+        $dsn = $_F['db']['config']['dsn'];
 
-        $_F['db']['config'] = $config_db;
-
-        if (!array_key_exists($dsn, self::$_conns)) {
-            self::$_conns[$dsn] = new FDB(
-                $config_db['dsn'],
-                $config_db['user'],
-                $config_db['password'],
-                $config_db['charset'],
-                $config_db['failover'],
-                $config_db['persistent'],
-                $config_db['timeout']
-            );
+        if (array_key_exists($dsn, self::$_connects)) {
+            self::$_connects[$dsn];
         }
-        $_F['db'][$db] = self::$_conns[$dsn];
 
-        return self::$_conns[$dsn];
+        self::$_connects[$dsn] = new FDB(
+            $_F['db']['config']['dsn'],
+            $_F['db']['config']['user'],
+            $_F['db']['config']['password'],
+            $_F['db']['config']['charset'],
+            $_F['db']['config']['failOver'],
+            $_F['db']['config']['persistent'],
+            $_F['db']['config']['timeout']
+        );
+
+        return self::$_connects[$dsn];
     }
 
     /**
@@ -140,6 +134,8 @@ class FDB {
      *
      * @param sql string $query
      * @param array $params
+     *
+     * @return mixed
      */
     public function fetchRow($query, $params = array()) {
         global $_F;
@@ -159,10 +155,13 @@ class FDB {
      * 取得所有的记录
      *
      * @param sql string $query
-     * @param array $params
+     * @param bool $from_cache
+     *
+     * @internal param array $params
+     *
      * @return array
      */
-    public function fetchAll($query, $from_cache=false) {
+    public function fetchAll($query, $from_cache = false) {
         global $_F;
 
         if ($_F['debug']) {
@@ -180,6 +179,8 @@ class FDB {
      *
      * @param string sql $query
      * @param array $params
+     *
+     * @return string
      */
     public function fetchOne($query, $params = array()) {
         global $_F;
@@ -193,17 +194,18 @@ class FDB {
         if ($result) {
             $row = $stmt->fetchColumn();
         }
-        return $row ;
+        return $row;
     }
+
 
     /**
      * 执行sql 语句
      *
-     * @param sqlstring $query
+     * @param $query
      * @param array $params
-     * @return 更新的记录的条数
+     *
+     * @return bool
      */
-
     public function exec($query, $params = array()) {
         global $_F;
 
@@ -225,12 +227,13 @@ class FDB {
 
     /**
      * 关闭数据库连接
+     *
      * @param string $dsn
      */
     public function close($dsn = null) {
 
         if ($dsn) {
-            self::$_conns[$dsn] = NULL;
+            self::$_connects[$dsn] = NULL;
         } else {
             $this->_dbh = NULL;
         }
@@ -240,7 +243,7 @@ class FDB {
     public static function query($sql) {
         global $_F;
 
-    	$_dbh = FDB::connect();
+        $_dbh = FDB::connect();
         return $_dbh->exec($sql);
     }
 
@@ -249,22 +252,22 @@ class FDB {
 
         $_dbh = FDB::connect();
 
-        return $_dbh->fetchAll($sql, $from_cache=false);
+        return $_dbh->fetchAll($sql, $from_cache = false);
     }
 
-    public static function fetchCached($sql, $cache_time=3600) {
+    public static function fetchCached($sql, $cache_time = 3600) {
         $cache_key = "sql-fetch_{$sql}";
-    	$cache_content = C::get($cache_key);
-    	if ($cache_content) {
-    		return $cache_content;
-    	}
+        $cache_content = C::get($cache_key);
+        if ($cache_content) {
+            return $cache_content;
+        }
 
-    	$cache_content = self::fetch($sql);
-    	C::set($cache_key, $cache_content, $cache_time);
-    	return $cache_content;
+        $cache_content = self::fetch($sql);
+        C::set($cache_key, $cache_content, $cache_time);
+        return $cache_content;
     }
 
-    public static function fetchFirst($sql, $from_cache=false) {
+    public static function fetchFirst($sql, $from_cache = false) {
         global $_F;
 
         $_dbh = FDB::connect();
@@ -272,7 +275,7 @@ class FDB {
         return $_dbh->fetchRow($sql);
     }
 
-    public static function fetchFirstCached($sql, $cache_time=3600) {
+    public static function fetchFirstCached($sql, $cache_time = 3600) {
         $cache_key = "sql-fetchFirst_{$sql}";
         $cache_content = C::get($cache_key);
         if ($cache_content) {
@@ -299,7 +302,7 @@ class FDB {
     public static function update($table, $data, $condition) {
         global $_F;
 
-        if (!$data['update_time'] && $_F['upate_from'] != 'gather') {
+        if (!$data['update_time']) {
             $data['update_time'] = date('Y-m-d H:i:s');
         }
 
@@ -318,12 +321,15 @@ class FDB {
     }
 
     /**
+     * 删除数据
+     *
      * @param      $table 表名
      * @param      $condition 条件
      * @param bool $is_real_delete true 真删除，false 假删除
+     *
      * @return bool
      */
-    public static function remove($table, $condition, $is_real_delete=false) {
+    public static function remove($table, $condition, $is_real_delete = false) {
 
         $table = new FDB_Table($table);
 
@@ -337,22 +343,44 @@ class FDB {
             $table->save($data, $condition);
         }
 
-
-
-
         return true;
     }
 
+    /**
+     * 字段数据 +1
+     *
+     * @param $table
+     * @param $field
+     * @param null $conditions
+     * @param int $unit
+     */
     public static function incr($table, $field, $conditions = null, $unit = 1) {
         $table = new FDB_Table($table);
         $table->incr($field, $conditions, array(), $unit);
     }
 
+    /**
+     * 字段数据 -1
+     *
+     * @param $table
+     * @param $field
+     * @param null $conditions
+     * @param array $params
+     * @param int $unit
+     */
     public static function decr($table, $field, $conditions = null, $params = array(), $unit = 1) {
         $table = new FDB_Table($table);
         $table->decr($field, $conditions, array(), $unit);
     }
 
+    /**
+     * 统计符合条目的数目
+     *
+     * @param $table
+     * @param null $conditions
+     *
+     * @return int
+     */
     public static function count($table, $conditions = null) {
         $table = new FDB_Table($table);
         return $table->count($conditions);

@@ -13,7 +13,7 @@ class FHttp {
      *
      * @return object
      */
-    public function download($http_file, $save_path = null) {
+    public static function download($http_file, $save_path = null) {
         $http_file_raw = file_get_contents($http_file);
 
         if ($save_path) {

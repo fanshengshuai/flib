@@ -72,12 +72,14 @@ class FUploader {
 		return $upload_file ['file_path'];
 	}
 
-	public function saveAttach($field, $attach_type='images', $obj = null) {
-		if ($_FILES [$field] ['size'] < 1)
-			return false;
-		if (! $obj) {
+    public function saveAttach($field, $attach_type='images', $obj = null) {
+        global $_F;
+
+        if ($_FILES [$field] ['size'] < 1)
+            return -1;
+        if (! $obj) {
             $obj = $attach_type . '/' . date('Y-m') . '/' . date('d') . '/' . date('YmdHis') . '.attach';
-		}
+        }
 
         // 处理扩展名
         if (strpos ( $obj, '.attach' )) {
@@ -90,7 +92,19 @@ class FUploader {
                 $file_ext = 'txt';
             }
 
-            if (!in_array($file_ext, array('jpg', 'png', 'gif'))) {
+            $default_upload_ext = array('jpg', 'png', 'gif');
+            $config_upload_ext = explode(',', str_replace(' ', '', FConfig::get('global.upload_file_ext')));
+
+            if ($config_upload_ext) {
+                $config_upload_ext = array_merge($config_upload_ext, $default_upload_ext);
+            } else {
+                $config_upload_ext = $default_upload_ext;
+            }
+
+            if (!in_array($file_ext, $config_upload_ext)) {
+                if (FConfig::get('global.debug')) {
+                    throw new Exception('禁止上传此类型的文件。');
+                }
                 return false;
             }
 
