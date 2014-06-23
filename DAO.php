@@ -15,8 +15,8 @@ class DAO extends FDB_Table {
     // 查询表达式
     protected $selectSql = 'SELECT%DISTINCT% %FIELD% FROM %TABLE%%JOIN%%WHERE%%GROUP%%HAVING%%ORDER%%LIMIT% %UNION%%COMMENT%';
 
-    public function __construct($table) {
-        parent::__construct($table);
+    public function __construct() {
+        parent::__construct($this->_table);
     }
 
     public function listByPage($page, $order = array(), $conditions = null, $per_page = 20) {

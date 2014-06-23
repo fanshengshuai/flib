@@ -43,7 +43,7 @@ class Flib {
 
         // if autoload Smarty, return false;
         if (strpos($className, 'Smarty') === 0) {
-            return;
+            return false;
         }
 
         $class_path = str_replace('_', '/', $className) . ".php";
@@ -77,10 +77,17 @@ class Flib {
         // 查是不是 App 的 class
         if ($_F['module']) {
             $file = str_replace(strtolower($_F['module']) . '/', '', $file);
-            $inc_file = APP_ROOT . 'modules/' . $_F['module'] . '/' . $file;
+
+            if (strpos($file, 'controller') !== false) {
+                $inc_file = APP_ROOT . 'modules/' . $_F['module'] . '/' . $file;
+            } else {
+                $inc_file = APP_ROOT . $file;
+            }
         } else {
             $inc_file = APP_ROOT . $file;
         }
+
+//        echo $inc_file;
 
         if (file_exists($inc_file)) {
             if ($_F ['debug']) {
@@ -217,9 +224,14 @@ class Flib {
         $_F['refer'] = $_REQUEST ['refer'] ? $_REQUEST ['refer'] : $_SERVER ['HTTP_REFERER'];
 
         $_F['in_ajax'] = ($_REQUEST['in_ajax'] || $_GET ['in_ajax'] || $_POST ['in_ajax']) ? true : false;
+
+        if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
+            $_F['in_ajax'] = true;
+        }
+
         $_F['is_post'] = ($_POST) ? true : false;
 
-        $_F['run_in'] = isset($_SERVER ['HTTP_HOST']) ? 'http' : 'shell';
+        $_F['run_in'] = isset($_SERVER ['HTTP_HOST']) ? 'web' : 'shell';
 
         define('IS_POST', $_F['is_post']);
 

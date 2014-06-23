@@ -6,6 +6,7 @@ class FImage_Driver_GD {
      * @var resource
      */
     private $img;
+    private $gif;
 
     /**
      * 图像信息，包括width,height,type,mime,size
@@ -15,22 +16,35 @@ class FImage_Driver_GD {
 
     /**
      * 构造方法，可用于打开一张图像
-     * @param string $imgname 图像路径
+     *
+     * @param string $imgName 图像路径
      */
-    public function __construct($imgname = null) {
-        $imgname && $this->open($imgname);
+    public function __construct($imgName = null) {
+        $imgName && $this->open($imgName);
+    }
+
+    /**
+     * 设置图片压缩质量
+     *
+     * @param $thumb_quality
+     */
+    public function setThumbQuality($thumb_quality) {
+        global $_F;
+
+        $_F['thumb_quality'] = $thumb_quality;
     }
 
     /**
      * 打开一张图像
-     * @param  string $imgname 图像路径
+     *
+     * @param  string $imgName 图像路径
      */
-    public function open($imgname) {
+    public function open($imgName) {
         //检测图像文件
-        if (!is_file($imgname)) E('不存在的图像文件');
+        if (!is_file($imgName)) E('不存在的图像文件');
 
         //获取图像信息
-        $info = getimagesize($imgname);
+        $info = getimagesize($imgName);
 
         //检测图像合法性
         if (false === $info || (IMAGETYPE_GIF === $info[2] && empty($info['bits']))) {
@@ -39,10 +53,10 @@ class FImage_Driver_GD {
 
         //设置图像信息
         $this->info = array(
-            'width'  => $info[0],
+            'width' => $info[0],
             'height' => $info[1],
-            'type'   => image_type_to_extension($info[2], false),
-            'mime'   => $info['mime'],
+            'type' => image_type_to_extension($info[2], false),
+            'mime' => $info['mime'],
         );
 
         //销毁已存在的图像
@@ -51,21 +65,24 @@ class FImage_Driver_GD {
         //打开图像
         if ('gif' == $this->info['type']) {
             require_once FLIB_ROOT . 'Driver/Image.GIF.php';
-            $this->gif = new FImage_Driver_GIF($imgname);
+            $this->gif = new FImage_Driver_GIF($imgName);
             $this->img = imagecreatefromstring($this->gif->image());
         } else {
             $fun = "imagecreatefrom{$this->info['type']}";
-            $this->img = $fun($imgname);
+            $this->img = $fun($imgName);
         }
     }
 
     /**
      * 保存图像
-     * @param  string  $imgname 图像保存名称
-     * @param  string  $type 图像类型
+     *
+     * @param  string $imgName 图像保存名称
+     * @param  string $type 图像类型
      * @param  boolean $interlace 是否对JPEG类型图像设置隔行扫描
      */
-    public function save($imgname, $type = null, $interlace = true) {
+    public function save($imgName, $type = null, $interlace = true) {
+        global $_F;
+
         if (empty($this->img)) E('没有可以被保存的图像资源');
 
         //自动获取图像类型
@@ -81,12 +98,16 @@ class FImage_Driver_GD {
             imageinterlace($this->img, $interlace);
         }
 
+        if ($_F['thumb_quality']) {
+            $_F['thumb_quality'] = 75;
+        }
+
         //保存图像
         if ('gif' == $type && !empty($this->gif)) {
-            $this->gif->save($imgname);
+            $this->gif->save($imgName);
         } else {
             $fun = "image{$type}";
-            $fun($this->img, $imgname);
+            $fun($this->img, $imgName, $_F['thumb_quality']);
         }
     }
 
@@ -142,6 +163,7 @@ class FImage_Driver_GD {
 
     /**
      * 裁剪图像
+     *
      * @param  integer $w 裁剪区域宽度
      * @param  integer $h 裁剪区域高度
      * @param  integer $x 裁剪区域x坐标
@@ -177,12 +199,15 @@ class FImage_Driver_GD {
 
     /**
      * 生成缩略图
+     *
      * @param  integer $width 缩略图最大宽度
      * @param  integer $height 缩略图最大高度
      * @param  integer $type 缩略图裁剪类型
      */
     public function thumb($width, $height, $type = FImage::THUMB_SCALE) {
         if (empty($this->img)) E('没有可以被缩略的图像资源');
+
+        $x = $y = 0;
 
         //原图宽度和高度
         $w = $this->info['width'];
@@ -249,10 +274,13 @@ class FImage_Driver_GD {
                 }
 
                 //设置缩略图的坐标及宽度和高度
-                $neww = $w * $scale;
-                $newh = $h * $scale;
-                $posx = ($width - $w * $scale) / 2;
-                $posy = ($height - $h * $scale) / 2;
+                $new_w = $w * $scale;
+                $new_h = $h * $scale;
+                $pos_x = ($width - $w * $scale) / 2;
+                $pos_y = ($height - $h * $scale) / 2;
+
+                $x = 0;
+                $y = 0;
 
                 do {
                     //创建新图像
@@ -262,7 +290,7 @@ class FImage_Driver_GD {
                     imagefill($img, 0, 0, $color);
 
                     //裁剪
-                    imagecopyresampled($img, $this->img, $posx, $posy, $x, $y, $neww, $newh, $w, $h);
+                    imagecopyresampled($img, $this->img, $pos_x, $pos_y, $x, $y, $new_w, $new_h, $w, $h);
                     imagedestroy($this->img); //销毁原图
                     $this->img = $img;
                 } while (!empty($this->gif) && $this->gifNext());
@@ -287,7 +315,8 @@ class FImage_Driver_GD {
 
     /**
      * 添加水印
-     * @param  string  $source 水印图片路径
+     *
+     * @param  string $source 水印图片路径
      * @param  integer $locate 水印位置
      * @param  integer $alpha 水印透明度
      */
@@ -295,6 +324,8 @@ class FImage_Driver_GD {
         //资源检测
         if (empty($this->img)) E('没有可以被添加水印的图像资源');
         if (!is_file($source)) E('水印图像不存在');
+
+        $x = $y = 0;
 
         //获取水印图像信息
         $info = getimagesize($source);
@@ -394,10 +425,11 @@ class FImage_Driver_GD {
 
     /**
      * 图像添加文字
-     * @param  string  $text 添加的文字
-     * @param  string  $font 字体路径
+     *
+     * @param  string $text 添加的文字
+     * @param  string $font 字体路径
      * @param  integer $size 字号
-     * @param  string  $color 文字颜色
+     * @param  string $color 文字颜色
      * @param  integer $locate 文字写入位置
      * @param  integer $offset 文字相对当前位置的偏移量
      * @param  integer $angle 文字倾斜角度
@@ -475,9 +507,9 @@ class FImage_Driver_GD {
             default:
                 /* 自定义文字坐标 */
                 if (is_array($locate)) {
-                    list($posx, $posy) = $locate;
-                    $x += $posx;
-                    $y += $posy;
+                    list($pos_x, $pos_y) = $locate;
+                    $x += $pos_x;
+                    $y += $pos_y;
                 } else {
                     E('不支持的文字位置类型');
                 }

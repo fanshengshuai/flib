@@ -56,14 +56,14 @@ class FResponse {
      *
      * @param $content string 内容
      */
-    public function write($content) {
+    public function write($content = null) {
         ob_clean();
 
         foreach ($this->header as $h_key => $h_value) {
             header("{$h_key}: $h_value");
         }
 
-        echo $content;
+        if ($content) echo $content;
     }
 
     /**
@@ -85,5 +85,81 @@ class FResponse {
         }
 
         return;
+    }
+
+    public static function sendHeader($headerKey, $headerValue = null) {
+
+        if (is_numeric($headerKey) && $headerValue == null) {
+            self::sendStatusHeader($headerKey);
+        } else {
+            header($headerKey . ': ' . $headerValue);
+        }
+    }
+
+    /**
+     * 发送HTTP状态
+     *
+     * @param integer $code 状态码
+     *
+     * @return void
+     */
+    public static function sendStatusHeader($code) {
+        static $httpStatusMap = array(
+            // Success 2xx
+            200 => 'OK',
+            // Redirection 3xx
+            301 => 'Moved Permanently',
+            302 => 'Moved Temporarily ', // 1.1
+            // Client Error 4xx
+            400 => 'Bad Request',
+            403 => 'Forbidden',
+            404 => 'Not Found',
+            // Server Error 5xx
+            500 => 'Internal Server Error',
+            503 => 'Service Unavailable',
+        );
+
+        if (isset($httpStatusMap[$code])) {
+            header('HTTP/1.1 ' . $code . ' ' . $httpStatusMap[$code]);
+            // 确保FastCGI模式下正常
+            header('Status:' . $code . ' ' . $httpStatusMap[$code]);
+        }
+    }
+
+    /**
+     * 跳转
+     *
+     * @param $url
+     * @param null $target
+     */
+    public static function redirect($url, $target = null) {
+        global $_F;
+
+        if ($url == 'r') {
+            $url = $_SERVER ['HTTP_REFERER'];
+        }
+
+        if ($_F ['in_ajax']) {
+            self::output(array('result' => true, 'redirect_url' => $url, 'target' => $target));
+            exit;
+        }
+
+        if ($target == 301) {
+            self::sendStatusHeader(301);
+            self::sendHeader('Location', $url); // 跳转到新地址
+        } elseif ($target) {
+            echo "<script> {$target}.location.href = '{$url}'; </script>";
+        } else {
+            header("location: " . $url);
+        }
+
+        exit ();
+    }
+
+    /**
+     * 刷新页面
+     */
+    public static function refresh() {
+        self::redirect('r');
     }
 }

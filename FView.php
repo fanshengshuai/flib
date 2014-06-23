@@ -146,7 +146,7 @@ class FView extends Smarty {
         if ($_F['run_in'] == 'shell') {
             $debug_contents = "DEBUG INFO:\n";
         } else {
-            $debug_contents = '<style> .debug_table { margin-left:20px; border:1px solid #000;} .debug_table th, .debug_table td { padding:5px; border:1px solid #000; } </style>';
+            $debug_contents = '<style> .debug_table { border-collapse: collapse;margin:20px; border:1px solid #000;} .debug_table th, .debug_table td { padding:5px; border:1px solid #000; } </style>';
         }
 
         // SQL DEBUG
@@ -155,12 +155,14 @@ class FView extends Smarty {
             $debug_contents .= '<table class="debug_table" rules="none" cellspacing="0" cellpadding="5"><tr><td colspan="2">SQL：</td></tr>';
             foreach ($_F['debug_info']['sql'] as $key => $item) {
                 if (is_array($item)) {
-                    $debug_contents .= "<tr><th>{$key}</th><td>{$item['sql']}<br/>{$item['params']}</td></tr>";
+                    $debug_contents .= "<tr><th>{$key}</th><td>{$item['sql']}<br/><pre>" .
+                        var_export($item['params'], true) . "</pre></td></tr>";
+
                 } else {
                     $debug_contents .= "<tr><th>{$key}</th><td>{$item}</td></tr>";
                 }
             }
-            $debug_contents .= '</table><br />';
+            $debug_contents .= '</table>';
         }
 
         // COOKIES DEBUG
@@ -168,31 +170,41 @@ class FView extends Smarty {
         foreach ($_COOKIE as $key => $item) {
             $debug_contents .= "<tr><th>{$key}</th><td>{$item}</td></tr>";
         }
-        $debug_contents .= '</table><br />';
+        $debug_contents .= '</table>';
 
         // ERRORS
-        $debug_contents .= '<table class="debug_table" rules="none" cellspacing="0" cellpadding="5"><tr><td colspan="2"><span style="background: #ff0000; color: #fff; padding:5px;"> ERRORS：</span></td></tr>';
-        foreach ($_F['errors'] as $key => $item) {
-            foreach ($item as $skey => $sItem) {
-                $debug_contents .= "<tr><th>{$key}</th><td>{$sItem}</td></tr>";
+        if ($_F['errors']) {
+
+            $debug_contents .= '<table class="debug_table" rules="none" cellspacing="0" cellpadding="5"><tr><td colspan="2"><span style="background: #ff0000; color: #fff; padding:5px;"> ERRORS：</span></td></tr>';
+            foreach ($_F['errors'] as $key => $item) {
+                foreach ($item as $skey => $sItem) {
+                    $debug_contents .= "<tr><th>{$key}</th><td>{$sItem}</td></tr>";
+                }
             }
+            $debug_contents .= '</table>';
+            unset($_F['errors']);
         }
-        $debug_contents .= '</table><br />';
-        unset($_F['errors']);
+
 
         // $_F DEBUG
         $debug_F = $_F;
         unset($debug_F['debug_info']);
         $debug_contents .= '<table class="debug_table" rules="none" cellspacing="0" cellpadding="5"><tr><td colspan="2">$_F：</td></tr>';
         foreach ($debug_F as $key => $item) {
-            $debug_contents .= "<tr><th>{$key}</th><td>" . var_export($item, true) . "</td></tr>";
+            if (is_string($item)) {
+                $item_text = $item;
+            } else {
+                $item_text = '' . var_export($item, true) . '';
+            }
+            $debug_contents .= "<tr><th>{$key}</th><td><pre>" . $item_text . "</pre></td></tr>";
         }
-        $debug_contents .= '</table><br />';
+        $debug_contents .= '</table>';
 
         // FILE DEBUG
         $debug_contents .= '<table class="debug_table" rules="none" cellspacing="0" cellpadding="5"><tr><td colspan="2">引用文件：</td></tr>';
         foreach ($_F['debug_info']['autoload_files'] as $key => $item) {
-            $debug_contents .= "<tr><th>{$key}</th><td>{$item}</td></tr>";
+            $key_show = $key + 1;
+            $debug_contents .= "<tr><th>{$key_show}</th><td>{$item}</td></tr>";
         }
         $debug_contents .= '</table>';
 

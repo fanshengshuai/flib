@@ -262,11 +262,7 @@ if (!function_exists('D')) {
         return new FDB_Table ($table);
     }
 }
-if (!function_exists('E')) {
-    function E($msg) {
-        throw new Exception($msg);
-    }
-}
+
 function xml2arr($xml) {
     $values = array();
     $index = array();

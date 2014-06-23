@@ -8,7 +8,6 @@
  * vim: set expandtab sw=4 ts=4 sts=4
  * $Id: Controller.php 86 2012-07-30 09:30:42Z yanjianshe $
  */
-
 class FController {
     protected $view;
 
@@ -23,6 +22,7 @@ class FController {
     public function __construct() {
         $this->setView();
     }
+
     protected function isPost() {
         if ($_POST) {
             return true;
@@ -45,7 +45,8 @@ class FController {
         }
 
         if ($check_results) {
-            echo json_encode(array('result' => 'failed', 'items' => $check_results));exit;
+            echo json_encode(array('result' => 'failed', 'items' => $check_results));
+            exit;
         }
         return true;
     }
@@ -54,7 +55,7 @@ class FController {
      * 成功提示
      * $items = array('username' => '已经存在', 'password' => '长度不够');
      */
-    protected function _ajaxSuccessMessage($items, $url='', $close_time=0) {
+    protected function _ajaxSuccessMessage($items, $url = '', $close_time = 0) {
 
         $result = array('result' => 'success', 'close_time' => $close_time);
 
@@ -72,13 +73,14 @@ class FController {
         //header("Content-Type: application/json; charset=UTF-8");
         //echo '{"result":"failed","items":{"real_name":"\u4e0d\u80fd\u4e3a\u7a7a","username":"\u4e0d\u80fd\u4e3a\u7a7a","id_card":"\u4e0d\u80fd\u4e3a\u7a7a","phone":"\u4e0d\u80fd\u4e3a\u7a7a","email":"\u4e0d\u80fd\u4e3a\u7a7a","good_at":"\u4e0d\u80fd\u4e3a\u7a7a","join_date":"\u4e0d\u80fd\u4e3a\u7a7a","comment":"\u4e0d\u80fd\u4e3a\u7a7a","teacher_Frade":"\u4e0d\u80fd\u4e3a\u7a7a"}}';
         //exit;
-        echo json_encode($result);exit;
+        echo json_encode($result);
+        exit;
     }
 
     /*
      * 检查是否是数字
      */
-    protected function _ajaxCheckIsNum($num_fields){
+    protected function _ajaxCheckIsNum($num_fields) {
         $check_results = null;
 
         foreach ($num_fields as $item) {
@@ -88,7 +90,8 @@ class FController {
         }
 
         if ($check_results) {
-            echo json_encode(array('result' => 'failed', 'items' => $check_results));exit;
+            echo json_encode(array('result' => 'failed', 'items' => $check_results));
+            exit;
         }
         return true;
     }
@@ -97,20 +100,22 @@ class FController {
      * 检查下拉列表的选中值是否为-1
      */
 
-    protected function  _ajaxCheckSelect($select_fields){
+    protected function  _ajaxCheckSelect($select_fields) {
 
         $check_results = null;
 
-        foreach($select_fields as $item ){
-            if($_POST[$item]==-1)
+        foreach ($select_fields as $item) {
+            if ($_POST[$item] == -1)
                 $check_results[$item] = '请选择下拉列表';
         }
 
-        if($check_results){
-            echo json_encode(array('result' => 'failed', 'items' => $check_results));exit;
+        if ($check_results) {
+            echo json_encode(array('result' => 'failed', 'items' => $check_results));
+            exit;
         }
         return true;
     }
+
     protected function _ajaxErrorMessage($items) {
 
         $result = array('result' => 'failed');
@@ -122,17 +127,19 @@ class FController {
         }
 
         ob_clean();
-        echo json_encode($result);exit;
+        echo json_encode($result);
+        exit;
     }
 
     public function ajaxRedirect($url) {
         $result = array('result' => 'redirect', 'url' => $url);
 
         ob_clean();
-        echo json_encode($result);exit;
+        echo json_encode($result);
+        exit;
     }
 
-    protected function success($message, $url='', $close_time=0) {
+    protected function success($message, $url = '', $close_time = 0) {
         global $_F;
 
         if ($url == 'r') {
@@ -180,7 +187,8 @@ class FController {
             }
 
             if ($check_results) {
-                $this->error($check_results);exit;
+                $this->error($check_results);
+                exit;
             }
         }
     }
@@ -188,7 +196,7 @@ class FController {
     /**
      * 取出POST内容
      */
-    protected function getPostData($form_fields, $force=false) {
+    protected function getPostData($form_fields, $force = false) {
 
         $post_data = array();
         foreach ($form_fields as $item) {
@@ -207,6 +215,7 @@ class FController {
     protected function assign($key, $value) {
         $this->view->set($key, $value);
     }
+
     protected function set($key, $value) {
         $this->view->set($key, $value);
     }
@@ -216,7 +225,7 @@ class FController {
         exit;
     }
 
-    protected function ajaxReturn(){
+    protected function ajaxReturn() {
 
     }
 }

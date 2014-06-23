@@ -287,20 +287,44 @@ class FDB {
         return $cache_content;
     }
 
+    /**
+     * 插入数据
+     *
+     * @param $table
+     * @param $data
+     *
+     * @return bool
+     */
     public static function insert($table, $data) {
+
         if (!$data['create_time']) {
             $data['create_time'] = date('Y-m-d H:i:s');
         }
+
         if (!$data['status']) {
             $data['status'] = 1;
         }
-        $table = new FDB_Table($table);
-        $table->save($data);
-        return $table->lastInsertId();
+
+        $table = new self($table);
+        return $table->save($data);
     }
 
+    /**
+     * 更新记录
+     *
+     * @param $table
+     * @param $data
+     * @param $condition
+     *
+     * @throws Exception
+     * @return bool
+     */
     public static function update($table, $data, $condition) {
         global $_F;
+
+        if (!$condition) {
+            throw new Exception("FDB update need condition.");
+        }
 
         if (!$data['update_time']) {
             $data['update_time'] = date('Y-m-d H:i:s');
@@ -315,21 +339,25 @@ class FDB {
             $condition = ltrim($c, ' and');
         }
 
-        $table = new FDB_Table($table);
-        $table->save($data, $condition);
-        return true;
+        $table = new FTable($table);
+        return $table->save($data, $condition);
     }
 
     /**
      * 删除数据
      *
-     * @param      $table 表名
-     * @param      $condition 条件
+     * @param      $table string 表名
+     * @param      $condition string 条件
      * @param bool $is_real_delete true 真删除，false 假删除
      *
+     * @throws Exception
      * @return bool
      */
     public static function remove($table, $condition, $is_real_delete = false) {
+
+        if (!$condition) {
+            throw new Exception("FDB remove need condition. Remove is a very dangerous operation.");
+        }
 
         $table = new FDB_Table($table);
 
@@ -355,8 +383,8 @@ class FDB {
      * @param int $unit
      */
     public static function incr($table, $field, $conditions = null, $unit = 1) {
-        $table = new FDB_Table($table);
-        $table->incr($field, $conditions, array(), $unit);
+        $table = new FTable($table);
+        $table->increase($field, $conditions, array(), $unit);
     }
 
     /**
@@ -369,8 +397,8 @@ class FDB {
      * @param int $unit
      */
     public static function decr($table, $field, $conditions = null, $params = array(), $unit = 1) {
-        $table = new FDB_Table($table);
-        $table->decr($field, $conditions, array(), $unit);
+        $table = new FTable($table);
+        $table->decrease($field, $conditions, array(), $unit);
     }
 
     /**
@@ -382,7 +410,7 @@ class FDB {
      * @return int
      */
     public static function count($table, $conditions = null) {
-        $table = new FDB_Table($table);
+        $table = new FTable($table);
         return $table->count($conditions);
     }
 }
