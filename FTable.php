@@ -61,6 +61,8 @@ class FTable {
 
                     if (strtolower($_v[0]) == 'in') {
                         $where[] .= "{$_k} {$_v[0]} ( " . join(',', $_v[1]) . " )";
+                    } elseif (strtolower($_v[0] == 'not in')) {
+
                     }
 
                     continue;
