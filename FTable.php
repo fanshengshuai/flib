@@ -67,24 +67,47 @@ class FTable {
         $params = array();
         if (is_string($conditions)) {
             $this->options['where'] = $conditions;
+            $this->options['params'] = array();
+
         } elseif (is_array($conditions)) {
             $where = '';
             foreach ($conditions as $_k => $_v) {
 
+                $tableFiled = $_k;
+
                 if (is_array($_v)) {
 
-                    if (strtolower($_v[0]) == 'in') {
-                        $where[] .= "{$_k} {$_v[0]} ( " . join(',', $_v[1]) . " )";
-                    } elseif (strtolower($_v[0] == 'not in')) {
+                    if (is_string($_v[0])) {
+                        if (strtolower($_v[0]) == 'in') {
+                            $where[] .= "{$_k} {$_v[0]} ( " . join(',', $_v[1]) . " )";
+                        }
+                    } elseif (!is_numeric($_v[0])) { // $where = array('uid' => array('in' => '1', 'not in' =>'2'));
+                        foreach ($_v as $where_item_sub_key => $where_item_sub_value) {
 
+                            $where_item_sub_key = str_replace(array('gte', 'lte', 'gt', 'lt', 'eq'),
+                                array('>= ', '<= ', '> ', '< ', '='), $where_item_sub_key);
+
+                            if (strpos(strtolower($where_item_sub_key), 'in') !== false) {
+                                if (is_array($where_item_sub_value)) {
+                                    $where_item_sub_value = join(',', $where_item_sub_value);
+                                }
+                                $where[] .= "$tableFiled {$where_item_sub_key} ( " . $where_item_sub_value . " )";
+                            } elseif (strpos(strtolower($where_item_sub_key), 'like') !== false) {
+                                $where[] .= "$tableFiled {$where_item_sub_key} ?";
+                                $params[] = "%" . trim(str_replace(array('like', 'LIKE'), '', $where_item_sub_value)) . "%";
+                            } else {
+                                $where[] .= "$tableFiled {$where_item_sub_key} ?";
+                                $params[] = $where_item_sub_value;
+                            }
+                        }
                     }
 
                     continue;
                 }
 
 
-                if (strpos($_k, ':')) {
-                    $_k = substr($_k, 0, strpos($_k, ':'));
+                if (strpos($tableFiled, ':')) {
+                    $tableFiled = substr($tableFiled, 0, strpos($tableFiled, ':'));
                 }
 
                 $__v = strtolower($_v);
@@ -99,11 +122,11 @@ class FTable {
                     $param = trim(substr($_v, strpos($_v, ' ')));
                     $opt = str_replace(array('gte', 'lte', 'gt', 'lt'), array('>= ', '<= ', '> ', '< '), $opt);
 
-                    $where[] .= "{$_k} $opt ?";
+                    $where[] .= "{$tableFiled} $opt ?";
                     $params[] = $param;
 
                 } else {
-                    $where[] .= "{$_k} = ?";
+                    $where[] .= "{$tableFiled} = ?";
                     $params[] = $_v;
                 }
             }

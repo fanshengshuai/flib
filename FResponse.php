@@ -78,7 +78,9 @@ class FResponse {
 
         if (is_array($mix)) {
             $response->setContentType('json');
-            $mix['debug_info'] = $_F['debug_info'];
+
+            if ($_F['debug']) $mix['debug_info'] = $_F['debug_info'];
+
             $response->write(json_encode($mix));;
         } elseif (is_string($mix)) {
             $response->write($mix);
