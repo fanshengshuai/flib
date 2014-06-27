@@ -48,6 +48,20 @@ class FTable {
      * @param null $conditions
      *
      * @return $this
+     *
+     * @example:
+     *
+     * $where = "uid > 10";
+     * or
+     * $where = array(
+     *      'uid' => array('in' => '1, 2, 4'),
+     *      'uid:1' => '1',
+     *      'uid:2' => 'like \'%xxx%\'',  // like
+     *      'uid:3' => 'gt 10',           // 大于 10
+     *      'uid:4' => 'gte 10',          // 大于等于 10
+     *      'uid:5' => 'lt 10',           // 小于 10
+     *      'uid:6' => 'lte 10',          // 小于等于 10
+     * );
      */
     public function where($conditions = null) {
         $params = array();
@@ -184,6 +198,8 @@ class FTable {
     public function count() {
         $this->options['fields'] = array("COUNT(*) as count");
         $result = $this->find();
+
+        $this->reset();
 
         return $result['count'];
     }
@@ -461,5 +477,9 @@ class FTable {
     public function rollBack() {
 
         $this->_dbh->rollBack();
+    }
+
+    public function reset() {
+        $this->options = null;
     }
 }
