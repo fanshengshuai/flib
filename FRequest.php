@@ -10,12 +10,44 @@
  * vim: set expandtab sw=4 ts=4 sts=4
  */
 class FRequest {
-    public static function get() {
 
+    /**
+     * 是否为 POST
+     * @return bool
+     */
+    public static function isPost() {
+        return (isset($_SERVER['REQUEST_METHOD']) && strtoupper($_SERVER['REQUEST_METHOD']) == 'POST');
     }
 
-    public static function post() {
+    public static function getInt($param) {
+        return intval($_GET[$param]);
+    }
 
+    public static function getString($param) {
+        return trim($_GET[$param]);
+    }
+
+    public static function getPostString($param) {
+        return $_POST[$param];
+    }
+
+    /**
+     * 获得 Request 中的数据并转成 int
+     *
+     * @param $param string request 参数
+     *
+     * @return int Request 中的数据
+     */
+    public static function getRequestInt($param) {
+        return intval($_REQUEST[$param]);
+    }
+
+    public static function getRequestString($param) {
+        return $_REQUEST[$param];
+    }
+
+    public static function getPostInt($param) {
+        return intval($_POST[$param]);
     }
 
     public static function getUploadedFiles() {
@@ -44,13 +76,6 @@ class FRequest {
         return $ip[$type];
     }
 
-    public static function getInt($val) {
-        return intval($_REQUEST['val']);
-    }
-
-    public static function getString($val) {
-        return trim($_REQUEST['val']);
-    }
 
     // 判断是否为手机访问
     public static function isMobile() {

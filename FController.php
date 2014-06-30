@@ -24,11 +24,7 @@ class FController {
     }
 
     protected function isPost() {
-        if ($_POST) {
-            return true;
-        }
-
-        return false;
+        return FRequest::isPost();
     }
 
     /**

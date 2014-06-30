@@ -11,7 +11,6 @@
 
 class FCache {
     public static function set($cache_key, $cache_content, $cache_time = 7200, $force = false) {
-
         global $_F;
 
         $cache_key = $_F['domain'] . $cache_key;
@@ -19,10 +18,10 @@ class FCache {
         self::init();
 
         if ($_F['memcache']) {
+
             $_F['memcache']->set($cache_key, $cache_content, MEMCACHE_COMPRESSED, $cache_time );
 			return true;
 		}
-
 		$save_content = json_encode ( array (
 				'cache_time' => $cache_time, 'content' => $cache_content));
 

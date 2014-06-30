@@ -305,8 +305,8 @@ class FDB {
             $data['status'] = 1;
         }
 
-        $table = new self($table);
-        return $table->save($data);
+        $table = new FTable($table);
+        return $table->insert($data);
     }
 
     /**
@@ -340,7 +340,7 @@ class FDB {
         }
 
         $table = new FTable($table);
-        return $table->save($data, $condition);
+        return $table->update($data, $condition);
     }
 
     /**
@@ -359,7 +359,7 @@ class FDB {
             throw new Exception("FDB remove need condition. Remove is a very dangerous operation.");
         }
 
-        $table = new FDB_Table($table);
+        $table = new FTable($table);
 
         if ($is_real_delete) {
             $table->remove($condition);
@@ -368,7 +368,7 @@ class FDB {
                 'status' => 2,
                 'remove_time' => date('Y-m-d H:i:s'),
             );
-            $table->save($data, $condition);
+            $table->update($data, $condition);
         }
 
         return true;

@@ -12,16 +12,11 @@
 class FTable {
     private $_connects = array();
     private $_dbh;
-    // 字段信息
-    protected $fields = array();
-    // 数据信息
-    protected $data = array();
-    protected $limit = 0;
     // 查询表达式参数
     protected $options = array();
+    protected $table_info = null;
     // 查询表达式
     protected $selectSql = 'SELECT%DISTINCT% %FIELD% FROM %TABLE%%JOIN%%WHERE%%GROUP%%HAVING%%ORDER%%LIMIT% %UNION%%COMMENT%';
-
 
     /**
      * 构建数据操作实例
@@ -35,6 +30,22 @@ class FTable {
 
         $this->_dbh = $this->connect();
         $this->_table = $_F['db']['config']['table_pre'] . $table;
+
+    }
+
+    /**
+     * 设置使用缓存
+     *
+     * @param int $cacheTime
+     *
+     * @return $this
+     * @internal param bool $useCache
+     */
+    public function cache($cacheTime = 3600) {
+        $this->options['useCache'] = true;
+        $this->options['cacheTime'] = $cacheTime;
+
+        return $this;
     }
 
     public function fields($fields) {
@@ -80,7 +91,7 @@ class FTable {
                     foreach ($_v as $where_item_sub_key => $where_item_sub_value) {
 
                         $where_item_sub_key = str_replace(array('gte', 'lte', 'gt', 'lt', 'eq'),
-                                                          array('>= ', '<= ', '> ', '< ', '='), $where_item_sub_key);
+                            array('>= ', '<= ', '> ', '< ', '='), $where_item_sub_key);
 
                         if (strpos(strtolower($where_item_sub_key), 'in') !== false) {
                             if (is_array($where_item_sub_value)) {
@@ -157,6 +168,8 @@ class FTable {
     /**
      * 获取一条记录
      *
+     * @param null $priValue mix 主键数值
+     *
      * @throws Exception
      * @internal param string $conditions
      * @internal param array $columns
@@ -168,21 +181,51 @@ class FTable {
      *
      * @return array || null
      */
-    public function find() {
+    public function find($priValue = null) {
         global $_F;
+
+        $retData = null;
+
+        // 按主键查询
+        if ($priValue) {
+            $this->table_info = $this->getTableInfo();
+            if (!$this->table_info['pri']) throw new Exception("该表没有设置主键，无法通过 find 参数查询。");
+            $this->where($this->table_info['pri'] . '=\'' . $priValue . '\'');
+        }
 
         $this->limit(1);
         $sql = $this->buildSql();
 
+        // 缓存处理
+        $cacheKey = "SQL-RESULT-{$this->_table}-{$sql}-" . join('-', $this->options['params']);
+        if ($this->options['useCache']) {
+
+            $cacheValue = FCache::get($cacheKey);
+            if ($cacheValue) {
+                $this->reset();
+                return $cacheValue;
+            }
+        }
+
         try {
             $stmt = $this->_dbh->prepare($sql);
             $stmt->execute($this->options['params']);
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $retData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($_F['debug'])
+                $_F['debug_info']['sql'][] = array('sql' => $sql, 'params' => $this->options['params']);
+
+
         } catch (PDOException $e) {
             throw new Exception($e);
         }
 
-        return $row;
+        // 缓存处理
+        if ($this->options['useCache'])
+            FCache::set($cacheKey, $retData, $this->options['cacheTime']);
+
+        $this->reset();
+        return $retData;
     }
 
     /**
@@ -192,18 +235,41 @@ class FTable {
      * @throws Exception
      */
     public function select() {
+        global $_F;
 
         $sql = $this->buildSql();
 
-//var_dump($this->options);
+        // 缓存处理
+        $cacheKey = "SQL-RESULT-{$this->_table}-{$sql}-" . join('-', $this->options['params']);
+        if ($this->options['useCache']) {
+
+            $cacheValue = FCache::get($cacheKey);
+
+            if ($cacheValue) {
+                // 放在 return 之前，不要忘记 cache 模式也要重置
+                $this->reset();
+                return $cacheValue;
+            }
+        }
+
         try {
             $stmt = $this->_dbh->prepare($sql);
             $stmt->execute($this->options['params']);
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            if ($_F['debug'])
+                $_F['debug_info']['sql'][] = array('sql' => $sql, 'params' => $this->options['params']);
+
         } catch (PDOException $e) {
             throw new Exception($e);
         }
 
+        // 缓存处理
+        if ($this->options['useCache'])
+            FCache::set($cacheKey, $rows, $this->options['cacheTime']);
+
+        // 放在 return 之前，不要忘记 cache 模式也要重置
+        $this->reset();
         return $rows;
     }
 
@@ -216,8 +282,6 @@ class FTable {
         $this->options['fields'] = array("COUNT(*) as count");
         $result = $this->find();
 
-        $this->reset();
-
         return $result['count'];
     }
 
@@ -228,8 +292,6 @@ class FTable {
         if ($this->options['fields']) {
             $columns = implode(',', $this->options['fields']);
         }
-
-//        var_dump($this->options['fields'], $columns);
 
         if (!$columns) {
             $columns = '*';
@@ -255,12 +317,6 @@ class FTable {
 
         } elseif ($this->options['limit'] > 0) {
             $sql .= ' limit ' . $this->options['limit'];
-        }
-
-//        echo $sql;
-
-        if ($_F['debug']) {
-            $_F['debug_info']['sql'][] = array('sql' => $sql, 'params' => $this->options['params']);
         }
 
         return $sql;
@@ -328,15 +384,16 @@ class FTable {
      * 插入一条记录 或更新表记录
      *
      * @param array $data
-     * @param string $conditions
-     * @param array $params
      *
      * @throws Exception
+     * @internal param string $conditions
+     * @internal param array $params
+     *
      * @internal param array $param
      *
      * @return bool || int
      */
-    public function save($data, $conditions = null, $params = array()) {
+    public function save($data) {
         global $_F;
 
         $tempParams = array();
@@ -346,10 +403,10 @@ class FTable {
             array_push($tempParams, $v);
         }
 
-        if ($conditions) {
+        if ($this->options['where']) {
             // 更新
-            $sql = "UPDATE `{$this->_table}` SET " . join(', ', $set) . " WHERE $conditions";
-            $params = array_merge($tempParams, $params);
+            $sql = "UPDATE `{$this->_table}` SET " . join(', ', $set) . " WHERE {$this->options['where']}";
+            $params = array_merge($tempParams, $this->options['params']);
         } else {
             // 插入
             $sql = "INSERT INTO `{$this->_table}` SET " . join(', ', $set);
@@ -366,10 +423,39 @@ class FTable {
             $stmt = $this->_dbh->prepare($sql);
             $stmt->execute($params);
 
+            $this->reset();
             return $this->_dbh->lastInsertId();
+
         } catch (PDOException $e) {
             throw new Exception($e);
         }
+    }
+
+    /**
+     * 增加一条数据
+     *
+     * @param $data
+     *
+     * @return bool
+     */
+    public function insert($data) {
+        $this->reset();
+
+        return $this->save($data);
+    }
+
+    /**
+     * 更新一条数据
+     *
+     * @param $data
+     * @param $where
+     *
+     * @return bool
+     */
+    public function update($data, $where) {
+        $this->reset();
+        $this->where($where);
+        return $this->save($data);
     }
 
     /**
@@ -385,6 +471,45 @@ class FTable {
         } catch (PDOException $e) {
             throw new Exception($e);
         }
+    }
+
+    /**
+     * 删除一条数据，需要通过where方法设置条件，参数为true为真删除
+     *
+     * @param bool $reallyMode true 为真删除，false 为假删除，默认为假删除
+     *
+     * @return bool
+     * @throws Exception
+     */
+    public function remove($reallyMode = false) {
+        global $_F;
+
+        // 检查条件
+        if (!$this->options['where'])
+            throw new Exception("FTable REMOVE function need where params. 我认为没有条件的删除是很危险的。");
+
+        // 假删除
+        if (!$reallyMode) {
+            return $this->save(array('status' => 2, 'remove_time' => date('Y-m-d H:i:s')));
+        }
+
+        $sql = "DELETE from $this->_table WHERE $this->options['where']";
+
+        if ($_F['debug'])
+            $_F['debug_info']['sql'][] = array('sql' => $sql, 'params' => $this->options['params']);
+
+        $this->reset();
+
+        try {
+            $stmt = $this->_dbh->prepare($sql);
+            $result = $stmt->execute($this->options['params']);
+
+            $this->reset();
+        } catch (PDOException $e) {
+            throw new Exception($e);
+        }
+
+        return $result;
     }
 
     /**
@@ -465,6 +590,7 @@ class FTable {
         $params = array();
         try {
             $stmt = $this->_dbh->prepare($sql);
+            $this->reset();
             return $stmt->execute($params);
         } catch (PDOException $e) {
             throw new Exception($e);
@@ -498,5 +624,41 @@ class FTable {
 
     public function reset() {
         $this->options = null;
+    }
+
+    /**
+     * 获得表结构
+     * @return array|null
+     * @throws Exception
+     */
+    private function getTableInfo() {
+        $tableInfo = FCache::get($this->_table);
+        if ($tableInfo) {
+            return $tableInfo;
+        }
+
+        try {
+            $sql = "desc $this->_table";
+
+            $stmt = $this->_dbh->prepare($sql);
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $tableInfo = array('pri' => null, 'fields' => null);
+            foreach ($rows as $row) {
+                if ($row['Key'] == 'PRI') {
+                    $tableInfo['pri'] = $row['Field'];
+                }
+            }
+            $tableInfo['fields'] = $rows;
+
+            FCache::set($this->_table, $tableInfo, 8640000);
+
+        } catch (PDOException $e) {
+            FLogger::write("获取表信息失败: " . $this->_table . "\t" . $e->getMessage());
+            throw new Exception("获取表信息失败。");
+        }
+
+        return $tableInfo;
     }
 }

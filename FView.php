@@ -29,12 +29,18 @@ class FView extends Smarty {
 
             $this->cache_dir = APP_ROOT . "data/{$_F['module']}/cache";
             $this->compile_dir = APP_ROOT . "data/{$_F['module']}/template/";
-            $this->template_dir = APP_ROOT . "modules/{$_F['module']}/templates/";
+            $this->template_dir = APP_ROOT . "modules/{$_F['module']}/tpl/";
+            if (!file_exists($this->template_dir)) {
+                $this->template_dir = APP_ROOT . "modules/{$_F['module']}/templates/";
+            }
         } else {
 
             $this->cache_dir = APP_ROOT . "data/cache";
             $this->compile_dir = APP_ROOT . 'data/template/';
-            $this->template_dir = APP_ROOT . 'template/';
+            $this->template_dir = APP_ROOT . 'tpl/';
+            if (!file_exists($this->template_dir)) {
+                $this->template_dir = APP_ROOT . "templates/";
+            }
         }
 
         if (defined('TPL_ROOT')) {

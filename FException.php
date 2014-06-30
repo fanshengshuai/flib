@@ -17,6 +17,7 @@ class FException extends Exception {
 
     public function traceError($e) {
 
+
         if (is_array($e)) {
             $error_message = $e['message'];
             $error_file = $e['file'];
@@ -28,8 +29,10 @@ class FException extends Exception {
             $exception_trace = nl2br($e->__toString());
         }
 
+
         $exception_message = $error_message
-            . '<br /> 异常出现在：' . $error_file . '&nbsp;&nbsp;&nbsp;&nbsp; 第 ' . $error_line . ' 行';
+            . '<br /> 异常出现在：' . $error_file . ' 第 ' . $error_line . ' 行';
+        FLogger::write($exception_message);
 
         header('HTTP/1.1 500 FLib Error');
         header('status: 500 FLib Error');
