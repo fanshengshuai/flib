@@ -90,8 +90,14 @@ class FTable {
 
                     foreach ($_v as $where_item_sub_key => $where_item_sub_value) {
 
-                        $where_item_sub_key = str_replace(array('gte', 'lte', 'gt', 'lt', 'eq'),
-                            array('>= ', '<= ', '> ', '< ', '='), $where_item_sub_key);
+                        // array("in", '(1, 2, 3)'); 内容不是数组的跳过
+                        // array(array('in' => '(1, 2)'))；只解析这样的
+                        if (is_numeric($where_item_sub_key)) {
+                            continue;
+                        }
+
+                        $where_item_sub_key = str_replace(array('gte', 'lte', 'gt', 'lt', 'neq', 'eq'),
+                            array('>= ', '<= ', '> ', '< ', '<>', '='), $where_item_sub_key);
 
                         if (strpos(strtolower($where_item_sub_key), 'in') !== false) {
                             if (is_array($where_item_sub_value)) {
@@ -105,6 +111,9 @@ class FTable {
                             $where[] .= "$tableFiled {$where_item_sub_key} ?";
                             $params[] = $where_item_sub_value;
                         }
+
+                        // 解析完后删除条件，剩下的条件由下面代码解析
+                        unset($conditions[$_k][$where_item_sub_key]);
                     }
 
                     continue;
@@ -207,13 +216,15 @@ class FTable {
             }
         }
 
+        if ($_F['debug'])
+            $_F['debug_info']['sql'][] = array('sql' => $sql, 'params' => $this->options['params']);
+
         try {
             $stmt = $this->_dbh->prepare($sql);
             $stmt->execute($this->options['params']);
             $retData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($_F['debug'])
-                $_F['debug_info']['sql'][] = array('sql' => $sql, 'params' => $this->options['params']);
+
 
 
         } catch (PDOException $e) {
@@ -252,13 +263,13 @@ class FTable {
             }
         }
 
+        if ($_F['debug'])
+            $_F['debug_info']['sql'][] = array('sql' => $sql, 'params' => $this->options['params']);
+
         try {
             $stmt = $this->_dbh->prepare($sql);
             $stmt->execute($this->options['params']);
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            if ($_F['debug'])
-                $_F['debug_info']['sql'][] = array('sql' => $sql, 'params' => $this->options['params']);
 
         } catch (PDOException $e) {
             throw new Exception($e);

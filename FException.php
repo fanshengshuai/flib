@@ -16,6 +16,7 @@ class FException extends Exception {
     }
 
     public function traceError($e) {
+        global $_F;
 
 
         if (is_array($e)) {
@@ -33,6 +34,16 @@ class FException extends Exception {
         $exception_message = $error_message
             . '<br /> 异常出现在：' . $error_file . ' 第 ' . $error_line . ' 行';
         FLogger::write($exception_message);
+
+        if ($_F['in_ajax']) {
+            if ($_F['debug']) {
+                FResponse::output(array('result' => 'exception', 'content' => $exception_message));
+                exit;
+            } else {
+                header('HTTP/1.1 500 FLib Error');
+                header('status: 500 FLib Error');
+            }
+        }
 
         header('HTTP/1.1 500 FLib Error');
         header('status: 500 FLib Error');
