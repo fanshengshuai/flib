@@ -611,25 +611,26 @@ class FTable {
      *
      * @param $field
      * @param $conditions
-     * @param array $params
      * @param int $unit
      *
      * @throws Exception
-     * @throws Exception
+     * @internal param array $params
      * @return mixed
      */
-    public function increase($field, $conditions, $params = array(), $unit = 1) {
+    public function increase($field, $conditions, $unit = 1) {
 
         if (!$conditions) {
             throw new Exception('FTable incr function need condition');
         }
 
+        $this->where($conditions);
+
         $sql = 'UPDATE ' . $this->_table . " SET `$field` = `$field` + $unit";
-        $sql .= ' WHERE ' . $conditions;
+        $sql .= ' WHERE ' . $this->options['where'];
 
         try {
             $stmt = $this->_dbh->prepare($sql);
-            $result = $stmt->execute($params);
+            $result = $stmt->execute($this->options['params']);
         } catch (PDOException $e) {
             throw new Exception($e);
         }
@@ -655,12 +656,14 @@ class FTable {
             throw new Exception('FTable decr function need condition');
         }
 
+        $this->where($conditions);
+
         $sql = 'UPDATE ' . $this->_table . " SET $field = IF($field > $unit,  $field - $unit, 0)";
-        $sql .= ' WHERE ' . $conditions;
+        $sql .= ' WHERE ' . $this->options['where'];
 
         try {
             $stmt = $this->_dbh->prepare($sql);
-            $result = $stmt->execute($params);
+            $result = $stmt->execute($this->options['params']);
         } catch (PDOException $e) {
             throw new Exception($e);
         }

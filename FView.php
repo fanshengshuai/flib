@@ -158,7 +158,9 @@ class FView extends Smarty {
         if ($_F['run_in'] == 'shell') {
             $debug_contents = "DEBUG INFO:\n";
         } else {
-            $debug_contents = '<style> .debug_table { border-collapse: collapse;margin:20px; border:1px solid #000;} .debug_table th, .debug_table td { padding:5px; border:1px solid #000; } </style>';
+            $debug_contents = '<style>
+            .debug_info { clear: both; position: relative; margin-top:300px; }
+            .debug_table { border-collapse: collapse;margin:20px; border:1px solid #000;} .debug_table th, .debug_table td { padding:5px; border:1px solid #000; } </style>';
         }
 
         // SQL DEBUG
@@ -225,6 +227,6 @@ class FView extends Smarty {
             $debug_contents = preg_match('/<.+?>/', '', $debug_contents);
         }
 
-        return "<div class=\"debug_info\">" . $debug_contents . "</div>";
+        return "<div class=\"debug_info clearfix\">" . $debug_contents . "</div>";
     }
 }

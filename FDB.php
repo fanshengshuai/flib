@@ -384,7 +384,7 @@ class FDB {
      */
     public static function incr($table, $field, $conditions = null, $unit = 1) {
         $table = new FTable($table);
-        $table->increase($field, $conditions, array(), $unit);
+        $table->increase($field, $conditions, $unit);
     }
 
     /**
@@ -398,7 +398,7 @@ class FDB {
      */
     public static function decr($table, $field, $conditions = null, $params = array(), $unit = 1) {
         $table = new FTable($table);
-        $table->decrease($field, $conditions, array(), $unit);
+        $table->decrease($field, $conditions, $unit);
     }
 
     /**
