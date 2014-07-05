@@ -10,6 +10,9 @@
  */
 class FPager {
 
+    /**
+     * @var int
+     */
     var $count = 0;
     var $page_size = 10;
 
@@ -101,11 +104,11 @@ class FPager {
     /**
      * 分页page url
      *
-     * @param unknown $url
+     * @param string $url
      *
      * @return string
      */
-    public static function getUrl($url) {
+    public static function getUrl($url = '') {
         global $_F;
 
         if (!$url) {
@@ -124,12 +127,12 @@ class FPager {
     }
 
 
-    public static function getPagerInfo($total, $per_page = 10, $page_list_num=10) {
+    public static function getPagerInfo($total, $currentPage=1, $per_page = 10, $page_list_num = 10) {
         global $_F;
 
         $ret = array('total' => $total, 'per_page' => $per_page);
 
-        $page = max(1, intval($_GET['page']));
+        $page = max(1, $currentPage);
         $pages = ceil($total / $per_page);
 
         if ($page > $pages) {
@@ -143,7 +146,7 @@ class FPager {
         $ret['prev'] = max(1, $page - 1);
         $ret['next'] = min($pages, $page + 1);
 
-        $ret['url_pre'] = self::getUrl($url);
+        $ret['url_pre'] = self::getUrl();
 
         $start = max(1, $ret['current'] - intval($page_list_num / 2));
 

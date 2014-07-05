@@ -19,6 +19,22 @@ class FRequest {
         return (isset($_SERVER['REQUEST_METHOD']) && strtoupper($_SERVER['REQUEST_METHOD']) == 'POST');
     }
 
+    public static function getAllParams($key = null) {
+        if ($key) {
+            return $_GET[$key];
+        }
+
+        return $_GET;
+    }
+
+    public static function getAllPostParams($key = null) {
+        if ($key) {
+            return $_POST[$key];
+        }
+
+        return $_POST;
+    }
+
     public static function getInt($param) {
         return intval($_GET[$param]);
     }

@@ -19,15 +19,15 @@ class Barcode {
     public function __construct() {
         //error_reporting(0);
 
-        header ("Content-type: image/png");
+        header("Content-type: image/png");
         // Date in the past
-        header ("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+        header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
         // always modified
-        header ("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+        header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
         // HTTP/1.1
-        header ("Cache-Control: no-cache, must-revalidate");
+        header("Cache-Control: no-cache, must-revalidate");
         // HTTP/1.0
-        header ("Pragma: no-cache");
+        header("Pragma: no-cache");
     }
 
     public function ean13($code = '000000000000', $w = 210, $h = 60) {
@@ -35,25 +35,25 @@ class Barcode {
         // Check validity of $code
         if (strlen($code) != 12) {
 
-            $im = @ImageCreate ($w, $h) or die ("Cannot Initialize new GD image stream");
-            $bg = ImageColorAllocate ($im, 255, 255, 255);
-            $fg = ImageColorAllocate ($im, 0, 0, 0);
-            ImageString ($im, 5, 3, 10, "Code $code is not valid", $fg);
-            ImageString ($im, 5, 3, 30, "12 digits?", $fg);
-            ImagePng ($im);
+            $im = @ImageCreate($w, $h) or die ("Cannot Initialize new GD image stream");
+            $bg = ImageColorAllocate($im, 255, 255, 255);
+            $fg = ImageColorAllocate($im, 0, 0, 0);
+            ImageString($im, 5, 3, 10, "Code $code is not valid", $fg);
+            ImageString($im, 5, 3, 30, "12 digits?", $fg);
+            ImagePng($im);
 //            break;
         }
 
 
         for ($i = 1; $i <= 12; $i++) {
-            if ((substr($code, $i-1, 1) <= 0) && ((substr($code, $i-1, 1) >= 9))) {
+            if ((substr($code, $i - 1, 1) <= 0) && ((substr($code, $i - 1, 1) >= 9))) {
 
-                $im = @ImageCreate ($w, $h) or die ("Cannot Initialize new GD image stream");
-                $bg = ImageColorAllocate ($im, 255, 255, 255);
-                $fg = ImageColorAllocate ($im, 0, 0, 0);
-                ImageString ($im, 5, 3, 10, "Code $code is not valid", $fg);
-                ImageString ($im, 5, 3, 30, "only digits!", $fg);
-                ImagePng ($im);
+                $im = @ImageCreate($w, $h) or die ("Cannot Initialize new GD image stream");
+                $bg = ImageColorAllocate($im, 255, 255, 255);
+                $fg = ImageColorAllocate($im, 0, 0, 0);
+                ImageString($im, 5, 3, 10, "Code $code is not valid", $fg);
+                ImageString($im, 5, 3, 30, "only digits!", $fg);
+                ImagePng($im);
                 break;
             }
         }
@@ -97,22 +97,19 @@ class Barcode {
         $extsum = 0;
 
         for ($i = 1; $i <= 12; $i++) {
-            $num = substr($code, $i-1, 1);
-            if ($oddeven == 1)
-            {
+            $num = substr($code, $i - 1, 1);
+            if ($oddeven == 1) {
                 $intsum = $num * $oddeven;
                 $extsum = $extsum + $intsum;
                 $oddeven = 3;
-            }
-            else
-            {
+            } else {
                 $intsum = $num * $oddeven;
                 $extsum = $extsum + $intsum;
                 $oddeven = 1;
             }
         }
 
-        $check = (floor($extsum/10)*10+10) - $extsum;
+        $check = (floor($extsum / 10) * 10 + 10) - $extsum;
 
         if ($check == 10) {
             $check = 0;
@@ -122,7 +119,7 @@ class Barcode {
         // Build Array from $code string
         for ($i = 1; $i <= 13; $i++) {
 
-            $c[$i] = substr($code, $i-1, 1);
+            $c[$i] = substr($code, $i - 1, 1);
         }
 
         // Set parity
@@ -174,32 +171,32 @@ class Barcode {
         $barbit = $barbit . "101";
 
         // Create Image
-        $im = @ImageCreate ($w, $h) or die ("Cannot Initialize new GD image stream");
-        $bg = ImageColorAllocate ($im, 255, 255, 255);
-        $fg = ImageColorAllocate ($im, 0, 0, 0);
+        $im = @ImageCreate($w, $h) or die ("Cannot Initialize new GD image stream");
+        $bg = ImageColorAllocate($im, 255, 255, 255);
+        $fg = ImageColorAllocate($im, 0, 0, 0);
 
         $start = 14;
         for ($i = 1; $i <= 95; $i++) {
 
             $end = $start + 2;
-            $bit = substr($barbit, $i-1, 1);
+            $bit = substr($barbit, $i - 1, 1);
             if ($bit == 0) {
-                Imagefilledrectangle ($im, $start, 0, $end, $h, $bg);
+                Imagefilledrectangle($im, $start, 0, $end, $h, $bg);
             } else {
-                Imagefilledrectangle ($im, $start, 0, $end, $h, $fg);
+                Imagefilledrectangle($im, $start, 0, $end, $h, $fg);
             }
 
             $start = $end;
         }
 
-        Imagefilledrectangle ($im, 0, ($h - 10), $w, $h, $bg);
-        Imagefilledrectangle ($im, 20, ($h - 20), 104, $h, $bg);
-        Imagefilledrectangle ($im, 112, ($h - 20), 195, $h, $bg);
+        Imagefilledrectangle($im, 0, ($h - 10), $w, $h, $bg);
+        Imagefilledrectangle($im, 20, ($h - 20), 104, $h, $bg);
+        Imagefilledrectangle($im, 112, ($h - 20), 195, $h, $bg);
         //Imagefilledrectangle ($im, 0, ($h - 8), 304, $h, $bg);
 
-        ImageString ($im, 5, 3, ($h - 18), $c[1], $fg);
-        ImageString ($im, 5, 40, ($h - 18), "$c[2]$c[3]$c[4]$c[5]$c[6]$c[7]", $fg);
-        ImageString ($im, 5, 130, ($h - 18), "$c[8]$c[9]$c[10]$c[11]$c[12]$c[13]", $fg);
-        ImagePng ($im);
+        ImageString($im, 5, 3, ($h - 18), $c[1], $fg);
+        ImageString($im, 5, 40, ($h - 18), "$c[2]$c[3]$c[4]$c[5]$c[6]$c[7]", $fg);
+        ImageString($im, 5, 130, ($h - 18), "$c[8]$c[9]$c[10]$c[11]$c[12]$c[13]", $fg);
+        ImagePng($im);
     }
 }

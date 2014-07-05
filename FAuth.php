@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * 作者: 范圣帅(fanshengshuai@gmail.com)
@@ -7,7 +8,6 @@
  * vim: set expandtab sw=4 ts=4 sts=4
  * $Id: Auth.php 11 2012-07-24 03:42:35Z fanshengshuai $
  */
-
 class FAuth {
 
     public function login($username, $password) {
@@ -19,7 +19,7 @@ class FAuth {
 
         ob_clean();
         if ($user) {
-            setcookie('auth', $user['uid']  . '_' . md5($username . "_" . $password), time() + 10000000, '/');
+            setcookie('auth', $user['uid'] . '_' . md5($username . "_" . $password), time() + 10000000, '/');
             return true;
         } else {
             return false;
@@ -27,7 +27,7 @@ class FAuth {
     }
 
     public function logout() {
-        setcookie('auth', '',  0, '/');
+        setcookie('auth', '', 0, '/');
         return true;
     }
 

@@ -32,6 +32,9 @@ class FView extends Smarty {
             $this->template_dir = APP_ROOT . "modules/{$_F['module']}/tpl/";
             if (!file_exists($this->template_dir)) {
                 $this->template_dir = APP_ROOT . "modules/{$_F['module']}/templates/";
+                if (!file_exists($this->template_dir)) {
+                    $this->template_dir = APP_ROOT . "modules/{$_F['module']}/templates/";
+                }
             }
         } else {
 
@@ -40,6 +43,9 @@ class FView extends Smarty {
             $this->template_dir = APP_ROOT . 'tpl/';
             if (!file_exists($this->template_dir)) {
                 $this->template_dir = APP_ROOT . "templates/";
+                if (!file_exists($this->template_dir)) {
+                    $this->template_dir = APP_ROOT . "template/";
+                }
             }
         }
 

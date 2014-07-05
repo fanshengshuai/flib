@@ -48,7 +48,9 @@ class IP {
     /**
      * 返回压缩后可进行比较的IP地址
      * @access private
+     *
      * @param string $ip
+     *
      * @return string
      */
     function packip($ip) {
@@ -60,7 +62,9 @@ class IP {
     /**
      * 返回读取的字符串
      * @access private
+     *
      * @param string $data
+     *
      * @return string
      */
     function getstring($data = "") {
@@ -99,7 +103,9 @@ class IP {
     /**
      * 根据所给 IP 地址或域名返回所在地区信息
      * @access public
+     *
      * @param string $ip
+     *
      * @return array
      */
     function getlocation($ip = '') {
@@ -202,7 +208,9 @@ class IP {
 
     /**
      * 构造函数，打开 QQWry.Dat 文件并初始化类中的信息
+     *
      * @param string $filename
+     *
      * @return IpLocation
      */
     function IP($filename = "") {

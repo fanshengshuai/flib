@@ -8,8 +8,10 @@
  * vim: set expandtab sw=4 ts=4 sts=4
  * $Id: Controller.php 86 2012-07-30 09:30:42Z yanjianshe $
  */
-class FController {
+abstract class FController {
     protected $view;
+
+    abstract function showMessage($message, $url = null);
 
     public function setView() {
         $this->view = new FView;
@@ -73,7 +75,7 @@ class FController {
         exit;
     }
 
-    /*
+    /**
      * 检查是否是数字
      */
     protected function _ajaxCheckIsNum($num_fields) {
@@ -92,11 +94,10 @@ class FController {
         return true;
     }
 
-    /*
+    /**
      * 检查下拉列表的选中值是否为-1
      */
-
-    protected function  _ajaxCheckSelect($select_fields) {
+    protected function _ajaxCheckSelect($select_fields) {
 
         $check_results = null;
 
@@ -138,30 +139,29 @@ class FController {
     protected function success($message, $url = '', $close_time = 0) {
         global $_F;
 
-        if ($url == 'r') {
+        if ($url == 'r')
             $url = $_SERVER['HTTP_REFERER'];
-        }
 
-        if ($_F['in_ajax']) {
+        if ($_F['in_ajax'])
             $this->_ajaxSuccessMessage($message, $url, $close_time);
-        } else {
+        else
+            $this->showMessage($message, 'success', $url);
 
-            if (method_exists(self, 'showMessage')) {
-                $this->showMessage($message, $url);
-            } else {
-                $this->_successAction($message, $url);
-            }
-        }
+        return 1;
     }
 
-    protected function error($message) {
+    protected function error($message, $url = '') {
         global $_F;
 
-        if ($_F['in_ajax']) {
+        if ($url == 'r')
+            $url = $_SERVER['HTTP_REFERER'];
+
+        if ($_F['in_ajax'])
             $this->_ajaxErrorMessage($message);
-        } else {
-            $this->showMessage($message, $url);
-        }
+        else
+            $this->showMessage($message, 'error', $url);
+
+        return -1;
     }
 
     /**
@@ -212,16 +212,9 @@ class FController {
         $this->view->set($key, $value);
     }
 
-    protected function set($key, $value) {
-        $this->view->set($key, $value);
-    }
+    protected function ajaxReturn($mix) {
+        FResponse::output($mix);
 
-    protected function _successAction() {
-        echo 'please write _successAction';
-        exit;
-    }
-
-    protected function ajaxReturn() {
-
+        return true;
     }
 }

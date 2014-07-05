@@ -59,7 +59,7 @@ class DAO extends FDB_Table {
     }
 
     public function find() {
-        
+
     }
 
     public function update($_pk_key, $data) {
@@ -739,7 +739,7 @@ class DAO extends FDB_Table {
 //                $val = '%' . $val . '%';
 //                $whereStr .= $key . ' LIKE ' . $this->parseValue($val);
 //            } else {
-                $whereStr .= $key . ' = ' . $this->parseValue($val);
+            $whereStr .= $key . ' = ' . $this->parseValue($val);
 //            }
         }
         return $whereStr;
@@ -782,10 +782,13 @@ class DAO extends FDB_Table {
         }
         return $whereStr;
     }
+
     /**
      * SQL指令安全过滤
      * @access public
-     * @param string $str  SQL字符串
+     *
+     * @param string $str SQL字符串
+     *
      * @return string
      */
     public function escapeString($str) {
@@ -795,22 +798,28 @@ class DAO extends FDB_Table {
     /**
      * 查询SQL组装 join
      * @access public
+     *
      * @param mixed $join
      * @param string $type JOIN类型
+     *
      * @return Model
      */
-    public function join($join,$type='INNER') {
-        $prefix =   $this->tablePrefix;
-        if(is_array($join)) {
-            foreach ($join as $key=>&$_join){
-                $_join  =   preg_replace_callback("/__([A-Z_-]+)__/sU", function($match) use($prefix){ return $prefix.strtolower($match[1]);}, $_join);
-                $_join  =   false !== stripos($_join,'JOIN')? $_join : $type.' JOIN ' .$_join;
+    public function join($join, $type = 'INNER') {
+        $prefix = $this->tablePrefix;
+        if (is_array($join)) {
+            foreach ($join as $key => &$_join) {
+                $_join = preg_replace_callback("/__([A-Z_-]+)__/sU", function ($match) use ($prefix) {
+                    return $prefix . strtolower($match[1]);
+                }, $_join);
+                $_join = false !== stripos($_join, 'JOIN') ? $_join : $type . ' JOIN ' . $_join;
             }
-            $this->options['join']      =   $join;
-        }elseif(!empty($join)) {
+            $this->options['join'] = $join;
+        } elseif (!empty($join)) {
             //将__TABLE_NAME__字符串替换成带前缀的表名
-            $join  = preg_replace_callback("/__([A-Z_-]+)__/sU", function($match) use($prefix){ return $prefix.strtolower($match[1]);}, $join);
-            $this->options['join'][]    =   false !== stripos($join,'JOIN')? $join : $type.' JOIN '.$join;
+            $join = preg_replace_callback("/__([A-Z_-]+)__/sU", function ($match) use ($prefix) {
+                return $prefix . strtolower($match[1]);
+            }, $join);
+            $this->options['join'][] = false !== stripos($join, 'JOIN') ? $join : $type . ' JOIN ' . $join;
         }
         return $this;
     }
@@ -818,50 +827,56 @@ class DAO extends FDB_Table {
     /**
      * 查询SQL组装 union
      * @access public
+     *
      * @param mixed $union
      * @param boolean $all
+     *
      * @return Model
      */
-    public function union($union,$all=false) {
-        if(empty($union)) return $this;
-        if($all) {
-            $this->options['union']['_all']  =   true;
+    public function union($union, $all = false) {
+        if (empty($union)) return $this;
+        if ($all) {
+            $this->options['union']['_all'] = true;
         }
-        if(is_object($union)) {
-            $union   =  get_object_vars($union);
+        if (is_object($union)) {
+            $union = get_object_vars($union);
         }
         // 转换union表达式
-        if(is_string($union) ) {
-            $prefix =   $this->tablePrefix;
+        if (is_string($union)) {
+            $prefix = $this->tablePrefix;
             //将__TABLE_NAME__字符串替换成带前缀的表名
-            $options  = preg_replace_callback("/__([A-Z_-]+)__/sU", function($match) use($prefix){ return $prefix.strtolower($match[1]);}, $union);
-        }elseif(is_array($union)){
-            if(isset($union[0])) {
-                $this->options['union']  =  array_merge($this->options['union'],$union);
+            $options = preg_replace_callback("/__([A-Z_-]+)__/sU", function ($match) use ($prefix) {
+                return $prefix . strtolower($match[1]);
+            }, $union);
+        } elseif (is_array($union)) {
+            if (isset($union[0])) {
+                $this->options['union'] = array_merge($this->options['union'], $union);
                 return $this;
-            }else{
-                $options =  $union;
+            } else {
+                $options = $union;
             }
-        }else{
+        } else {
             E(L('_DATA_TYPE_INVALID_'));
         }
-        $this->options['union'][]  =   $options;
+        $this->options['union'][] = $options;
         return $this;
     }
 
     /**
      * SQL查询
      * @access public
-     * @param string $sql  SQL指令
-     * @param mixed $parse  是否需要解析SQL
+     *
+     * @param string $sql SQL指令
+     * @param mixed $parse 是否需要解析SQL
+     *
      * @return mixed
      */
-    public function query($sql,$parse=false) {
-        if(!is_bool($parse) && !is_array($parse)) {
+    public function query($sql, $parse = false) {
+        if (!is_bool($parse) && !is_array($parse)) {
             $parse = func_get_args();
             array_shift($parse);
         }
-        $sql  =   $this->parseSql($sql,$parse);
+        $sql = $this->parseSql($sql, $parse);
         echo $sql;
 
         return $this->db->query($sql);

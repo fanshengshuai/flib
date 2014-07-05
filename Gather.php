@@ -15,7 +15,7 @@ class Gather {
 
         $end_pos = strpos($_tmp, $end);
         if ($end_pos) {
-            $_tmp_1 = substr($_tmp, 0,  $end_pos);
+            $_tmp_1 = substr($_tmp, 0, $end_pos);
         }
 
         return $_tmp_1;
@@ -37,12 +37,12 @@ class Gather {
                 $uri = $uri . "index.html";
             }
 
-            if (!file_exists(APP_ROOT . 'public' .$uri)) {
+            if (!file_exists(APP_ROOT . 'public' . $uri)) {
                 $uri_p = explode('/', trim($uri, '/'));
                 unset($uri_p[count($uri_p) - 1]);
 
                 $d = join('/', $uri_p);
-                $d_r = APP_ROOT .'public/' . $d;
+                $d_r = APP_ROOT . 'public/' . $d;
                 if (!file_exists($d_r)) {
                     mkdir($d_r, 0777, true);
                     chmod($d_r, 0777);
@@ -54,7 +54,8 @@ class Gather {
 
                 $w_file = APP_ROOT . 'public/' . trim($uri, '/');
                 file_put_contents($w_file, $content);
-                echo $content;exit;
+                echo $content;
+                exit;
             }
         }
     }

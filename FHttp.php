@@ -77,7 +77,7 @@ class FHttp {
         'proxyAuthUser' => 'user',
         'proxyAuthPwd' => 'password',
     );
-    
+
     private $header = array(
         "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Charset: GBK,utf-8;q=0.7,*;q=0.3",

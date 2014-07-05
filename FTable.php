@@ -10,12 +10,60 @@
  * $Id$
  */
 class FTable {
+    /**
+     * @var array
+     */
     private $_connects = array();
+
+    /**
+     * @param array $pagerOptions
+     */
+    public function setPagerOptions($pagerOptions) {
+        $this->pagerOptions = $pagerOptions;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPagerOptions() {
+        return $this->pagerOptions;
+    }
+
+    /**
+     * @param array $options
+     */
+    public function setOptions($options) {
+        $this->options = $options;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptions() {
+        return $this->options;
+    }
+    /**
+     * @var PDO
+     */
     private $_dbh;
     // 查询表达式参数
+    /**
+     * @var array
+     */
     protected $options = array();
+    /**
+     * 分页配置项
+     * @var array
+     */
+    protected $pagerOptions = array();
+    /**
+     * @var string
+     */
     protected $table_info = null;
     // 查询表达式
+    /**
+     * @var string
+     */
     protected $selectSql = 'SELECT%DISTINCT% %FIELD% FROM %TABLE%%JOIN%%WHERE%%GROUP%%HAVING%%ORDER%%LIMIT% %UNION%%COMMENT%';
 
     /**
@@ -48,6 +96,11 @@ class FTable {
         return $this;
     }
 
+    /**
+     * @param $fields
+     *
+     * @return $this
+     */
     public function fields($fields) {
         $this->options['fields'] = $fields;
         return $this;
@@ -224,9 +277,6 @@ class FTable {
             $stmt->execute($this->options['params']);
             $retData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-
-
-
         } catch (PDOException $e) {
             throw new Exception($e);
         }
@@ -296,6 +346,10 @@ class FTable {
         return $result['count'];
     }
 
+    /**
+     * @return string
+     * @throws Exception
+     */
     private function buildSql() {
         global $_F;
 
@@ -333,6 +387,10 @@ class FTable {
         return $sql;
     }
 
+    /**
+     * @return mixed
+     * @throws Exception
+     */
     public function connect() {
         global $_F;
 
@@ -376,6 +434,7 @@ class FTable {
      */
     public function page($page) {
         $this->options['page'] = $page;
+        $this->pagerOptions['page'] = $page;
         return $this;
     }
 
@@ -388,6 +447,7 @@ class FTable {
      */
     public function limit($limit) {
         $this->options['limit'] = $limit;
+        $this->pagerOptions['limit'] = $limit;
         return $this;
     }
 
@@ -435,8 +495,8 @@ class FTable {
             $stmt->execute($params);
 
             $this->reset();
-            return $this->_dbh->lastInsertId();
 
+            return $stmt->rowCount();
         } catch (PDOException $e) {
             throw new Exception($e);
         }
@@ -452,7 +512,17 @@ class FTable {
     public function insert($data) {
         $this->reset();
 
-        return $this->save($data);
+        if (!$data['create_time']) {
+            $data['create_time'] = date('Y-m-d H:i:s');
+        }
+
+        if (!$data['status']) {
+            $data['status'] = 1;
+        }
+
+        $this->save($data);
+
+        return $this->_dbh->lastInsertId();
     }
 
     /**
@@ -461,11 +531,24 @@ class FTable {
      * @param $data
      * @param $where
      *
+     * @throws Exception
      * @return bool
      */
-    public function update($data, $where) {
-        $this->reset();
-        $this->where($where);
+    public function update($data, $where = null) {
+
+        if ($where) {
+            $this->reset();
+            $this->where($where);
+        }
+
+        if (!$this->options['where']) {
+            throw new Exception("FDB update need condition.");
+        }
+
+        if (!$data['update_time']) {
+            $data['update_time'] = date('Y-m-d H:i:s');
+        }
+
         return $this->save($data);
     }
 
@@ -633,6 +716,9 @@ class FTable {
         $this->_dbh->rollBack();
     }
 
+    /**
+     *
+     */
     public function reset() {
         $this->options = null;
     }
@@ -671,5 +757,27 @@ class FTable {
         }
 
         return $tableInfo;
+    }
+
+    /**
+     * 获得分页信息
+     *
+     * @throws Exception
+     * @return array
+     */
+    public function getPagerInfo() {
+        global $_F;
+
+        $count = $this->count();
+
+        if (!isset($this->pagerOptions['page'])) {
+            if ($_F['debug']) {
+                throw new Exception('使用 getPagerInfo 的时候，必须在查询方法上使用 page 参数。如：$table->page(1)->limit(20)->select();');
+            } else {
+                return false;
+            }
+        }
+
+        return FPager::getPagerInfo($count, $this->pagerOptions['page'], $this->pagerOptions['limit']);
     }
 }

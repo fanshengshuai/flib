@@ -8,7 +8,6 @@
  * vim: set expandtab sw=4 ts=4 sts=4
  * $Id: FCache.php 11 2012-07-24 03:42:35Z fanshengshuai $
  */
-
 class FCache {
     public static function set($cache_key, $cache_content, $cache_time = 7200, $force = false) {
         global $_F;
@@ -19,11 +18,11 @@ class FCache {
 
         if ($_F['memcache']) {
 
-            $_F['memcache']->set($cache_key, $cache_content, MEMCACHE_COMPRESSED, $cache_time );
-			return true;
-		}
-		$save_content = json_encode ( array (
-				'cache_time' => $cache_time, 'content' => $cache_content));
+            $_F['memcache']->set($cache_key, $cache_content, MEMCACHE_COMPRESSED, $cache_time);
+            return true;
+        }
+        $save_content = json_encode(array(
+            'cache_time' => $cache_time, 'content' => $cache_content));
 
         $cache_file = FCache::getFileFCachePath($cache_key);
 
@@ -61,8 +60,11 @@ class FCache {
 
         $cache_dir = FConfig::get('global.cache_dir');
 
-        if ($cache_dir) { $cache_dir = "{$cache_dir}/"; }
-        else { $cache_dir = APP_ROOT . "data/cache/"; }
+        if ($cache_dir) {
+            $cache_dir = "{$cache_dir}/";
+        } else {
+            $cache_dir = APP_ROOT . "data/cache/";
+        }
 
         $hash_file_path = FFile::getHashPath($cache_key, 3, $cache_dir, true);
         $cache_file = $hash_file_path['file_path'];
@@ -103,8 +105,8 @@ class FCache {
         global $_F;
 
         if (FConfig::get('global.memcache.enable')) {
-	        $_F['memcache'] = new Memcache;
-	        $_F['memcache']->connect('127.0.0.1', 11211);
+            $_F['memcache'] = new Memcache;
+            $_F['memcache']->connect('127.0.0.1', 11211);
         }
     }
 }

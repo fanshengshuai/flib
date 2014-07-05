@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  *      作者: 范圣帅(fanshengshuai@gmail.com)
@@ -8,8 +9,6 @@
  *
  *  $Id: EMail.php 11 2012-07-24 03:42:35Z fanshengshuai $
  */
-
-
 class EMail {
 
     public $user_smtp = true;
@@ -55,7 +54,7 @@ class EMail {
 
         $mailtos = join(',', $mailtos);
 
-        $title="=?UTF-8?B?".base64_encode($title)."?="; //防止标题变乱码
+        $title = "=?UTF-8?B?" . base64_encode($title) . "?="; //防止标题变乱码
 
         $headers = "From: {$from['name']} <{$from['mail']}> \n";
         $headers .= "X-Sender: \n";

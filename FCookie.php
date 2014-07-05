@@ -8,7 +8,6 @@
  * vim: set expandtab sw=4 ts=4 sts=4
  * $Id: Cookie.php 23 2012-07-25 05:38:34Z fanshengshuai $
  */
-
 class FCookie {
     public static function set($var, $value, $life = 7200) {
         global $_F;
@@ -26,10 +25,10 @@ class FCookie {
         $secure = $_SERVER['SERVER_PORT'] == 443 ? 1 : 0;
         $life = $life > 0 ? $timestamp + $life : ($life < 0 ? $timestamp - 31536000 : 0);
 
-        setcookie($var, $value, $life, $path);//, $domain, $secure);
-        return ;
+        setcookie($var, $value, $life, $path); //, $domain, $secure);
+        return;
 
-        if(PHP_VERSION < '5.2.0') {
+        if (PHP_VERSION < '5.2.0') {
             setcookie($var, $value, $life, $path, $domain, $secure);
         } else {
             setcookie($var, $value, $life, $path, $domain, $secure, $httponly);
@@ -44,6 +43,7 @@ class FCookie {
     public static function delete($key) {
         Cookie::set($key, null, -1);
     }
+
     public static function remove($key) {
         self::set($key, null, -1);
     }

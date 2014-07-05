@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * 作者: 范圣帅(fanshengshuai@gmail.com)
@@ -34,13 +35,14 @@ class FConfig {
      *
      * @param string $key 配置的key
      * @param mixed $defaultValue key不存在时返回默认值
+     *
      * @return mixed
      */
     public static function get($key, $defaultValue = null) {
 
         $config =& FConfig::getInstance();
         $value = $config->_GET($key);
-        if (!$value){
+        if (!$value) {
             return $defaultValue;
         }
 
@@ -50,8 +52,9 @@ class FConfig {
     /**
      * exists
      * 检查一个配置是否存在
-     * 
+     *
      * @param  string $key 配置的key
+     *
      * @return boolean
      */
     public static function exists($key) {
@@ -66,6 +69,7 @@ class FConfig {
      *
      * @param  string $key 键
      * @param  mixed $value 值
+     *
      * @return void
      */
     public static function set($key, $value) {
@@ -79,6 +83,7 @@ class FConfig {
      * 获取一个配置的值
      *
      * @param string $key 配置的key
+     *
      * @return mixed
      */
     protected function _GET($key) {
@@ -105,6 +110,7 @@ class FConfig {
      * 匹配
      *
      * @param  string $key
+     *
      * @return mixed
      */
     protected function _match($key) {
@@ -119,7 +125,7 @@ class FConfig {
         }
 
         $leave = array();
-        for ($i = 0; $i < count($parts); $i ++) {
+        for ($i = 0; $i < count($parts); $i++) {
             $part = array_pop($parts);
             array_unshift($leave, $part);
 
@@ -157,6 +163,7 @@ class FConfig {
      * 检查一个配置是否存在
      *
      * @param  string $key 配置的key
+     *
      * @return boolean
      */
     protected function _exists($key) {
@@ -170,6 +177,7 @@ class FConfig {
      * 根据key加载配置
      *
      * @param string $key
+     *
      * @return void
      */
     protected function _loadKey($key) {
@@ -211,15 +219,16 @@ class FConfig {
      * @param  mixed $conf 配置
      * @param  string $file 定义配置文件
      * throw new FConfig_Exception
+     *
      * @return void
      */
     protected function _load($rootkey, $conf = false, $file = null) {
 
         if ($conf === false) {
             if (in_array($file, self::$_loaded)) {
-                return ;
+                return;
             } else {
-               array_push(self::$_loaded, $file);
+                array_push(self::$_loaded, $file);
             }
 
             if (!is_file($file)) {
