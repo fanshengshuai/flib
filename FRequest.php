@@ -19,6 +19,11 @@ class FRequest {
         return (isset($_SERVER['REQUEST_METHOD']) && strtoupper($_SERVER['REQUEST_METHOD']) == 'POST');
     }
 
+    /**
+     * @param null $key
+     *
+     * @return mixed
+     */
     public static function getAllParams($key = null) {
         if ($key) {
             return $_GET[$key];
@@ -27,6 +32,11 @@ class FRequest {
         return $_GET;
     }
 
+    /**
+     * @param null $key
+     *
+     * @return mixed
+     */
     public static function getAllPostParams($key = null) {
         if ($key) {
             return $_POST[$key];
@@ -35,16 +45,55 @@ class FRequest {
         return $_POST;
     }
 
+    /**
+     * @param $param
+     *
+     * @return int
+     */
     public static function getInt($param) {
-        return intval($_GET[$param]);
+
+        if (isset($_GET[$param])) {
+            return intval($_GET[$param]);
+        } else {
+            return null;
+        }
     }
 
+    /**
+     * @param $param
+     *
+     * @return string
+     */
     public static function getString($param) {
         return trim($_GET[$param]);
     }
 
+    /**
+     * @param $param
+     *
+     * @return bool
+     */
+    public static function getBoolean($param) {
+        return isset($_GET[$param]);
+    }
+
+    /**
+     * @param $param
+     *
+     * @return mixed
+     */
     public static function getPostString($param) {
         return $_POST[$param];
+    }
+
+    /**
+     * 获得 POST 数据中bool数值
+     * @param $param
+     *
+     * @return bool
+     */
+    public static function getPostBoolean($param) {
+        return isset($_POST[$param]);
     }
 
     /**
@@ -58,18 +107,47 @@ class FRequest {
         return intval($_REQUEST[$param]);
     }
 
+    /**
+     * @param $param
+     *
+     * @return bool
+     */
+    public static function getRequestBoolean($param) {
+        return isset($_REQUEST[$param]);
+    }
+
+    /**
+     * @param $param
+     *
+     * @return mixed
+     */
     public static function getRequestString($param) {
         return $_REQUEST[$param];
     }
 
+    /**
+     * 获得 POST 中 int 数值
+     *
+     * @param $param
+     *
+     * @return int
+     */
     public static function getPostInt($param) {
         return intval($_POST[$param]);
     }
 
+    /**
+     *
+     */
     public static function getUploadedFiles() {
 
     }
 
+    /**
+     * @param int $type
+     *
+     * @return mixed
+     */
     public static function getClientIP($type = 0) {
         static $ip = NULL;
 
@@ -94,6 +172,9 @@ class FRequest {
 
 
     // 判断是否为手机访问
+    /**
+     * @return bool
+     */
     public static function isMobile() {
         $user_agent = $_SERVER ['HTTP_USER_AGENT'];
         $mobile_agents = Array(

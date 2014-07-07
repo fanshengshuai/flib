@@ -42,6 +42,7 @@ class FTable {
     public function getOptions() {
         return $this->options;
     }
+
     /**
      * @var PDO
      */
@@ -259,7 +260,7 @@ class FTable {
         $sql = $this->buildSql();
 
         // 缓存处理
-        $cacheKey = "SQL-RESULT-{$this->_table}-{$sql}-" . join('-', $this->options['params']);
+        $cacheKey = "SQL-RESULT-{$this->_table}-{$sql}-" . ($this->options['params'] ? join('-', $this->options['params']) : '');
         if ($this->options['useCache']) {
 
             $cacheValue = FCache::get($cacheKey);
@@ -300,8 +301,13 @@ class FTable {
 
         $sql = $this->buildSql();
 
+        // 处理分页参数，放在 缓存处理 之前
+        if ($this->options['page']) {
+            $this->setPagerOptions(array('page' => $this->options['page'], 'limit' => $this->options['limit']));
+        }
+
         // 缓存处理
-        $cacheKey = "SQL-RESULT-{$this->_table}-{$sql}-" . join('-', $this->options['params']);
+        $cacheKey = "SQL-RESULT-{$this->_table}-{$sql}-" . ($this->options['params'] ? join('-', $this->options['params']) : '');
         if ($this->options['useCache']) {
 
             $cacheValue = FCache::get($cacheKey);
@@ -433,8 +439,7 @@ class FTable {
      * @return $this
      */
     public function page($page) {
-        $this->options['page'] = $page;
-        $this->pagerOptions['page'] = $page;
+        $this->options['page'] = max(1, $page);
         return $this;
     }
 
@@ -447,7 +452,6 @@ class FTable {
      */
     public function limit($limit) {
         $this->options['limit'] = $limit;
-        $this->pagerOptions['limit'] = $limit;
         return $this;
     }
 
@@ -587,12 +591,10 @@ class FTable {
             return $this->save(array('status' => 2, 'remove_time' => date('Y-m-d H:i:s')));
         }
 
-        $sql = "DELETE from $this->_table WHERE $this->options['where']";
+        $sql = "DELETE from $this->_table WHERE {$this->options['where']}";
 
         if ($_F['debug'])
             $_F['debug_info']['sql'][] = array('sql' => $sql, 'params' => $this->options['params']);
-
-        $this->reset();
 
         try {
             $stmt = $this->_dbh->prepare($sql);
@@ -611,26 +613,25 @@ class FTable {
      *
      * @param $field
      * @param $conditions
+     * @param array $params
      * @param int $unit
      *
      * @throws Exception
-     * @internal param array $params
+     * @throws Exception
      * @return mixed
      */
-    public function increase($field, $conditions, $unit = 1) {
+    public function increase($field, $conditions, $params = array(), $unit = 1) {
 
         if (!$conditions) {
             throw new Exception('FTable incr function need condition');
         }
 
-        $this->where($conditions);
-
         $sql = 'UPDATE ' . $this->_table . " SET `$field` = `$field` + $unit";
-        $sql .= ' WHERE ' . $this->options['where'];
+        $sql .= ' WHERE ' . $conditions;
 
         try {
             $stmt = $this->_dbh->prepare($sql);
-            $result = $stmt->execute($this->options['params']);
+            $result = $stmt->execute($params);
         } catch (PDOException $e) {
             throw new Exception($e);
         }
@@ -656,14 +657,12 @@ class FTable {
             throw new Exception('FTable decr function need condition');
         }
 
-        $this->where($conditions);
-
         $sql = 'UPDATE ' . $this->_table . " SET $field = IF($field > $unit,  $field - $unit, 0)";
-        $sql .= ' WHERE ' . $this->options['where'];
+        $sql .= ' WHERE ' . $conditions;
 
         try {
             $stmt = $this->_dbh->prepare($sql);
-            $result = $stmt->execute($this->options['params']);
+            $result = $stmt->execute($params);
         } catch (PDOException $e) {
             throw new Exception($e);
         }
@@ -772,8 +771,9 @@ class FTable {
         global $_F;
 
         $count = $this->count();
+        $pagerOptions = $this->getPagerOptions();
 
-        if (!isset($this->pagerOptions['page'])) {
+        if (!isset($pagerOptions['page'])) {
             if ($_F['debug']) {
                 throw new Exception('使用 getPagerInfo 的时候，必须在查询方法上使用 page 参数。如：$table->page(1)->limit(20)->select();');
             } else {
@@ -781,6 +781,6 @@ class FTable {
             }
         }
 
-        return FPager::getPagerInfo($count, $this->pagerOptions['page'], $this->pagerOptions['limit']);
+        return FPager::getPagerInfo($count, $pagerOptions['page'], $pagerOptions['limit']);
     }
 }

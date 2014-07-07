@@ -19,9 +19,6 @@ class FPager {
     public static function build($total, $page_size = 20, $url = null, $page = -1) {
         global $_F;
 
-        $total = intval($total . '');
-        $page_size = max(20, $page_size);
-
         if ($total < $page_size) {
             return array();
         }

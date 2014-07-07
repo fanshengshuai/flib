@@ -9,7 +9,7 @@
  *
  * $Id: DAO.php 196 2012-08-11 10:46:03Z fanshengshuai $
  */
-class DAO extends FDB_Table {
+abstract class DAO extends FDB_Table {
     // 数据库表达式
     protected $comparison = array('eq' => '=', 'neq' => '<>', 'gt' => '>', 'egt' => '>=', 'lt' => '<', 'elt' => '<=', 'notlike' => 'NOT LIKE', 'like' => 'LIKE', 'in' => 'IN', 'notin' => 'NOT IN');
     // 查询表达式
