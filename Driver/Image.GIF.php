@@ -38,6 +38,7 @@ class FImage_Driver_GIF {
 
     /**
      * 设置或获取当前帧的数据
+     *
      * @param  string $stream 二进制数据流
      *
      * @return boolean        获取到的数据

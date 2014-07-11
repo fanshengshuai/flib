@@ -24,6 +24,7 @@ class DB_Shard_Stats extends DB_Shard {
      *
      * @param  array $shards
      * @param  array $shardKey
+     *
      * @return void
      */
     public function shard($shards, $shardKey) {
@@ -34,9 +35,9 @@ class DB_Shard_Stats extends DB_Shard {
 
         try {
             $rows = DAO_MySql::findAll($shards['table'], $conditions, $params,
-                                       array(),
-                                       array('*'),
-                                       array('dc_start_date' => 'DESC'));
+                array(),
+                array('*'),
+                array('dc_start_date' => 'DESC'));
             $db = $rows[0];
             if (!$db) {
 
@@ -62,17 +63,17 @@ class DB_Shard_Stats extends DB_Shard {
             } elseif (0 == ($this->_GETRandomByDiId($diId) % 2)) {
 
                 // 随机调换主从IP，均衡负载
-            	list($hostIp, $failoverIp) = array($db['dc_slave_ip'], $db['dc_master_ip']);
+                list($hostIp, $failoverIp) = array($db['dc_slave_ip'], $db['dc_master_ip']);
             }
 
             $this->db['dsn'] = sprintf('mysql:dbname=%s_%03d;host=%s',
-                                       $databasePre, $dbId, $hostIp);
+                $databasePre, $dbId, $hostIp);
             $this->db['user'] = $shards['user'];
             $this->db['password'] = $shards['password'];
             $this->db['charset'] = $shards['charset'];
             $this->db['persistent'] = $shards['persistent'];
             $this->db['failover'] = sprintf('mysql:dbname=%s_%03d;host=%s',
-                                       $databasePre, $dbId, $failoverIp);
+                $databasePre, $dbId, $failoverIp);
 
         } catch (Exception $e) {
 
@@ -87,6 +88,7 @@ class DB_Shard_Stats extends DB_Shard {
      *
      * @param integer $diId 站点ID
      * @param integer $second 控制平均多长时间进行一次随机操作，单位(s)
+     *
      * @return integer
      */
     protected function _GETRandomByDiId($diId = 0, $second = 3600) {
@@ -97,7 +99,7 @@ class DB_Shard_Stats extends DB_Shard {
         $md5 = md5($seed);
         // 把 md5 值的字串每一位转成 10 进制数，并求和，其结果作为随机数
         $random = 0;
-        for($i = 0; $i < 32; $i ++) {
+        for ($i = 0; $i < 32; $i++) {
             $random = $random + hexdec($md5{$i});
         }
 
@@ -114,12 +116,12 @@ class DB_Shard_Stats extends DB_Shard {
     public function getDB() {
 
         $db = array('dsn' => $this->db['dsn'],
-                    'user' => $this->db['user'],
-                    'password' => $this->db['password'],
-                    'charset' => $this->db['charset'],
-                    'persistent' => $this->db['persistent'],
-                    'failover' => $this->db['failover']
-                    );
+            'user' => $this->db['user'],
+            'password' => $this->db['password'],
+            'charset' => $this->db['charset'],
+            'persistent' => $this->db['persistent'],
+            'failover' => $this->db['failover']
+        );
 
         return $db;
     }

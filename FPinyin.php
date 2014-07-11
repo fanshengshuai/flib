@@ -6,6 +6,7 @@
 class FPinyin {
 
     public static function getPinyin($string) {
+        $string = preg_replace('#^([0-9]+)#', '', $string);
         $pinyin = new self;
         return $pinyin->_getPinyin($string, 'utf8');
     }

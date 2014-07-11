@@ -29,10 +29,10 @@ class DB_Shard_IndexTable extends DB_Shard {
     public function getDB() {
 
         $db = array('dsn' => $this->db['dsn'],
-                    'user' => $this->db['user'],
-                    'password' => $this->db['password'],
-                    'charset' => $this->db['charset']
-                    );
+            'user' => $this->db['user'],
+            'password' => $this->db['password'],
+            'charset' => $this->db['charset']
+        );
 
         return $db;
     }

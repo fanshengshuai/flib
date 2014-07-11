@@ -1,6 +1,6 @@
 <?php
 
-class FDB_Exception extends PDOException  {
+class FDB_Exception extends PDOException {
 
     public function __construct($message, $code = 0) {
         if (is_a($message, 'Exception')) {

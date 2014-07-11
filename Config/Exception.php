@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  *      作者: 范圣帅(fanshengshuai@gmail.com)
@@ -6,7 +7,6 @@
  *
  *  $Id: Exception.php 11 2012-07-24 03:42:35Z fanshengshuai $
  */
-
 class Config_Exception extends Exception {
 
     public function __construct($message, $code = 0) {

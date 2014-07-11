@@ -170,7 +170,7 @@ class Flib {
                 break;
             case E_NOTICE:
             case E_USER_NOTICE :
-//                $_F['errors']['NOTICE'][] = "[$err_no] $err_str " . basename($err_file) . " 第 $err_line 行.";
+                // $_F['errors']['NOTICE'][] = "[$err_no] $err_str " . basename($err_file) . " 第 $err_line 行.";
                 break;
             default :
                 $_F['errors']['OTHER'][] = "[$err_no] $err_str " . basename($err_file) . " 第 $err_line 行.";
@@ -254,7 +254,6 @@ class Flib {
         $sub_keep_domains = FConfig::get('global.sub_domain.keep_domains');
 
         // 是否开了子域名
-// && in_array($_F['cname'], $sub_keep_domains)
         if ($sub_domain_status == 'on') {
             foreach (FConfig::get('global.sub_domain.sub_domain_rewrite') as $key => $value) {
                 if ($key == $_F['cname']) {
@@ -275,9 +274,6 @@ class Flib {
             FDispatcher::init();
         }
 
-//        define('IS_CGI',substr(PHP_SAPI, 0,3)=='cgi' ? 1 : 0 );
-//        define('IS_WIN',strstr(PHP_OS, 'WIN') ? 1 : 0 );
-//        define('IS_CLI',PHP_SAPI=='cli'? 1   :   0);
     }
 
     public static function resetAll() {

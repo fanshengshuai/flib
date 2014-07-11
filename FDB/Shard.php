@@ -3,8 +3,8 @@
 class DB_Shard {
 
     public static $rules = array('range' => 'DB_Shard_Range',
-                                 'stats' => 'DB_Shard_Stats'
-                                );
+        'stats' => 'DB_Shard_Stats'
+    );
 
     public function factory($options, $shardKey) {
 

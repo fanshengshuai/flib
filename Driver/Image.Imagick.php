@@ -16,6 +16,7 @@ class FImage_Driver_Imagick {
 
     /**
      * 构造方法，可用于打开一张图像
+     *
      * @param string $imgname 图像路径
      */
     public function __construct($imgname = null) {
@@ -24,6 +25,7 @@ class FImage_Driver_Imagick {
 
     /**
      * 打开一张图像
+     *
      * @param  string $imgname 图像路径
      */
     public function open($imgname) {
@@ -38,17 +40,18 @@ class FImage_Driver_Imagick {
 
         //设置图像信息
         $this->info = array(
-            'width'  => $this->img->getImageWidth(),
+            'width' => $this->img->getImageWidth(),
             'height' => $this->img->getImageHeight(),
-            'type'   => strtolower($this->img->getImageFormat()),
-            'mime'   => $this->img->getImageMimeType(),
+            'type' => strtolower($this->img->getImageFormat()),
+            'mime' => $this->img->getImageMimeType(),
         );
     }
 
     /**
      * 保存图像
-     * @param  string  $imgname 图像保存名称
-     * @param  string  $type 图像类型
+     *
+     * @param  string $imgname 图像保存名称
+     * @param  string $type 图像类型
      * @param  boolean $interlace 是否对JPEG类型图像设置隔行扫描
      */
     public function save($imgname, $type = null, $interlace = true) {
@@ -131,6 +134,7 @@ class FImage_Driver_Imagick {
 
     /**
      * 裁剪图像
+     *
      * @param  integer $w 裁剪区域宽度
      * @param  integer $h 裁剪区域高度
      * @param  integer $x 裁剪区域x坐标
@@ -186,6 +190,7 @@ class FImage_Driver_Imagick {
 
     /**
      * 生成缩略图
+     *
      * @param  integer $width 缩略图最大宽度
      * @param  integer $height 缩略图最大高度
      * @param  integer $type 缩略图裁剪类型
@@ -335,7 +340,8 @@ class FImage_Driver_Imagick {
 
     /**
      * 添加水印
-     * @param  string  $source 水印图片路径
+     *
+     * @param  string $source 水印图片路径
      * @param  integer $locate 水印位置
      * @param  integer $alpha 水印透明度
      */
@@ -441,10 +447,11 @@ class FImage_Driver_Imagick {
 
     /**
      * 图像添加文字
-     * @param  string  $text 添加的文字
-     * @param  string  $font 字体路径
+     *
+     * @param  string $text 添加的文字
+     * @param  string $font 字体路径
      * @param  integer $size 字号
-     * @param  string  $color 文字颜色
+     * @param  string $color 文字颜色
      * @param  integer $locate 文字写入位置
      * @param  integer $offset 文字相对当前位置的偏移量
      * @param  integer $angle 文字倾斜角度

@@ -120,7 +120,7 @@ abstract class FController {
         if (is_array($items)) {
             $result['items'] = $items;
         } else {
-            $result['message'] = $items;
+            $result['msg'] = $items;
         }
 
         ob_clean();

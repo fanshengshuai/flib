@@ -62,7 +62,7 @@ class FDB_Table {
      * 在配置文件conf/db.php中，指定$conf['MODULE.siteTables.TABLE.num']的值，可实现所有数据库上TABLE的分表
      *
      * @param string $table 表名
-     * @param array  $shardKey 切分关键字
+     * @param array $shardKey 切分关键字
      *
      * @return array
      *           + db 数据库相关配置

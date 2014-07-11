@@ -251,7 +251,6 @@ class FDB {
         global $_F;
 
         $_dbh = FDB::connect();
-
         return $_dbh->fetchAll($sql, $from_cache = false);
     }
 

@@ -16,11 +16,11 @@ class Mail_SMTP {
 
         $mail->IsSMTP();
         //$mail->SMTPDebug  = 2;                     // enables SMTP debug information (for testing)
-        $mail->SMTPAuth   = true;                  // enable SMTP authentication
-        $mail->Host       = "smtp.qq.com"; // sets the SMTP server
-        $mail->Port       = 25;                    // set the SMTP port for the GMAIL server
-        $mail->Username   = ""; // SMTP account username
-        $mail->Password   = "";        // SMTP account password
+        $mail->SMTPAuth = true; // enable SMTP authentication
+        $mail->Host = "smtp.qq.com"; // sets the SMTP server
+        $mail->Port = 25; // set the SMTP port for the GMAIL server
+        $mail->Username = ""; // SMTP account username
+        $mail->Password = ""; // SMTP account password
 
         $mail->SetFrom($mail->Username, 'OA系统');
     }
@@ -38,7 +38,7 @@ class Mail_SMTP {
 
         //$mail->AddAttachment("images/phpmailer_mini.gif"); // attachment
 
-        if(!$mail->Send()) {
+        if (!$mail->Send()) {
             return false;
             //echo "Mailer Error: " . $mail->ErrorInfo;
         } else {

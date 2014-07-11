@@ -15,9 +15,14 @@ class FException extends Exception {
         $this->view = new FView;
     }
 
+    /**
+     * @param $e Exception
+     */
     public function traceError($e) {
         global $_F;
 
+
+		$error_code = $e->getCode();
 
         if (is_array($e)) {
             $error_message = $e['message'];
@@ -40,8 +45,12 @@ class FException extends Exception {
                 FResponse::output(array('result' => 'exception', 'content' => $exception_message));
                 exit;
             } else {
-                header('HTTP/1.1 500 FLib Error');
-                header('status: 500 FLib Error');
+                if ($error_code == 404) {
+                    FResponse::sendStatusHeader(404);
+                } else {
+                    FResponse::sendStatusHeader(500);
+                }
+                exit;
             }
         }
 

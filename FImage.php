@@ -37,7 +37,8 @@ class FImage {
     /**
      * 构造方法，用于实例化一个图片处理对象
      *
-     * @param string $type 要使用的类库，默认使用GD库
+     * @param int|string $type 要使用的类库，默认使用GD库
+     * @param null $imgname
      */
     public function __construct($type = self::IMAGE_GD, $imgname = null) {
         /* 判断调用库的类型 */
@@ -206,8 +207,8 @@ class FImage {
 
     public static function getThumbPicUrl($pic_file, $size = '100x100') {
 
-        $full_pic_file = UPLOAD_DIR . $pic_file;
-        $thumb_file = UPLOAD_DIR . "cache/{$pic_file}.{$size}.jpg";
+        $full_pic_file = UPLOAD_ROOT . $pic_file;
+        $thumb_file = UPLOAD_ROOT. "cache/{$pic_file}.{$size}.jpg";
         $thumb_pic_url = "/uploads/cache/{$pic_file}.{$size}.jpg";
 
         if (file_exists($thumb_file)) {

@@ -154,6 +154,8 @@ class FView extends Smarty {
     public function getDebugInfo() {
         global $_F;
 
+		unset($_F['db']);
+
 
         if ($_F['run_in'] == 'shell') {
             $debug_contents = "DEBUG INFO:\n";
