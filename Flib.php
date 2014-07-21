@@ -217,9 +217,13 @@ class Flib {
         $_F['query_string'] = $_SERVER ['QUERY_STRING'];
 
         $_F['http_host'] ? $_F['http_host'] : $_F['http_host'] = $_SERVER ['HTTP_HOST'];
-        $_F['top_domain'] = substr($_F ['domain'], strpos($_F ['domain'], '.') + 1);
-        $_F['cookie_domain'] = substr($_F ['http_host'], strpos($_F ['http_host'], '.'));
-        $_F['cname'] = substr($_F ['http_host'], 0, strpos($_F ['http_host'], '.'));
+
+        $last_part = substr($_F ['http_host'], strrpos($_F ['http_host'], '.'));
+        $left_part = str_replace($last_part, '', $_F ['http_host']);
+        $_F['cookie_domain'] = substr($left_part, strrpos($left_part, '.')) . $last_part;
+        $_F['domain'] = trim($_F['cookie_domain'], '.');
+
+        $_F['subdomain'] =str_replace($_F['cookie_domain'], '', $_F ['http_host']);
 
         $_F['refer'] = $_REQUEST ['refer'] ? $_REQUEST ['refer'] : $_SERVER ['HTTP_REFERER'];
 
@@ -251,12 +255,11 @@ class Flib {
         }
 
         $sub_domain_status = FConfig::get('global.sub_domain.status');
-        $sub_keep_domains = FConfig::get('global.sub_domain.keep_domains');
 
         // 是否开了子域名
         if ($sub_domain_status == 'on') {
             foreach (FConfig::get('global.sub_domain.sub_domain_rewrite') as $key => $value) {
-                if ($key == $_F['cname']) {
+                if ($key == $_F['subdomain']) {
                     $_F['module'] = $value;
                 }
 
