@@ -16,6 +16,25 @@ class FTable {
     private $_connects = array();
 
     /**
+     * @var string 表
+     */
+    private $_table = null;
+
+    /**
+     * @param string $table
+     */
+    public function setTable($table) {
+        $this->_table = $table;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTable() {
+        return $this->_table;
+    }
+
+    /**
      * @param array $pagerOptions
      */
     public function setPagerOptions($pagerOptions) {
@@ -42,6 +61,8 @@ class FTable {
     public function getOptions() {
         return $this->options;
     }
+
+
 
     /**
      * @var PDO
@@ -303,7 +324,7 @@ class FTable {
 
         // 处理分页参数，放在 缓存处理 之前
         if ($this->options['page']) {
-            $this->setPagerOptions(array('where' => $this->options['where'], 'params' => $this->options['params'], 'page' => $this->options['page'], 'limit' => $this->options['limit']));
+            $this->setPagerOptions(array('page' => $this->options['page'], 'limit' => $this->options['limit']));
         }
 
         // 缓存处理
@@ -346,7 +367,6 @@ class FTable {
      * @return mixed
      */
     public function count() {
-        $this->options['page'] = 1;
         $this->options['fields'] = array("COUNT(*) as count");
         $result = $this->find();
 
@@ -621,22 +641,18 @@ class FTable {
      * @throws Exception
      * @return mixed
      */
-    public function increase($field, $conditions = null, $params = array(), $unit = 1) {
+    public function increase($field, $conditions, $params = array(), $unit = 1) {
 
-        if ($conditions) {
-            $this->where($conditions);
-        }
-
-        if (!$this->options['where']) {
-            throw new Exception('FTable increase function need condition');
+        if (!$conditions) {
+            throw new Exception('FTable incr function need condition');
         }
 
         $sql = 'UPDATE ' . $this->_table . " SET `$field` = `$field` + $unit";
-        $sql .= ' WHERE ' . $this->options['where'];
+        $sql .= ' WHERE ' . $conditions;
 
         try {
             $stmt = $this->_dbh->prepare($sql);
-            $result = $stmt->execute($this->options['params']);
+            $result = $stmt->execute($params);
         } catch (PDOException $e) {
             throw new Exception($e);
         }
@@ -656,22 +672,18 @@ class FTable {
      * @throws Exception
      * @throws Exception
      */
-    public function decrease($field, $conditions = null, $params = array(), $unit = 1) {
+    public function decrease($field, $conditions, $params = array(), $unit = 1) {
 
-        if ($conditions) {
-            $this->where($conditions);
-        }
-
-        if (!$this->options['where']) {
-            throw new Exception('FTable decrease function need condition');
+        if (!$conditions) {
+            throw new Exception('FTable decr function need condition');
         }
 
         $sql = 'UPDATE ' . $this->_table . " SET $field = IF($field > $unit,  $field - $unit, 0)";
-        $sql .= ' WHERE ' . $this->options['where'];
+        $sql .= ' WHERE ' . $conditions;
 
         try {
             $stmt = $this->_dbh->prepare($sql);
-            $result = $stmt->execute($this->options['params']);
+            $result = $stmt->execute($params);
         } catch (PDOException $e) {
             throw new Exception($e);
         }
@@ -716,7 +728,7 @@ class FTable {
      */
     public function commit() {
 
-        $this->_dbh->commit();
+        return $this->_dbh->commit();
     }
 
     /**
@@ -779,7 +791,6 @@ class FTable {
     public function getPagerInfo() {
         global $_F;
 
-        $this->options = $this->getPagerOptions();
         $count = $this->count();
         $pagerOptions = $this->getPagerOptions();
 
