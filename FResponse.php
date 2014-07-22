@@ -70,6 +70,7 @@ class FResponse {
      * 输出内容，可以是数组，可以是文本
      *
      * @param $mix
+     * @return bool
      */
     public static function output($mix) {
         global $_F;
@@ -88,7 +89,7 @@ class FResponse {
             $response->write($mix);
         }
 
-        return;
+        return true;
     }
 
     public static function sendHeader($headerKey, $headerValue = null) {
@@ -135,6 +136,7 @@ class FResponse {
      *
      * @param $url
      * @param null $target
+     * @return bool
      */
     public static function redirect($url, $target = null) {
         global $_F;
@@ -157,7 +159,7 @@ class FResponse {
             header("location: " . $url);
         }
 
-        exit ();
+        return true;
     }
 
     /**
