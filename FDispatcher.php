@@ -70,14 +70,14 @@ class FDispatcher {
 
         if (!$_F['controller'] || !$_F['action']) {
             if (RUN_MODE == 'sync') {
-                return;
+                return false;
             }
             throw new Exception("访问路径不正确，没有找到 {$_F['uri']}", 404);
         }
 
         if (!class_exists($_F['controller'])) {
             if (RUN_MODE == 'sync') {
-                return;
+                return false;
             }
 
             if ($_F['module']) {
@@ -86,11 +86,9 @@ class FDispatcher {
                     $_F['controller'] = $c_backup;
                 } else {
                     throw new Exception("找不到控制器：{$_F['controller']}", 404);
-                    exit;
                 }
             } else {
                 throw new Exception("找不到控制器：{$_F['controller']}", 404);
-                exit;
             }
 
         }
@@ -103,7 +101,10 @@ class FDispatcher {
         if (method_exists($controller, $action . "")) {
 
             if (method_exists($controller, 'beforeAction')) {
-                $controller->beforeAction();
+                // IMPORTANT beforeAction must return true
+                if (!$controller->beforeAction()) {
+                    return false;
+                }
             }
 
             // 加载函数类
@@ -114,8 +115,9 @@ class FDispatcher {
                 //return ;
             }
             throw new Exception("找不到 {$_F['action']}Action ", 404);
-            exit;
         }
+
+        return true;
     }
 
     private function _checkRouter(&$c, &$a) {
