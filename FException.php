@@ -22,7 +22,9 @@ class FException extends Exception {
         global $_F;
 
 
-		$error_code = $e->getCode();
+        if (!is_array($e)) {
+            $error_code = $e->getCode();
+        }
 
         if (is_array($e)) {
             $error_message = $e['message'];
@@ -40,9 +42,21 @@ class FException extends Exception {
             . '<br /> 异常出现在：' . $error_file . ' 第 ' . $error_line . ' 行';
         FLogger::write($exception_message);
 
+        if (!$_F['debug']) {
+            if ($error_code == 404) {
+                FResponse::sendStatusHeader(404);
+                $this->view->displaySysPage('404.tpl');
+//                echo "<strong>404 NOT FOUND</strong>";
+            } else {
+                FResponse::sendStatusHeader(500);
+                $this->view->displaySysPage('500.tpl');
+            }
+            exit;
+        }
+
         if ($_F['in_ajax']) {
             if ($_F['debug']) {
-                FResponse::output(array('result' => 'exception', 'content' => $exception_message));
+                FResponse::output(array('result' => 'exception', 'content' => preg_replace('/<br.+?>/i', "\n", $exception_message)));
                 exit;
             } else {
                 if ($error_code == 404) {
@@ -59,16 +73,9 @@ class FException extends Exception {
         $exception_message = str_replace(APP_ROOT, '', $exception_message);
         $exception_trace = str_replace(APP_ROOT, '', $exception_trace);
 
-        $this->view->set('exception_message', $exception_message);
-        $this->view->set('exception_trace', $exception_trace);
-        $this->view->displaySysPage('exception.tpl');
-    }
+        $this->view->set('exception_message', str_replace(APP_ROOT, '', $exception_message));
+        $this->view->set('exception_trace', preg_replace('#[\w\d \#]+?/f.php.+?$#si', ' Flib 引导入口', $exception_trace));
 
-    public function printMessage($exception_message) {
-
-        header('HTTP/1.1 500 FLib Error');
-        header('status: 500 FLib Error');
-        $this->view->set('exception_message', $exception_message);
         $this->view->displaySysPage('exception.tpl');
     }
 }

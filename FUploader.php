@@ -68,7 +68,7 @@ class FUploader {
 
     public static function saveFile($field, $attach_type = 'image') {
         $uploader = new FUploader ();
-        $photo_file = "{$attach_type}/" . date('Ymd') . '/' . date('YmdHis') . ".attach";
+        $photo_file = "{$attach_type}/" . date('Ymd') . '/' . date('His') . rand(1000, 9999) . ".attach";
         $upload_file = $uploader->saveAttach($field, $attach_type, $photo_file);
         return $upload_file ['file_path'];
     }

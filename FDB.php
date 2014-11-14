@@ -14,215 +14,82 @@ class FDB {
 
     private $_dbh;
 
-    /**
-     * FDB 构造函数
-     *
-     * @param string $dsn
-     * @param string $user
-     * @param string $password
-     * @param string $charset
-     * @param string $failOver
-     * @param boolean $persistent
-     * @param integer $timeout
-     *
-     * @throws FDB_Exception
-     */
-    private function __construct($dsn, $user, $password, $charset, $failOver = '', $persistent = false, $timeout = 0) {
 
-        $attr = array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_PERSISTENT => $persistent);
-        if (0 < $timeout) {
-            $attr[PDO::ATTR_TIMEOUT] = $timeout;
-        }
-
-        try {
-            $this->_dbh = new PDO($dsn, $user, $password, $attr);
-            $this->_dbh->exec("SET NAMES '" . $charset . "'");
-        } catch (PDOException $e) {
-
-            if ($failOver) {
-                try {
-                    $this->_dbh = new PDO($failOver, $user, $password, $attr);
-                    $this->_dbh->exec("SET NAMES '" . $charset . "'");
-                } catch (PDOException $e) {
-                    throw new FDB_Exception("can't connect to the server because:" . $e->getMessage());
-                }
-            } else {
-
-                throw new FDB_Exception("连接数据库失败：" . $e->getMessage());
-            }
-        }
+    public static function getConfig() {
+        return FConfig::get('db');
     }
 
+    /**
+     * @param string $rw_type
+     *
+     * @throws Exception
+     * @return PDO
+     */
+    public static function connect($rw_type = 'rw') {
+        global $_F;
+
+        $gConfig = self::getConfig();
+
+        $curConfig = null;
+        if ($rw_type == 'w') {
+            $curConfig = $gConfig['server'][array_rand($gConfig['server'])];
+        } else {
+            if ($gConfig['server_read'] && count($gConfig['server_read']) > 0) {
+                $curConfig = $gConfig['server_read'][array_rand($gConfig['server_read'])];
+            } else {
+                $curConfig = $gConfig['server'][array_rand($gConfig['server'])];
+            }
+        }
+
+        $dsn = $curConfig['dsn'];
+
+        FLogger::write($rw_type, $dsn);
+
+        if (isset(self::$_connects[$dsn])) {
+            return self::$_connects[$dsn];
+        }
+
+        $attr = array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_PERSISTENT => false);
+        $attr[PDO::ATTR_TIMEOUT] = 5;
+
+        try {
+            $dbh = new PDO($curConfig['dsn'], $curConfig['user'], $curConfig['password'], $attr);
+            $dbh->exec("SET NAMES '" . $gConfig['charset'] . "'");
+        } catch (PDOException $e) {
+            throw new Exception("连接数据库失败：" . $e->getMessage());
+        }
+
+        self::$_connects[$dsn] = $dbh;
+
+        return $dbh;
+    }
 
     public function table($t) {
         return $t;
     }
 
-
-    /**
-     * 获取数据库连接类
-     *
-     * @throws Exception
-     * @internal param string $dsn
-     * @internal param string $user
-     * @internal param string $password
-     * @internal param string $charset
-     * @internal param string $failOver
-     * @internal param bool $persistent
-     * @internal param int $timeout
-     * @return FDB 实例
-     */
-    public static function connect() {
-        global $_F;
-
-        if (!$_F['db']['config']) {
-            $db = 'default';
-            $_F['db']['config'] = FConfig::get('db.' . $db);
-        } else {
-            // check db.php
-            if (!include(APP_ROOT . "config/db.php")) {
-                throw new Exception ('NO DB CONFIG EXIST ! PLEASE CHECK config/db.php');
-            }
-        }
-
-        $dsn = $_F['db']['config']['dsn'];
-
-        if (array_key_exists($dsn, self::$_connects)) {
-            self::$_connects[$dsn];
-        }
-
-        self::$_connects[$dsn] = new FDB(
-            $_F['db']['config']['dsn'],
-            $_F['db']['config']['user'],
-            $_F['db']['config']['password'],
-            $_F['db']['config']['charset'],
-            $_F['db']['config']['failOver'],
-            $_F['db']['config']['persistent'],
-            $_F['db']['config']['timeout']
-        );
-
-        return self::$_connects[$dsn];
-    }
-
     /**
      * 开启事务
      */
-    public function begin() {
+    public static function begin() {
 
-        $this->_dbh->beginTransaction();
+        self::connect()->beginTransaction();
     }
 
     /**
      * 提交事务
      */
-    public function commit() {
+    public static function commit() {
 
-        $this->_dbh->commit();
+        self::connect()->commit();
     }
 
     /**
      * 回滚事务
      */
-    public function rollBack() {
+    public static function rollBack() {
 
-        $this->_dbh->rollBack();
-    }
-
-    /**
-     * 取得记录的第一行
-     *
-     * @param sql string $query
-     * @param array $params
-     *
-     * @return mixed
-     */
-    public function fetchRow($query, $params = array()) {
-        global $_F;
-
-        if ($_F['debug']) {
-            $_F['debug_info']['sql'][] = $query;
-        }
-
-        $stmt = $this->_dbh->prepare($query);
-        $stmt->execute($params);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row;
-
-    }
-
-    /**
-     * 取得所有的记录
-     *
-     * @param sql string $query
-     * @param bool $from_cache
-     *
-     * @internal param array $params
-     *
-     * @return array
-     */
-    public function fetchAll($query, $from_cache = false) {
-        global $_F;
-
-        if ($_F['debug']) {
-            $_F['debug_info']['sql'][] = $query;
-        }
-
-        $stmt = $this->_dbh->prepare($query);
-        $stmt->execute();
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return $rows;
-    }
-
-    /**
-     * 获取记录的第一行第一列
-     *
-     * @param string sql $query
-     * @param array $params
-     *
-     * @return string
-     */
-    public function fetchOne($query, $params = array()) {
-        global $_F;
-
-        if ($_F['debug']) {
-            $_F['debug_info']['sql'][] = $query;
-        }
-
-        $stmt = $this->_dbh->prepare($query);
-        $result = $stmt->execute($params);
-        if ($result) {
-            $row = $stmt->fetchColumn();
-        }
-        return $row;
-    }
-
-
-    /**
-     * 执行sql 语句
-     *
-     * @param $query
-     * @param array $params
-     *
-     * @return bool
-     */
-    public function exec($query, $params = array()) {
-        global $_F;
-
-        if ($_F['debug']) {
-            $_F['debug_info']['sql'][] = $query;
-        }
-
-        $stmt = $this->_dbh->prepare($query);
-        return $stmt->execute($params);
-    }
-
-    /**
-     * 获取最后一条记录的id
-     */
-    public function lastInsertId() {
-
-        return $this->_dbh->lastInsertId();
+        self::connect()->rollBack();
     }
 
     /**
@@ -243,46 +110,62 @@ class FDB {
     public static function query($sql) {
         global $_F;
 
-        $_dbh = FDB::connect();
+        $_dbh = self::connect('w');
         return $_dbh->exec($sql);
     }
 
     public static function fetch($sql) {
         global $_F;
 
-        $_dbh = FDB::connect();
-        return $_dbh->fetchAll($sql, $from_cache = false);
+        $_dbh = self::connect('r');
+
+        if ($_F['debug']) {
+            $_F['debug_info']['sql'][] = $sql;
+        }
+
+        $stmt = $_dbh->prepare($sql);
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $rows;
     }
 
     public static function fetchCached($sql, $cache_time = 3600) {
         $cache_key = "sql-fetch_{$sql}";
-        $cache_content = C::get($cache_key);
+        $cache_content = FCache::get($cache_key);
         if ($cache_content) {
             return $cache_content;
         }
 
         $cache_content = self::fetch($sql);
-        C::set($cache_key, $cache_content, $cache_time);
+        FCache::set($cache_key, $cache_content, $cache_time);
         return $cache_content;
     }
 
-    public static function fetchFirst($sql, $from_cache = false) {
+    public static function fetchFirst($sql, $params = null) {
         global $_F;
 
-        $_dbh = FDB::connect();
+        if ($_F['debug']) {
+            $_F['debug_info']['sql'][] = $sql;
+        }
 
-        return $_dbh->fetchRow($sql);
+        $dbh = self::connect('r');
+
+        $stmt = $dbh->prepare($sql);
+        $stmt->execute($params);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row;
     }
 
     public static function fetchFirstCached($sql, $cache_time = 3600) {
         $cache_key = "sql-fetchFirst_{$sql}";
-        $cache_content = C::get($cache_key);
+        $cache_content = FCache::get($cache_key);
         if ($cache_content) {
             return $cache_content;
         }
 
         $cache_content = self::fetchFirst($sql);
-        C::set($cache_key, $cache_content, $cache_time);
+        FCache::set($cache_key, $cache_content, $cache_time);
         return $cache_content;
     }
 
@@ -359,16 +242,7 @@ class FDB {
         }
 
         $table = new FTable($table);
-
-        if ($is_real_delete) {
-            $table->remove($condition);
-        } else {
-            $data = array(
-                'status' => 2,
-                'remove_time' => date('Y-m-d H:i:s'),
-            );
-            $table->update($data, $condition);
-        }
+        $table->where($condition)->remove($is_real_delete);
 
         return true;
     }

@@ -208,8 +208,8 @@ class FImage {
     public static function getThumbPicUrl($pic_file, $size = '100x100') {
 
         $full_pic_file = UPLOAD_ROOT . $pic_file;
-        $thumb_file = UPLOAD_ROOT. "cache/{$pic_file}.{$size}.jpg";
-        $thumb_pic_url = "/uploads/cache/{$pic_file}.{$size}.jpg";
+        $thumb_file = UPLOAD_ROOT. "{$pic_file}.{$size}.jpg";
+        $thumb_pic_url = "/uploads/{$pic_file}.{$size}.jpg";
 
         if (file_exists($thumb_file)) {
             return $thumb_pic_url;

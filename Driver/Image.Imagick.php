@@ -36,7 +36,7 @@ class FImage_Driver_Imagick {
         empty($this->img) || $this->img->destroy();
 
         //载入图像
-        $this->img = new \Imagick(realpath($imgname));
+        $this->img = new Imagick(realpath($imgname));
 
         //设置图像信息
         $this->info = array(
@@ -198,6 +198,10 @@ class FImage_Driver_Imagick {
     public function thumb($width, $height, $type = FImage::THUMB_SCALE) {
         if (empty($this->img)) E('没有可以被缩略的图像资源');
 
+        if ($height == 'auto') {
+            $height = 10000000000;
+        }
+        
         //原图宽度和高度
         $w = $this->info['width'];
         $h = $this->info['height'];

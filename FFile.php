@@ -92,4 +92,8 @@ class FFile {
     public static function append($file_path, $content) {
         file_put_contents($file_path, FILE_APPEND);
     }
+
+    public static function isWriteAble($file) {
+        return is_writable($file);
+    }
 }

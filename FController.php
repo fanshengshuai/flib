@@ -11,7 +11,7 @@
 abstract class FController {
     protected $view;
 
-    abstract function showMessage($message, $url = null);
+    abstract function showMessage($message, $msgType, $url = null);
 
     public function setView() {
         $this->view = new FView;
@@ -204,8 +204,12 @@ abstract class FController {
         return $post_data;
     }
 
+    protected function load($tpl = null) {
+        return $this->view->load($tpl);
+    }
+
     protected function display($tpl = null) {
-        $this->view->disp($tpl);
+        return $this->view->disp($tpl);
     }
 
     protected function assign($key, $value) {
@@ -216,5 +220,11 @@ abstract class FController {
         FResponse::output($mix);
 
         return true;
+    }
+
+    protected function openDebug() {
+        global $_F;
+
+        $_F['debug'] = 1;
     }
 }

@@ -31,6 +31,43 @@ class FLogger {
     // 日志信息
     static $log = array();
 
+    private $log_file = null;
+    private $date = null;
+    private $time = null;
+
+    public function __construct($log_type = null) {
+
+        list($this->date, $this->time) = explode(" ", date("Y-m-d H:i:s"));
+
+
+        if ($log_type != null) $this->setLogType($log_type);
+    }
+
+    public function setLogType($log_type) {
+
+        $this->log_file = APP_ROOT . "logs/{$log_type}/" . $this->date . ".log";
+
+        FFile::mkdir(dirname($this->log_file));
+    }
+
+    /**
+     * 追加日志
+     *
+     * @param $log_content
+     * @throws Exception 日志类型
+     */
+    public function append($log_content) {
+        $now = $this->date . " " . $this->time;
+
+        $write_content = "{$now}\t{$log_content}\n";
+
+        if (!$this->log_file) {
+            throw new Exception("LOG TYPE NOT SET !!");
+        }
+
+        file_put_contents($this->log_file, $write_content, FILE_APPEND);
+    }
+
     /**
      * +----------------------------------------------------------
      * 日志直接写入

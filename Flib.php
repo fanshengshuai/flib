@@ -13,23 +13,6 @@ class Flib {
     private static $_instance = array();
 
     /**
-     * 应用程序初始化
-     *
-     * @access public
-     */
-    static public function Start() {
-        global $_F;
-
-        return self::StartApp();
-    }
-
-    public static function StartApp() {
-        global $_F;
-
-        FApp::run();
-    }
-
-    /**
      * 系统自动加载Flib类库，并且支持配置自动加载路径
      *
      * @param $className
@@ -159,8 +142,8 @@ class Flib {
                 $errorStr = "[$err_no] $err_str " . basename($err_file) . " 第 $err_line 行.";
                 // if(C('LOG_RECORD')) Log::write($errorStr,Log::ERR);
                 $exception = new FException ();
-                $exception->printMessage($errorStr);
-                break;
+            $exception->traceError(new Exception($errorStr));
+            break;
             case E_STRICT :
                 $_F['errors']['STRICT'][] = "[$err_no] $err_str " . basename($err_file) . " 第 $err_line 行.";
                 break;
@@ -179,7 +162,7 @@ class Flib {
     }
 
     public static function createFlibMin() {
-        $files = "DB/Table, FCookie, FFile, FView, DAO, App, FDB, Pager, FCache, FException, FDispatcher, FController, C, Cache";
+        $files = "DB/Table, FCookie, FFile, FView, DAO, App, FDB, Pager, FCache, FException, FDispatcher, FController, FSession";
         $files = explode(',', $files); /*FConfig,*/
 
         $flib_str = '';
@@ -296,6 +279,6 @@ class Flib {
 Flib::init();
 
 if (FLIB_RUN_MODE != 'manual') {
-    Flib::Start();
+    FApp::run();
 }
 

@@ -13,10 +13,10 @@ class FTable {
     /**
      * @var array
      */
-    private $_connects = array();
+    private static $_connects = array();
 
     /**
-     * @var string 表
+     * @var string
      */
     private $_table = null;
 
@@ -62,8 +62,6 @@ class FTable {
         return $this->options;
     }
 
-
-
     /**
      * @var PDO
      */
@@ -93,14 +91,24 @@ class FTable {
      *
      * @param string $table
      *
+     * @param null   $as
+     *
      * @internal param array
      */
-    public function __construct($table) {
+    public function __construct($table, $as = null) {
         global $_F;
 
-        $this->_dbh = $this->connect();
-        $this->_table = $_F['db']['config']['table_pre'] . $table;
+        $this->config = FDB::getConfig();
+        $this->_table = "`{$this->config['table_pre']}{$table}`";
 
+        if ($as) {
+            $this->_table = $this->_table . " as {$as}";
+        }
+    }
+
+    public function connect($rw_type = 'w') {
+        $this->_dbh = FDB::connect($rw_type);
+        return $this->_dbh;
     }
 
     /**
@@ -181,7 +189,13 @@ class FTable {
                             $where[] .= "$tableFiled {$where_item_sub_key} ( " . $where_item_sub_value . " )";
                         } elseif (strpos(strtolower($where_item_sub_key), 'like') !== false) {
                             $where[] .= "$tableFiled {$where_item_sub_key} ?";
-                            $params[] = "%" . trim(str_replace(array('like', 'LIKE'), '', $where_item_sub_value)) . "%";
+
+                            if (strpos($where_item_sub_value, '%') === false) {
+                                $params[] = "%" . trim(str_replace(array('like', 'LIKE'), '', $where_item_sub_value)) . "%";
+                            } else {
+                                $params[] = trim(str_replace(array('like', 'LIKE'), '', $where_item_sub_value));
+                            }
+
                         } else {
                             $where[] .= "$tableFiled {$where_item_sub_key} ?";
                             $params[] = $where_item_sub_value;
@@ -249,19 +263,32 @@ class FTable {
         return $this;
     }
 
+
+    /**
+     * 分组 edit by wyr
+     *
+     * @param $group
+     *
+     * @return $this
+     */
+    public function group($group) {
+        $this->options['group_by'] = $group;
+        return $this;
+    }
+
     /**
      * 获取一条记录
      *
      * @param null $priValue mix 主键数值
      *
      * @throws Exception
-     * @internal param string $conditions
-     * @internal param array $columns
+     * @internal      param string $conditions
+     * @internal      param array $columns
      *
-     * @internal param array $params
+     * @internal      param array $params
      *
-     * @internal param array $param
-     * @internal param \columns $array 列
+     * @internal      param array $param
+     * @internal      param \columns $array 列
      *
      * @return array || null
      */
@@ -277,8 +304,16 @@ class FTable {
             $this->where($this->table_info['pri'] . '=\'' . $priValue . '\'');
         }
 
-        $this->limit(1);
-        $sql = $this->buildSql();
+
+        if ($this->options['group_by']) {
+            $sql = 'select count(0) as count from (' . $this->buildSql() . ')A';
+        } else {
+            $sql = $this->buildSql();
+            $this->limit(1);
+        }
+
+
+        // echo($sql . '<br>');
 
         // 缓存处理
         $cacheKey = "SQL-RESULT-{$this->_table}-{$sql}-" . ($this->options['params'] ? join('-', $this->options['params']) : '');
@@ -292,9 +327,10 @@ class FTable {
         }
 
         if ($_F['debug'])
-            $_F['debug_info']['sql'][] = array('sql' => $sql, 'params' => $this->options['params']);
+            FDebug::logSql($sql, $this->options['params']);
 
         try {
+            $this->connect('r');
             $stmt = $this->_dbh->prepare($sql);
             $stmt->execute($this->options['params']);
             $retData = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -324,7 +360,12 @@ class FTable {
 
         // 处理分页参数，放在 缓存处理 之前
         if ($this->options['page']) {
-            $this->setPagerOptions(array('page' => $this->options['page'], 'limit' => $this->options['limit']));
+            $this->setPagerOptions(array('where'    => $this->options['where'],
+                                         'params'   => $this->options['params'],
+                                         'page'     => $this->options['page'],
+                                         'limit'    => $this->options['limit'],
+                                         'fields'   => $this->options['fields'],
+                                         'group_by' => $this->options['group_by']));
         }
 
         // 缓存处理
@@ -341,9 +382,10 @@ class FTable {
         }
 
         if ($_F['debug'])
-            $_F['debug_info']['sql'][] = array('sql' => $sql, 'params' => $this->options['params']);
+            FDebug::logSql($sql, $this->options['params']);
 
         try {
+            $this->connect('r');
             $stmt = $this->_dbh->prepare($sql);
             $stmt->execute($this->options['params']);
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -367,8 +409,20 @@ class FTable {
      * @return mixed
      */
     public function count() {
-        $this->options['fields'] = array("COUNT(*) as count");
+        $this->options['page'] = 1;
+        $this->options['limit'] = 0;
+
+        if (!$this->options['group_by']) {
+            if ($this->options['fields']) {
+                $this->options['fields'] = array("COUNT(0) as count"); //修改leftJoin u.*报错 edit:wyr
+            } else {
+                $this->options['fields'] = array("COUNT(*) as count");
+            }
+
+        }
+
         $result = $this->find();
+
 
         return $result['count'];
     }
@@ -381,76 +435,47 @@ class FTable {
         global $_F;
 
         $columns = null;
-        if ($this->options['fields']) {
+        if ($this->options['fields'] && is_array($this->options['fields'])) {
             $columns = implode(',', $this->options['fields']);
-        }
-
-        if (!$columns) {
+        } else {
             $columns = '*';
         }
 
-        $sql = "SELECT $columns FROM $this->_table";
+        $sql = "SELECT $columns FROM {$this->_table}";
 
         if ($this->options['where']) {
             $sql .= ' WHERE ' . $this->options['where'];
+        }
+
+        if ($this->options['group_by'] && is_array($this->options['group_by'])) {
+            $sql .= ' GROUP BY ' . implode(',', $this->options['group_by']);
         }
 
         if ($this->options['order_by']) {
             $sql .= ' ORDER BY ' . $this->options['order_by'];
         }
 
-        if ($this->options['page'] > 0) {
+//        var_dump($this->options);
 
-            if (!$this->options['limit']) {
-                throw new Exception('limit cannot be 0 when use page function, please use limit function to set it.');
+        if ($this->options['limit']) {
+            if ($this->options['page'] > 0) {
+
+//            if (!$this->options['group_by']) {
+                if (!$this->options['limit']) {
+                    throw new Exception('limit cannot be 0 when use page function, please use limit function to set it.');
+                }
+
+                $sql .= ' limit ' . (($this->options['page'] - 1) * $this->options['limit']) . ',' . $this->options['limit'];
+//            }
+
+            } elseif ($this->options['limit'] > 0) {
+                $sql .= ' limit ' . $this->options['limit'];
             }
-
-            $sql .= ' limit ' . (($this->options['page'] - 1) * $this->options['limit']) . ',' . $this->options['limit'];
-
-        } elseif ($this->options['limit'] > 0) {
-            $sql .= ' limit ' . $this->options['limit'];
         }
 
         return $sql;
     }
 
-    /**
-     * @return mixed
-     * @throws Exception
-     */
-    public function connect() {
-        global $_F;
-
-        if (!$_F['db']['config']) {
-            $db = 'default';
-            $_F['db']['config'] = FConfig::get('db.' . $db);
-        } else {
-            // check db.php
-            if (!include(APP_ROOT . "config/db.php")) {
-                throw new Exception ('NO DB CONFIG EXIST ! PLEASE CHECK config/db.php');
-            }
-        }
-
-        $dsn = $_F['db']['config']['dsn'];
-
-        if (array_key_exists($dsn, $this->_connects)) {
-            $this->_connects[$dsn];
-        }
-
-        $attr = array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_PERSISTENT => false);
-        $attr[PDO::ATTR_TIMEOUT] = 5;
-
-        try {
-            $this->_dbh = new PDO($_F['db']['config']['dsn'], $_F['db']['config']['user'], $_F['db']['config']['password'], $attr);
-            $this->_dbh->exec("SET NAMES '" . $_F['db']['config']['charset'] . "'");
-        } catch (PDOException $e) {
-            throw new Exception("连接数据库失败：" . $e->getMessage());
-        }
-
-        $this->_connects[$dsn] = $this->_dbh;
-
-        return $this->_connects[$dsn];
-    }
 
     /**
      * 分页：页数
@@ -482,10 +507,10 @@ class FTable {
      * @param array $data
      *
      * @throws Exception
-     * @internal param string $conditions
-     * @internal param array $params
+     * @internal     param string $conditions
+     * @internal     param array $params
      *
-     * @internal param array $param
+     * @internal     param array $param
      *
      * @return bool || int
      */
@@ -501,20 +526,21 @@ class FTable {
 
         if ($this->options['where']) {
             // 更新
-            $sql = "UPDATE `{$this->_table}` SET " . join(', ', $set) . " WHERE {$this->options['where']}";
+            $sql = "UPDATE {$this->_table} SET " . join(', ', $set) . " WHERE {$this->options['where']}";
             $params = array_merge($tempParams, $this->options['params']);
         } else {
             // 插入
-            $sql = "INSERT INTO `{$this->_table}` SET " . join(', ', $set);
+            $sql = "INSERT INTO {$this->_table} SET " . join(', ', $set);
             $params = $tempParams;
         }
 
         if ($_F['debug']) {
-            $_F['debug_info']['sql'][] = array('sql' => $sql, 'params' => $this->options['params']);
+            FDebug::logSql($sql, $this->options['params']);
         }
 
         // 捕获PDOException后 抛出Exception
         try {
+            $this->connect('w');
 
             $stmt = $this->_dbh->prepare($sql);
             $stmt->execute($params);
@@ -537,11 +563,13 @@ class FTable {
     public function insert($data) {
         $this->reset();
 
-        if (!$data['create_time']) {
+        $tableInfo = $this->getTableInfo();
+
+        if (isset($tableInfo['fields']['create_time']) && !$data['create_time']) {
             $data['create_time'] = date('Y-m-d H:i:s');
         }
 
-        if (!$data['status']) {
+        if (isset($tableInfo['fields']['status']) && !isset($data['status'])) {
             $data['status'] = 1;
         }
 
@@ -570,8 +598,34 @@ class FTable {
             throw new Exception("FDB update need condition.");
         }
 
-        if (!$data['update_time']) {
+        $tableInfo = $this->getTableInfo();
+
+        if (isset($tableInfo['fields']['update_time']) && !$data['update_time']) {
             $data['update_time'] = date('Y-m-d H:i:s');
+        }
+
+        return $this->save($data);
+    }
+
+
+    /**
+     * 更新一条数据 不包含update_time字段的更新 edit:wyr
+     *
+     * @param $data
+     * @param $where
+     *
+     * @throws Exception
+     * @return bool
+     */
+    public function update1($data, $where = null) {
+
+        if ($where) {
+            $this->reset();
+            $this->where($where);
+        }
+
+        if (!$this->options['where']) {
+            throw new Exception("FDB update need condition.");
         }
 
         return $this->save($data);
@@ -615,9 +669,11 @@ class FTable {
         $sql = "DELETE from $this->_table WHERE {$this->options['where']}";
 
         if ($_F['debug'])
-            $_F['debug_info']['sql'][] = array('sql' => $sql, 'params' => $this->options['params']);
+            FDebug::logSql($sql, $this->options['params']);
 
         try {
+            $this->connect('w');
+
             $stmt = $this->_dbh->prepare($sql);
             $result = $stmt->execute($this->options['params']);
 
@@ -632,27 +688,33 @@ class FTable {
     /**
      * 自增
      *
-     * @param $field
-     * @param $conditions
-     * @param array $params
+     * @param     $field
      * @param int $unit
      *
      * @throws Exception
-     * @throws Exception
+     * @internal param $conditions
+     * @internal param array $params
      * @return mixed
      */
-    public function increase($field, $conditions, $params = array(), $unit = 1) {
+    public function increase($field, $unit = 1) {
+        global $_F;
 
-        if (!$conditions) {
-            throw new Exception('FTable incr function need condition');
+        if (!$this->options['where']) {
+            throw new Exception('FTable increase function need condition');
         }
 
-        $sql = 'UPDATE ' . $this->_table . " SET `$field` = `$field` + $unit";
-        $sql .= ' WHERE ' . $conditions;
+        $sql = "UPDATE {$this->_table} SET `$field` = `$field` + $unit";
+        $sql .= ' WHERE ' . $this->options['where'];
+
+        if ($_F['debug']) {
+            FDebug::logSql($sql, $this->options['params']);
+        }
 
         try {
+            $this->connect('w');
+
             $stmt = $this->_dbh->prepare($sql);
-            $result = $stmt->execute($params);
+            $result = $stmt->execute($this->options['params']);
         } catch (PDOException $e) {
             throw new Exception($e);
         }
@@ -663,27 +725,28 @@ class FTable {
     /**
      * 自减
      *
-     * @param $field
-     * @param $conditions
-     * @param array $params
+     * @param     $field
      * @param int $unit
      *
+     * @throws Exception
+     * @internal param $conditions
+     * @internal param array $params
      * @return mixed
-     * @throws Exception
-     * @throws Exception
      */
-    public function decrease($field, $conditions, $params = array(), $unit = 1) {
+    public function decrease($field, $unit = 1) {
 
-        if (!$conditions) {
-            throw new Exception('FTable decr function need condition');
+        if (!$this->options['where']) {
+            throw new Exception('FTable decrease function need condition');
         }
 
         $sql = 'UPDATE ' . $this->_table . " SET $field = IF($field > $unit,  $field - $unit, 0)";
-        $sql .= ' WHERE ' . $conditions;
+        $sql .= ' WHERE ' . $this->options['where'];
 
         try {
+            $this->connect('w');
+
             $stmt = $this->_dbh->prepare($sql);
-            $result = $stmt->execute($params);
+            $result = $stmt->execute($this->options['params']);
         } catch (PDOException $e) {
             throw new Exception($e);
         }
@@ -706,37 +769,14 @@ class FTable {
         //echo "$sql \n";
         $params = array();
         try {
+            $this->connect('w');
+
             $stmt = $this->_dbh->prepare($sql);
             $this->reset();
             return $stmt->execute($params);
         } catch (PDOException $e) {
             throw new Exception($e);
         }
-    }
-
-
-    /**
-     * 开启事务
-     */
-    public function begin() {
-
-        $this->_dbh->beginTransaction();
-    }
-
-    /**
-     * 提交事务
-     */
-    public function commit() {
-
-        return $this->_dbh->commit();
-    }
-
-    /**
-     * 回滚事务
-     */
-    public function rollBack() {
-
-        $this->_dbh->rollBack();
     }
 
     /**
@@ -759,6 +799,7 @@ class FTable {
 
         try {
             $sql = "desc $this->_table";
+            $this->connect('r');
 
             $stmt = $this->_dbh->prepare($sql);
             $stmt->execute();
@@ -769,8 +810,10 @@ class FTable {
                 if ($row['Key'] == 'PRI') {
                     $tableInfo['pri'] = $row['Field'];
                 }
+
+                $tableInfo['fields'][$row['Field']] = $row;
             }
-            $tableInfo['fields'] = $rows;
+//            $tableInfo['fields'] = $rows;
 
             FCache::set($this->_table, $tableInfo, 8640000);
 
@@ -791,6 +834,7 @@ class FTable {
     public function getPagerInfo() {
         global $_F;
 
+        $this->options = $this->getPagerOptions();
         $count = $this->count();
         $pagerOptions = $this->getPagerOptions();
 
@@ -803,5 +847,18 @@ class FTable {
         }
 
         return FPager::getPagerInfo($count, $pagerOptions['page'], $pagerOptions['limit']);
+    }
+
+    public function leftJoin($table, $as, $on = null) {
+        $this->_table = "{$this->_table} left join `{$table}` as {$as}";
+
+        if ($on) $this->on($on);
+
+        return $this;
+    }
+
+    public function on($condition) {
+        $this->_table = "{$this->_table} on {$condition}";
+        return $this;
     }
 }

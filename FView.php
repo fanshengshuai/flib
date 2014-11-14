@@ -58,7 +58,7 @@ class FView extends Smarty {
         $this->cache_lifetime = 300;
     }
 
-    public function setTemplateDir($template_dir = '') {
+    public function setTemplateDir($template_dir) {
 
         if (!$template_dir) {
             $template_dir = APP_ROOT . 'template/';
@@ -87,6 +87,8 @@ class FView extends Smarty {
             $content = preg_replace('/<head>.+?<\/head>/si', '', $content);
             $content = preg_replace('/<.+?>/', '', $content);
             $content = preg_replace("/\n\s+/i", "\n", $content);
+
+            var_export($_F);
         }
 
         if ($_F['debug'] && !$_F['in_ajax']) {
@@ -133,15 +135,17 @@ class FView extends Smarty {
 
         $this->set('_F', $_F);
 
-        $view_compress = FConfig::get('view.compress');
+        $view_compress = FConfig::get('global.output_compress');
         $contents = $this->fetch($tpl);
 
         if ($view_compress) {
             // 会有 http:// 这样的都替换没了
-            //$contents = preg_replace('#//.*$#im', '', $contents);
+            $contents = preg_replace('#^\s*//.*$#im', '', $contents);
             $contents = preg_replace('#<!--.+?-->#si', '', $contents);
             $contents = preg_replace('/^\s+/im', '', $contents);
             $contents = preg_replace('/>\s+/im', '>', $contents);
+            $contents = preg_replace('/\s*([{};,])\s*/im', '\1', $contents);
+//            $contents = preg_replace('/\s+/im', ' ', $contents);
         }
 
         if ($_F['debug'] && !$_F['in_ajax']) {

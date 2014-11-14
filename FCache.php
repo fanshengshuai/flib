@@ -73,9 +73,20 @@ class FCache {
     }
 
     public static function delete($cache_key) {
+        global $_F;
+
+        $cache_key = $_F['domain'] . $cache_key;
+
+        self::init();
+
+        if ($_F['memcache']) {
+            $_F['memcache']->delete($cache_key);
+            return true;
+        }
+
         $cache_file = FCache::getFileFCachePath($cache_key);
 
-        unlink($cache_key);
+        unlink($cache_file);
     }
 
     public static function deleteAll() {
@@ -106,7 +117,16 @@ class FCache {
 
         if (FConfig::get('global.memcache.enable')) {
             $_F['memcache'] = new Memcache;
-            $_F['memcache']->connect('127.0.0.1', 11211);
+            $_F['memcache']->connect(FConfig::get('global.memcache.ip'), 11211);
+        }
+    }
+
+    public static function flush() {
+        global $_F;
+
+        self::init();
+        if (FConfig::get('global.memcache.enable')) {
+            $_F['memcache']->flush();
         }
     }
 }

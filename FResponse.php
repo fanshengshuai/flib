@@ -140,13 +140,12 @@ class FResponse {
      */
     public static function redirect($url, $target = null) {
         global $_F;
-
         if ($url == 'r') {
             $url = $_SERVER ['HTTP_REFERER'];
         }
 
         if ($_F ['in_ajax']) {
-            self::output(array('result' => true, 'redirect_url' => $url, 'target' => $target));
+            self::output(array('result' => 'redirect', 'redirect_url' => $url, 'target' => $target));
             exit;
         }
 
@@ -159,7 +158,7 @@ class FResponse {
             header("location: " . $url);
         }
 
-        return true;
+        exit;
     }
 
     /**

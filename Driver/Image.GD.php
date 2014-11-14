@@ -40,11 +40,17 @@ class FImage_Driver_GD {
      * @param  string $imgName 图像路径
      */
     public function open($imgName) {
+        global $_F;
+
         //检测图像文件
         if (!is_file($imgName)) E('不存在的图像文件');
 
         //获取图像信息
         $info = getimagesize($imgName);
+
+        $required_memory = $info[0] * $info[1] * $info['bits'];
+        $new_limit=memory_get_usage() + $required_memory+200000000;
+        ini_set("memory_limit", $new_limit);
 
         //检测图像合法性
         if (false === $info || (IMAGETYPE_GIF === $info[2] && empty($info['bits']))) {
@@ -59,6 +65,13 @@ class FImage_Driver_GD {
             'mime' => $info['mime'],
         );
 
+
+        $imgInfo= getimagesize($imgName);
+        $imgType = str_replace('image/', '', $imgInfo['mime']);
+        if ($imgType == 'png') {
+            $this->info['type'] = $imgType;
+        }
+
         //销毁已存在的图像
         empty($this->img) || imagedestroy($this->img);
 
@@ -70,6 +83,9 @@ class FImage_Driver_GD {
         } else {
             $fun = "imagecreatefrom{$this->info['type']}";
             $this->img = $fun($imgName);
+
+            $_F['pic_type'] = $this->info['type'];
+//            var_dump($fun);
         }
     }
 
@@ -206,6 +222,10 @@ class FImage_Driver_GD {
      */
     public function thumb($width, $height, $type = FImage::THUMB_SCALE) {
         if (empty($this->img)) E('没有可以被缩略的图像资源');
+
+        if ($height == 'auto') {
+            $height = 10000000000;
+        }
 
         $x = $y = 0;
 
@@ -568,5 +588,26 @@ class FImage_Driver_GD {
      */
     public function __destruct() {
         empty($this->img) || imagedestroy($this->img);
+    }
+
+
+    function getPicType($file) {
+        /*$png_header = "/x89/x50/x4e/x47/x0d/x0a/x1a/x0a";
+        $jpg_header = "/xff/xd8";*/
+
+        $header = file_get_contents($file, 0, NULL, 0, 5);
+
+//        echo bin2hex($header);exit;
+        if ($header{0} . $header{1} == "/x89/x50") {
+            return 'png';
+        } else if ($header{0} . $header{1} == "/xff/xd8") {
+            return 'jpeg';
+        } else if ($header{0} . $header{1} . $header{2} == "/x47/x49/x46") {
+
+            if ($header{4} == "/x37")
+                return 'gif87';
+            else if ($header{4} == "/x39")
+                return 'gif89';
+        }
     }
 }
