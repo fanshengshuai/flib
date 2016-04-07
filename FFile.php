@@ -7,7 +7,7 @@
  * 创建: 2012-07-31 12:08:29
  * vim: set expandtab sw=4 ts=4 sts=4 *
  *
- * $Id: FlibFile.php 92 2012-07-31 08:08:22Z fanshengshuai $
+ * $Id: FFile.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
 class FFile {
 
@@ -44,7 +44,7 @@ class FFile {
     /**
      * 创建目录
      *
-     * @param $dir 目录
+     * @param $dir string 目录
      *
      * @return bool
      */
@@ -78,6 +78,7 @@ class FFile {
 
         $path_info = pathinfo($file_path);
 
+//        var_dump($path_info);
         if (!file_exists($path_info['dirname'])) {
             $ret = self::mkdir($path_info['dirname']);
         }

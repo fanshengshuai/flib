@@ -7,7 +7,7 @@
  * 创建: 2014-07-03 10:57:22
  * vim: set expandtab sw=4 ts=4 sts=4 *
  *
- * $Id$
+ * $Id: FUI.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
 class FUI {
 

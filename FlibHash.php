@@ -7,7 +7,7 @@
  * 创建: 2012-07-31 11:27:33
  * vim: set expandtab sw=4 ts=4 sts=4 *
  *
- * $Id: FlibHash.php 92 2012-07-31 08:08:22Z fanshengshuai $
+ * $Id: FlibHash.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
 class FlibHash {
 

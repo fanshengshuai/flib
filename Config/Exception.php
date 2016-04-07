@@ -5,7 +5,7 @@
  *      作者: 范圣帅(fanshengshuai@gmail.com)
  *  创建时间: 2012-02-12 23:47:27
  *
- *  $Id: Exception.php 11 2012-07-24 03:42:35Z fanshengshuai $
+ *  $Id: Exception.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
 class Config_Exception extends Exception {
 

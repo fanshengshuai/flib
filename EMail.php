@@ -7,7 +7,7 @@
  *
  *  vim: set expandtab sw=4 ts=4 sts=4
  *
- *  $Id: EMail.php 11 2012-07-24 03:42:35Z fanshengshuai $
+ *  $Id: EMail.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
 class EMail {
 

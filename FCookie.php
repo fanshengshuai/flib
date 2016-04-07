@@ -6,7 +6,7 @@
  * 时间: 2012-07-02 01:22:06
  *
  * vim: set expandtab sw=4 ts=4 sts=4
- * $Id: Cookie.php 23 2012-07-25 05:38:34Z fanshengshuai $
+ * $Id: FCookie.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
 class FCookie {
     public static function set($var, $value, $life = 7200) {

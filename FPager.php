@@ -6,7 +6,7 @@
  * 时间: 2012-07-02 01:22:53
  *
  * vim: set expandtab sw=4 ts=4 sts=4
- * $Id: Pager.php 281 2012-08-26 03:43:45Z fanshengshuai $
+ * $Id: FPager.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
 class FPager {
 
@@ -112,24 +112,34 @@ class FPager {
         global $_F;
 
         if (!$url) {
-            $url = $_SERVER ['REQUEST_URI'];
+            $url = $_F['url'];
+//            $url = $_SERVER ['REQUEST_URI'];
         }
-        $url = preg_replace('#&*page=(\d)*#i', '', $url);
-        $url = trim($url, '?');
-        if (strpos($url, '?')) {
-            $url .= '&';
+
+        unset($_REQUEST['page']);
+        if ($_REQUEST) {
+            $url = $url . '?' . http_build_query($_REQUEST, '', '&amp;') . '&amp;page=';
         } else {
-            $url .= '?';
+            $url = $url . '?page=';
         }
-        $url .= 'page=';
+
+//        $url = preg_replace('#&*page=(\d)*#i', '', $url);
+//        $url = trim($url, '?');
+//        if (strpos($url, '?')) {
+//            $url .= '&';
+//        } else {
+//            $url .= '?';
+//        }
 
         return $url;
     }
 
 
-    public static function getPagerInfo($total, $currentPage=1, $per_page = 10, $page_list_num = 10) {
+    public static function getPagerInfo($total, $currentPage=1, $per_page = 10, $page_list_num = 5) {
         global $_F;
-
+        if($currentPage >= 4) {
+            $page_list_num = 3;
+        }
         $ret = array('total' => $total, 'per_page' => $per_page);
 
         $page = max(1, $currentPage);

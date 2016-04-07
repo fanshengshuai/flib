@@ -8,6 +8,8 @@ class FDebug {
     public static function logSql($sql, $param = null) {
         global $_F;
 
+        $fLogger = new FLogger('sql');
+
         $sql_new = '';
         if (!count($param)) {
             $sql_new = $sql;
@@ -21,9 +23,10 @@ class FDebug {
                 $sql_new .= substr($sql, 0, $pos) . $item;
                 $sql = substr($sql, $pos + 1);
             }
+
+            $sql_new .= $sql;
         }
 
-        $fLogger = new FLogger('sql');
         $fLogger->append($sql_new);
 
         $_F['debug_info']['sql'][] = $sql_new;

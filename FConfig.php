@@ -6,7 +6,7 @@
  * 时间: 2012-07-02 01:21:51
  *
  * vim: set expandtab sw=4 ts=4 sts=4
- * $Id: FConfig.php 192 2012-08-11 08:31:08Z fanshengshuai $
+ * $Id: FConfig.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
 class FConfig {
 
@@ -39,6 +39,40 @@ class FConfig {
      * @return mixed
      */
     public static function get($key, $defaultValue = null) {
+
+        /*
+        $path = explode('.', $key);
+        $pri_config_key = $path[0];
+
+        $file = F_APP_ROOT . "/config/{$path[0]}.php";
+        if ($_F['dev_mode']) {
+            $file_local = APP_ROOT . "config/{$path[0]}.local.php";
+
+            if (is_file($file_local)) {
+                $file = $file_local;
+            }
+        } elseif ($_F['test_mode']) {
+            $file_local = APP_ROOT . "config/{$path[0]}.lan.php";
+
+            if (is_file($file_local)) {
+                $file = $file_local;
+            }
+        }
+
+        if (is_file($file)) {
+            $_F['config'][$pri_config_key] = include($file);
+        }
+
+        $retData = null;
+        $config_var = 'return $_F[\'config\']';
+        foreach ($path as $item) {
+            $config_var .= "['$item']";
+        }
+
+        var_export(eval('<?php echo \'aaa\';'));
+         */
+
+
 
         $config =& FConfig::getInstance();
         $value = $config->_GET($key);
@@ -181,34 +215,46 @@ class FConfig {
      * @return void
      */
     protected function _loadKey($key) {
+        global $_F;
 
         $path = explode('.', $key);
+        $file = F_APP_ROOT . "/config/{$path[0]}.php";
+        if ($_F['dev_mode']) {
+            $file_local = APP_ROOT . "config/{$path[0]}.local.php";
 
-        if (is_file(APP_ROOT . "config/{$path[0]}.php")) {
-            require APP_ROOT . "config/{$path[0]}.php";
+            if (is_file($file_local)) {
+                $file = $file_local;
+            }
+        } elseif ($_F['test_mode']) {
+            $file_local = APP_ROOT . "config/{$path[0]}.lan.php";
 
-            $_v = $_config[$path[0]];
+            if (is_file($file_local)) {
+                $file = $file_local;
+            }
+        }
+
+        $_config = null;
+        if (is_file($file)) {
+            $_v = include($file);
+            //var_dump($_v);
+
+            //$_v = $_config[$path[0]];
             foreach ($path as $_path_key => $_subkey) {
 
                 if ($_path_key == 0) {
                     continue;
                 }
 
+
                 if (isset($_v[$_subkey])) {
                     $_v = $_v[$_subkey];
                 } else {
                     $_v = '';
                 }
-
-                //echo $_v;
             }
 
             FConfig::set($key, $_v);
-        } else {
-            return false;
         }
-
-        //$this->_load($rootkey, false, $file);
     }
 
     /**

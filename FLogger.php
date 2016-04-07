@@ -7,7 +7,7 @@
  * 创建: 2014-07-19 10:26:09
  * vim: set expandtab sw=4 ts=4 sts=4 *
  *
- * $Id: Log.php 11 2012-07-24 03:42:35Z fanshengshuai $
+ * $Id: FLogger.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
 class FLogger {
 
@@ -37,35 +37,19 @@ class FLogger {
 
     public function __construct($log_type = null) {
 
-        list($this->date, $this->time) = explode(" ", date("Y-m-d H:i:s"));
-
-
-        if ($log_type != null) $this->setLogType($log_type);
-    }
-
-    public function setLogType($log_type) {
-
-        $this->log_file = APP_ROOT . "logs/{$log_type}/" . $this->date . ".log";
-
-        FFile::mkdir(dirname($this->log_file));
+        $this->logType= $log_type;
     }
 
     /**
      * 追加日志
      *
      * @param $log_content
+     *
      * @throws Exception 日志类型
      */
     public function append($log_content) {
-        $now = $this->date . " " . $this->time;
 
-        $write_content = "{$now}\t{$log_content}\n";
-
-        if (!$this->log_file) {
-            throw new Exception("LOG TYPE NOT SET !!");
-        }
-
-        file_put_contents($this->log_file, $write_content, FILE_APPEND);
+        self::write($log_content, $this->logType);
     }
 
     /**
@@ -73,38 +57,61 @@ class FLogger {
      * 日志直接写入
      * +----------------------------------------------------------
      * @static
-     * @access public
+     * @access   public
      * +----------------------------------------------------------
      *
-     * @param string $message 日志信息
-     * @param string $level 日志级别
-     * @param int|string $type 日志记录方式
-     * @param string $destination 写入目标
-     * @param string $extra 额外参数
-     * +----------------------------------------------------------
+     * @param string     $message 日志信息
+     * @param int|string $type    日志记录方式
+     * @param string     $level   日志级别
+     *
+     * @internal param string $destination 写入目标
+     * @internal param string $extra 额外参数
      *
      * @return void
-    +----------------------------------------------------------
      */
-    static function write($message, $level = self::LOG_LEVEL_ERR, $type = '', $destination = '', $extra = '') {
-        $now = date("Y-m-d H:i:s");
-        $type = $type ? $type : FConfig::get('logger.LOG_TYPE');
-        if (self::LOG_TYPE_FILE == $type) { // 文件方式记录日志
+    static function write($message, $type = 'common', $level = self::LOG_LEVEL_INFO) {
+        global $_F;
 
-            if (empty($destination))
-                $destination = FConfig::get('logger.LOG_PATH') . date('Y-m-d') . '.log';
-
-            FFile::mkdir(dirname($destination));
-
-            //检测日志文件大小，超过配置大小则备份日志文件重新生成
-            if (is_file($destination) && floor(FConfig::get('logger.LOG_FILE_SIZE')) <= filesize($destination))
-                rename($destination, str_replace(basename($destination), date('Y-m-d.H_i_s') . '.log', $destination));
-
-        } else {
-            $destination = $destination ? $destination : '';
-            $extra = $extra ? $extra : FConfig::get('logger.LOG_EXTRA');
+        if (is_array($message)) {
+            $message = json_encode($message);
         }
 
-        error_log("{$now}\t" . $_SERVER['REQUEST_URI'] . "\t{$level}\t{$message}\r\n", $type, $destination, $extra);
+        $now = date("Y-m-d H:i:s");
+
+        $log_file_size = FConfig::get('logger.LOG_FILE_SIZE');
+        $log_file_size = $log_file_size ? $log_file_size : 1024000;
+
+        $file_log_path = FConfig::get('logger.LOG_PATH');
+        $file_log_path = $file_log_path ? $file_log_path : APP_ROOT . 'data/logs/';
+
+//        $file_log_path = $file_log_path;
+
+        if ($_F['run_in'] == 'shell') {
+            $file_log_path .= $_F['run_in'] . '/';
+        } elseif ($_F['module']) {
+            $file_log_path .= $_F['module'] . '/';
+        }
+
+        if ($type) {
+            $file_log_path .= "{$type}/"; }
+
+        $file_log_path .= date('Y-m-d') . '.log';
+
+        FFile::mkdir(dirname($file_log_path));
+
+        if (is_file($file_log_path) && floor($log_file_size) <= filesize($file_log_path))
+            rename($file_log_path, str_replace(basename($file_log_path), date('Y-m-d.H_i_s') . '.log', $file_log_path));
+
+        $write_content = "{$now}\t{$level}";
+
+        if ($_SERVER['REQUEST_URI']) {
+            $write_content .= "\tURL:http:/"."/{$_F['http_host']}{$_F['uri']}\t" . ($_F['refer'] ? "REFER:{$_F['refer']}":'');
+//        } else {
+//            $write_content .= "\t{$_F['run_in']}\t{$_F['module']}";
+        }
+
+        $write_content .= "\t{$message}\r\n";
+
+        file_put_contents($file_log_path, $write_content, FILE_APPEND);
     }
 }

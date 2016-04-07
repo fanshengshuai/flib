@@ -1,16 +1,14 @@
 <?php
 
 /**
- *
  * 作者: 范圣帅(fanshengshuai@gmail.com)
  *
  * 创建: 2011-04-18 22:35:29
  * vim: set expandtab sw=4 ts=4 sts=4 *
  *
- * $Id: Flib.php 178 2012-08-10 03:35:55Z fanshengshuai $
+ * $Id: Flib.php 766 2015-04-14 18:00:54Z fanshengshuai $
  */
 class Flib {
-    private static $_instance = array();
 
     /**
      * 系统自动加载Flib类库，并且支持配置自动加载路径
@@ -70,7 +68,8 @@ class Flib {
             $inc_file = APP_ROOT . $file;
         }
 
-//        echo $inc_file;
+        // file_put_contents(APP_ROOT . "data/inc_file.txt", $inc_file . "\n",FILE_APPEND);
+        // echo $inc_file . "<hr>";
 
         if (file_exists($inc_file)) {
             if ($_F ['debug']) {
@@ -83,12 +82,14 @@ class Flib {
         if (count(spl_autoload_functions()) == 1) {
             throw new Exception('File no found: ' . $inc_file, 404);
 
-            if ($_F ['debug']) {
-                $_F ['debug_info'] ['autoload_files'] [] = "<span style='color:red'>{$inc_file} <strong>[ FAILED ]</strong></span><br /> Class: {$className}";
-            }
+//            if ($_F ['debug']) {
+//                $_F ['debug_info'] ['autoload_files'] [] = "<span style='color:red'>{$inc_file} <strong>[ FAILED ]</strong></span><br /> Class: {$className}";
+//            }
         } else {
 //            spl_autoload_unregister(array('Flib', 'autoLoad'));
         }
+
+        return false;
     }
 
     /**
@@ -128,10 +129,10 @@ class Flib {
     /**
      * 自定义错误处理
      *
-     * @param $err_no 错误类型
-     * @param $err_str 错误信息
-     * @param $err_file 错误文件
-     * @param $err_line 错误行数
+     * @param $err_no int 错误类型
+     * @param $err_str string 错误信息
+     * @param $err_file string 错误文件
+     * @param $err_line int 错误行数
      */
     static public function appError($err_no, $err_str, $err_file, $err_line) {
         global $_F;
@@ -142,8 +143,8 @@ class Flib {
                 $errorStr = "[$err_no] $err_str " . basename($err_file) . " 第 $err_line 行.";
                 // if(C('LOG_RECORD')) Log::write($errorStr,Log::ERR);
                 $exception = new FException ();
-            $exception->traceError(new Exception($errorStr));
-            break;
+                $exception->traceError(new Exception($errorStr));
+                break;
             case E_STRICT :
                 $_F['errors']['STRICT'][] = "[$err_no] $err_str " . basename($err_file) . " 第 $err_line 行.";
                 break;
@@ -162,14 +163,15 @@ class Flib {
     }
 
     public static function createFlibMin() {
-        $files = "DB/Table, FCookie, FFile, FView, DAO, App, FDB, Pager, FCache, FException, FDispatcher, FController, FSession";
-        $files = explode(',', $files); /*FConfig,*/
+        $files = "FConfig, FCookie,FDebug, FFile, FView, FDB, FTable, FException, FDispatcher, FController, FSession,FCache, FApp, FPager, FRequest, FRedis, FLogger";
+        $files = explode(',', $files);
 
         $flib_str = '';
-        foreach ($files as $f) {
-            $f = FLIB_ROOT . trim($f) . '.php';
+        foreach ($files as $class) {
+            $class = trim($class);
+            $f = FLIB_ROOT . trim($class) . '.php';
             $_content = file_GET_contents($f);
-            $flib_str .= $_content;
+            $flib_str .= "\nif (!class_exists('$class')) {" . $_content . ' } ';
         }
 
         $flib_str = str_replace('<?php', '', $flib_str);
@@ -188,13 +190,21 @@ class Flib {
         header("Access-Control-Allow-Origin: *");
 
         if (!defined('FLIB_ROOT')) {
-            define ('FLIB_ROOT', dirname(__FILE__) . '/');
+            define('FLIB_ROOT', dirname(__FILE__) . '/');
+        }
+
+        if (!defined('APP_ROOT') && defined('WEB_ROOT_DIR')) {
+            define('APP_ROOT', WEB_ROOT_DIR);
         }
 
         date_default_timezone_set('Asia/Chongqing');
         ini_set("error_reporting", E_ALL & ~E_NOTICE);
 
+
         if (phpversion() < '5.3.0') set_magic_quotes_runtime(0);
+
+        define('CURRENT_TIMESTAMP', time());
+        define('CURRENT_DATE_TIME', date('Y-m-d H:i:s'));
 
         $_F['user_agent'] = $_SERVER ['HTTP_USER_AGENT'];
         $_F['query_string'] = $_SERVER ['QUERY_STRING'];
@@ -202,11 +212,29 @@ class Flib {
         $_F['http_host'] ? $_F['http_host'] : $_F['http_host'] = $_SERVER ['HTTP_HOST'];
 
         $last_part = substr($_F ['http_host'], strrpos($_F ['http_host'], '.'));
+        if ($last_part == '.local') {
+            $_F['dev_mode'] = true;
+        } elseif ($last_part == '.lan') {
+            $_F['test_mode'] = true;
+        }
+
+        // 注册AUTOLOAD方法，设定错误和异常处理
+        spl_autoload_register(array('Flib', 'autoLoad'));
+
+        register_shutdown_function(array('Flib', 'fatalError'));
+        restore_error_handler();
+        set_error_handler(array('Flib', 'appError'));
+        restore_exception_handler();
+        set_exception_handler(array('Flib', 'appException'));
+
         $left_part = str_replace($last_part, '', $_F ['http_host']);
-        $_F['cookie_domain'] = substr($left_part, strrpos($left_part, '.')) . $last_part;
+        if ($left_part) {
+            $_F['cookie_domain'] = substr($left_part, strrpos($left_part, '.')) . $last_part;
+        }
         $_F['domain'] = trim($_F['cookie_domain'], '.');
 
-        $_F['subdomain'] =str_replace($_F['cookie_domain'], '', $_F ['http_host']);
+        $_F['subdomain'] = str_replace($_F['cookie_domain'], '', $_F ['http_host']);
+        FDispatcher::getURI();
 
         $_F['refer'] = $_REQUEST ['refer'] ? $_REQUEST ['refer'] : $_SERVER ['HTTP_REFERER'];
 
@@ -216,18 +244,12 @@ class Flib {
             $_F['in_ajax'] = true;
         }
 
+
         $_F['is_post'] = ($_POST) ? true : false;
 
         $_F['run_in'] = isset($_SERVER ['HTTP_HOST']) ? 'web' : 'shell';
 
         define('IS_POST', $_F['is_post']);
-
-        // 注册AUTOLOAD方法，设定错误和异常处理
-        spl_autoload_register(array('Flib', 'autoLoad'));
-
-        register_shutdown_function(array('Flib', 'fatalError'));
-        set_error_handler(array('Flib', 'appError'));
-        set_exception_handler(array('Flib', 'appException'));
 
 
         if (FConfig::get('global.flib_compress')) {
@@ -240,7 +262,7 @@ class Flib {
         $sub_domain_status = FConfig::get('global.sub_domain.status');
 
         // 是否开了子域名
-        if ($sub_domain_status == 'on') {
+        if ($sub_domain_status) {
             foreach (FConfig::get('global.sub_domain.sub_domain_rewrite') as $key => $value) {
                 if ($key == $_F['subdomain']) {
                     $_F['module'] = $value;
@@ -276,9 +298,9 @@ class Flib {
     }
 }
 
+define('FLIB', 1);
 Flib::init();
 
 if (FLIB_RUN_MODE != 'manual') {
     FApp::run();
 }
-

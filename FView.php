@@ -6,7 +6,7 @@
  * 创建: 2012-07-28 10:57:45
  * vim: set expandtab sw=4 ts=4 sts=4 *
  *
- * $Id: View.php 128 2012-08-06 08:58:30Z fanshengshuai $
+ * $Id: FView.php 766 2015-04-14 18:00:54Z fanshengshuai $
  */
 
 if (!class_exists('Smarty')) {
@@ -20,15 +20,19 @@ if (!class_exists('Smarty')) {
 }
 
 class FView extends Smarty {
+    public $msg_tpl = null;
+
 
     public function __construct() {
         global $_F;
         parent::__construct();
 
+        $this->msg_tpl = "public/msg.tpl.php";
+
         if ($_F['module']) {
 
-            $this->cache_dir = APP_ROOT . "data/{$_F['module']}/cache";
-            $this->compile_dir = APP_ROOT . "data/{$_F['module']}/template/";
+            $this->cache_dir = APP_ROOT . "data/cache/{$_F['module']}/";
+            $this->compile_dir = APP_ROOT . "data/template/{$_F['module']}/";
             $this->template_dir = APP_ROOT . "modules/{$_F['module']}/tpl/";
             if (!file_exists($this->template_dir)) {
                 $this->template_dir = APP_ROOT . "modules/{$_F['module']}/templates/";
@@ -53,9 +57,13 @@ class FView extends Smarty {
             $this->template_dir = TPL_ROOT;
         }
 
+        $this->php_handling = Smarty::PHP_ALLOW;
         $this->caching = false;
         $this->debugging = false;
         $this->cache_lifetime = 300;
+
+        $this->left_delimiter = "<{";
+        $this->right_delimiter = "}>";
     }
 
     public function setTemplateDir($template_dir) {
@@ -78,17 +86,15 @@ class FView extends Smarty {
     public function displaySysPage($tpl) {
         global $_F;
 
-        $this->template_dir = FLIB_ROOT . 'View/';
-        $content = $this->fetch($tpl);
-
         if ($_F['run_in'] == 'shell') {
-            $content = str_replace(array('<br />', '</p>', '</tr>'), "\n", $content);
-            $content = str_replace(array('&nbsp;'), " ", $content);
-            $content = preg_replace('/<head>.+?<\/head>/si', '', $content);
-            $content = preg_replace('/<.+?>/', '', $content);
-            $content = preg_replace("/\n\s+/i", "\n", $content);
-
-            var_export($_F);
+            $content = $this->getDebugInfo();
+            echo $content;
+            exit;
+        } else {
+            $this->template_dir = FLIB_ROOT . 'View/';
+            $this->left_delimiter = "{";
+            $this->right_delimiter = "}";
+            $content = $this->fetch($tpl);
         }
 
         if ($_F['debug'] && !$_F['in_ajax']) {
@@ -100,6 +106,21 @@ class FView extends Smarty {
     }
 
     public function disp($tpl = null) {
+        global $_F;
+
+        $tpl = $this->getDefaultTpl($tpl);
+
+        if ($this->cache_id) {
+            $contents = $this->load($tpl, $this->cache_id);
+        } else {
+            $contents = $this->load($tpl);
+        }
+
+
+        echo $contents;
+    }
+
+    private function getDefaultTpl($tpl = null) {
         global $_F;
 
         if (!$tpl) {
@@ -115,23 +136,19 @@ class FView extends Smarty {
                 $a = strtolower($a);
                 $tpl = "{$c}/{$a}";
             }
+
+            $tpl .= '.tpl.php';
         }
 
-        if ($this->cache_id) {
-            $contents = $this->load($tpl . '.tpl', $this->cache_id);
-        } else {
-            $contents = $this->load($tpl . '.tpl');
-        }
 
-//        if (!$_F['uid']) {
-//            FCache::save($contents);
-//        }
-
-        echo $contents;
+        return $tpl;
     }
 
     public function load($tpl) {
         global $_F;
+
+
+        $tpl = $this->getDefaultTpl($tpl);
 
         $this->set('_F', $_F);
 
@@ -140,7 +157,7 @@ class FView extends Smarty {
 
         if ($view_compress) {
             // 会有 http:// 这样的都替换没了
-            $contents = preg_replace('#^\s*//.*$#im', '', $contents);
+            $contents = preg_replace('#^\s*/' . '/.*$#im', '', $contents);
             $contents = preg_replace('#<!--.+?-->#si', '', $contents);
             $contents = preg_replace('/^\s+/im', '', $contents);
             $contents = preg_replace('/>\s+/im', '>', $contents);
@@ -158,7 +175,7 @@ class FView extends Smarty {
     public function getDebugInfo() {
         global $_F;
 
-		unset($_F['db']);
+        unset($_F['db']);
 
 
         if ($_F['run_in'] == 'shell') {
@@ -234,5 +251,9 @@ class FView extends Smarty {
         }
 
         return "<div class=\"debug_info clearfix\">" . $debug_contents . "</div>";
+    }
+
+    public function setMsgTpl($msg_tpl) {
+        $this->msg_tpl = $msg_tpl;
     }
 }

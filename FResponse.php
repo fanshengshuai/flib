@@ -89,7 +89,7 @@ class FResponse {
             $response->write($mix);
         }
 
-        return true;
+        exit;
     }
 
     public static function sendHeader($headerKey, $headerValue = null) {

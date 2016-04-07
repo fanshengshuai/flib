@@ -7,7 +7,7 @@
  * 创建: 2011-04-19 09:08:23
  * vim: set expandtab sw=4 ts=4 sts=4 *
  *
- * $Id: App.php 46 2012-07-26 09:13:51Z fanshengshuai $
+ * $Id: FApp.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
 class FApp {
     /**
@@ -26,7 +26,8 @@ class FApp {
             $_F['debug'] = true;
         }
 
-        if (FConfig::get('global.session.type') == 'db') {
+        $session_type = FConfig::get('global.session.type');
+        if ($session_type == 'db') {
 
             $handler = new FSession();
             session_set_save_handler(
@@ -37,6 +38,16 @@ class FApp {
                 array(&$handler, "destroy"),
                 array(&$handler, "gc"));
 
+            $handler->start();
+        } elseif ($session_type == 'memcache') {
+            ini_set('session.save_handler', 'memcache');
+            ini_set('session.save_path', 'tcp:/'.'/127.0.0.1:11211'); // . FConfig::get('global.memcache.ip')
+
+            $handler = new FSession();
+            $handler->start();
+
+        } else {
+            $handler = new FSession();
             $handler->start();
         }
     }

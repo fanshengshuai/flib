@@ -7,7 +7,7 @@
  * 创建: 2012-07-24 10:29:39
  * vim: set expandtab sw=4 ts=4 sts=4 *
  *
- * $Id: FException.php 11 2012-07-24 03:42:35Z fanshengshuai $
+ * $Id: FException.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
 class FException extends Exception {
 
@@ -40,7 +40,28 @@ class FException extends Exception {
 
         $exception_message = $error_message
             . '<br /> 异常出现在：' . $error_file . ' 第 ' . $error_line . ' 行';
-        FLogger::write($exception_message);
+
+        $log_text = "\n--------------------------------------------------------\n";
+
+        if ($_F['current_sql']) {
+            $log_text .= "SQL: " . $_F['current_sql'] . "\n";
+            $log_text .= "--------------------------------------------------------\n";
+        }
+
+        if (is_object($e)) {
+            $log_text .= $e->__toString() . "\n";
+            $log_text .= "--------------------------------------------------------\n";
+        } else {
+            $log_text .= $error_message . "\n";
+            $log_text .= "--------------------------------------------------------\n";
+        }
+
+        if ($_F['run_in'] == 'shell') {
+            $log_text_header = "\n\n          ==========================================\n                         ERROR FOUND\n          ========================================== \n";
+            die($log_text_header . $log_text);
+        }
+
+        FLogger::write($log_text, 'error');
 
         if (!$_F['debug']) {
             if ($error_code == 404) {
@@ -72,6 +93,8 @@ class FException extends Exception {
         header('status: 500 FLib Error');
         $exception_message = str_replace(APP_ROOT, '', $exception_message);
         $exception_trace = str_replace(APP_ROOT, '', $exception_trace);
+
+        if ($_F[''])
 
         $this->view->set('exception_message', str_replace(APP_ROOT, '', $exception_message));
         $this->view->set('exception_trace', preg_replace('#[\w\d \#]+?/f.php.+?$#si', ' Flib 引导入口', $exception_trace));

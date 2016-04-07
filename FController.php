@@ -6,12 +6,26 @@
  * 时间: 2010-11-02 01:12:12
  *
  * vim: set expandtab sw=4 ts=4 sts=4
- * $Id: Controller.php 86 2012-07-30 09:30:42Z yanjianshe $
+ * $Id: FController.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
 abstract class FController {
     protected $view;
 
-    abstract function showMessage($message, $msgType, $url = null);
+    protected function showMessage($message, $msgType, $url = null) {
+        if ($this->view->msg_tpl) {
+            $this->assign('msg', $message);
+            $this->assign('msgType', $msgType);
+            $this->assign('url', $url);
+            $this->display($this->view->msg_tpl);
+        } else {
+            echo $message;
+            if ($url) {
+                echo "<script> setTimeout(function() { location = $url; },2000); </script>";
+            }
+        }
+
+        exit;
+    }
 
     public function setView() {
         $this->view = new FView;

@@ -10,7 +10,7 @@
  * 浣跨敤锛涗笉鍏佽?瀵圭▼搴忎唬鐮佷互浠讳綍褰㈠紡浠讳綍鐩?殑鐨勫啀鍙戝竷銆
  * ==========================================================
  * $Author: liubo $
- * $Id: cls_json.php 17217 2011-01-19 06:29:08Z liubo $
+ * $Id: FJSON.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
 if (!defined('F_CHARSET')) {
     define ('F_CHARSET', 'utf-8');

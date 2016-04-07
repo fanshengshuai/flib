@@ -7,7 +7,7 @@
  * 创建: 2012-07-24 22:57:17
  * vim: set expandtab sw=4 ts=4 sts=4 *
  *
- * $Id: DAO.php 196 2012-08-11 10:46:03Z fanshengshuai $
+ * $Id: DAO.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
 abstract class DAO extends FDB_Table {
     // 数据库表达式

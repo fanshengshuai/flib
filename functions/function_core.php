@@ -1,4 +1,17 @@
 <?php
+
+if (!function_exists('M')) {
+    /**
+     * @param $table
+     * @param null $as
+     * @param null $db_conf
+     * @return FTable
+     */
+    function M($table, $as = null, $db_conf = null) {
+        return new FTable($table, $as, $db_conf);
+    }
+}
+
 if (!function_exists('redirect')) {
     function redirect($url, $target = '') {
         global $_F;
@@ -415,4 +428,31 @@ function getPicUrl($pic_url) {
     } else {
         return "http://s.fmscg.com/uploads/{$pic_url}";
     }
+}
+
+
+function get_article($limit, $cid1, $cid2, $sort="id desc") {
+    global $_F;
+//    $_F['debug'] =1;
+    $t = new FTable('article');
+    $where = array('cat_id' => $cid1);
+    if ($cid2) {
+        $where['cat_id_2'] = $cid2;
+    }
+    $list = $t->where($where)->order($sort)->limit($limit)->select();
+    return $list;
+}
+
+/**
+ * URL过滤
+ * @param   string  $url  参数字符串，一个urld地址,对url地址进行校正
+ * @return  返回校正过的url;
+ */
+function sanitize_url($url , $check = 'http://')
+{
+    if (strpos( $url, $check ) === false)
+    {
+        $url = $check . $url;
+    }
+    return $url;
 }

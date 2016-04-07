@@ -7,13 +7,9 @@
  * 创建: 2012-08-08 10:57:22
  * vim: set expandtab sw=4 ts=4 sts=4 *
  *
- * $Id$
+ * $Id: FTable.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
 class FTable {
-    /**
-     * @var array
-     */
-    private static $_connects = array();
 
     /**
      * @var string
@@ -24,6 +20,7 @@ class FTable {
      * @param string $table
      */
     public function setTable($table) {
+        $this->table_raw = $table;
         $this->_table = $table;
     }
 
@@ -31,7 +28,7 @@ class FTable {
      * @return string
      */
     public function getTable() {
-        return $this->_table;
+        return $this->table_raw;
     }
 
     /**
@@ -66,20 +63,23 @@ class FTable {
      * @var PDO
      */
     private $_dbh;
-    // 查询表达式参数
+
     /**
      * @var array
      */
     protected $options = array();
+
     /**
      * 分页配置项
      * @var array
      */
     protected $pagerOptions = array();
+
     /**
      * @var string
      */
     protected $table_info = null;
+
     // 查询表达式
     /**
      * @var string
@@ -90,23 +90,27 @@ class FTable {
      * 构建数据操作实例
      *
      * @param string $table
-     *
-     * @param null   $as
-     *
-     * @internal param array
+     * @param null $as
+     * @param null $db_conf
      */
-    public function __construct($table, $as = null) {
-        global $_F;
-
+    public function __construct($table, $as = null, $db_conf = null) {
+        $this->table_raw = $table;
         $this->config = FDB::getConfig();
-        $this->_table = "`{$this->config['table_pre']}{$table}`";
+        $this->table = $this->_table = "`{$this->config['table_pre']}{$table}`";
 
         if ($as) {
             $this->_table = $this->_table . " as {$as}";
         }
+
+        if ($db_conf) {
+            $this->db_conf = $db_conf;
+        }
     }
 
     public function connect($rw_type = 'w') {
+        if ($this->db_conf) {
+            $rw_type = $this->db_conf;
+        }
         $this->_dbh = FDB::connect($rw_type);
         return $this->_dbh;
     }
@@ -164,14 +168,31 @@ class FTable {
             $this->options['params'] = array();
 
         } elseif (is_array($conditions)) {
-            $where = '';
+            $where = array();
             foreach ($conditions as $_k => $_v) {
 
                 $tableFiled = $_k;
 
-                if (is_array($_v)) {
+
+                // IMPORTANT 一定要全等于！！！
+                if ($_v === "__NO_VALUE__") {
+                    $where[] = "$_k";
+                    continue;
+                }
+
+                if (is_null($_v)) {
+                    $where[] = "$_k IS NULL";
+                    continue;
+                } elseif (is_array($_v)) {
 
                     foreach ($_v as $where_item_sub_key => $where_item_sub_value) {
+
+
+//                        if (strtoupper($where_item_sub_key) == 'BETWEEN') {
+//                            $where[] .= "{$tableFiled} = ?";
+//                            $params[] = "BETWEEN $where_item_sub_value";
+//                            continue;
+//                        }
 
                         // array("in", '(1, 2, 3)'); 内容不是数组的跳过
                         // array(array('in' => '(1, 2)'))；只解析这样的
@@ -196,6 +217,11 @@ class FTable {
                                 $params[] = trim(str_replace(array('like', 'LIKE'), '', $where_item_sub_value));
                             }
 
+                        } elseif (strpos(strtolower($where_item_sub_key), 'between') !== false) {
+                            if (is_array($where_item_sub_value)) {
+                                $where_item_sub_value = join(',', $where_item_sub_value);
+                            }
+                            $where[] .= "$tableFiled {$where_item_sub_key}  " . $where_item_sub_value . " ";
                         } else {
                             $where[] .= "$tableFiled {$where_item_sub_key} ?";
                             $params[] = $where_item_sub_value;
@@ -208,22 +234,17 @@ class FTable {
                     continue;
                 }
 
-
-                if (strpos($tableFiled, ':')) {
-                    $tableFiled = substr($tableFiled, 0, strpos($tableFiled, ':'));
-                }
-
                 $__v = strtolower($_v);
                 if (strpos($__v, 'like ') !== false) {
                     $where[] .= "{$_k} like ?";
                     $params[] = "%" . trim(str_replace(array('like', 'LIKE'), '', $_v)) . "%";
                 } elseif (
                     strpos($_v, 'gt ') !== false || strpos($_v, 'lt ') !== false ||
-                    strpos($_v, 'gte ') !== false || strpos($_v, 'lte ') !== false
+                    strpos($_v, 'gte ') !== false || strpos($_v, 'lte ') !== false || strpos($_v, 'ni ') !== false
                 ) {
                     $opt = substr($_v, 0, strpos($_v, ' '));
                     $param = trim(substr($_v, strpos($_v, ' ')));
-                    $opt = str_replace(array('gte', 'lte', 'gt', 'lt'), array('>= ', '<= ', '> ', '< '), $opt);
+                    $opt = str_replace(array('gte', 'lte', 'gt', 'lt', 'ni'), array('>= ', '<= ', '> ', '< ', 'not in '), $opt);
 
                     $where[] .= "{$tableFiled} $opt ?";
                     $params[] = $param;
@@ -234,8 +255,7 @@ class FTable {
                 }
             }
 
-
-            $this->options['where'] = join(' and ', $where);
+            $this->options['where'] = join(' AND ', $where);
             $this->options['params'] = $params;
         }
 
@@ -265,7 +285,7 @@ class FTable {
 
 
     /**
-     * 分组 edit by wyr
+     * 分组
      *
      * @param $group
      *
@@ -282,13 +302,6 @@ class FTable {
      * @param null $priValue mix 主键数值
      *
      * @throws Exception
-     * @internal      param string $conditions
-     * @internal      param array $columns
-     *
-     * @internal      param array $params
-     *
-     * @internal      param array $param
-     * @internal      param \columns $array 列
      *
      * @return array || null
      */
@@ -306,14 +319,14 @@ class FTable {
 
 
         if ($this->options['group_by']) {
-            $sql = 'select count(0) as count from (' . $this->buildSql() . ')A';
+            $sql = 'select count(*) as count from (' . $this->buildSql() . ')A';
         } else {
-            $sql = $this->buildSql();
             $this->limit(1);
+            $sql = $this->buildSql();
         }
 
 
-        // echo($sql . '<br>');
+//         echo($sql . '<br>');
 
         // 缓存处理
         $cacheKey = "SQL-RESULT-{$this->_table}-{$sql}-" . ($this->options['params'] ? join('-', $this->options['params']) : '');
@@ -336,7 +349,8 @@ class FTable {
             $retData = $stmt->fetch(PDO::FETCH_ASSOC);
 
         } catch (PDOException $e) {
-            throw new Exception($e);
+            $_F['current_sql'] = $sql;
+            throw $e;
         }
 
         // 缓存处理
@@ -360,12 +374,12 @@ class FTable {
 
         // 处理分页参数，放在 缓存处理 之前
         if ($this->options['page']) {
-            $this->setPagerOptions(array('where'    => $this->options['where'],
-                                         'params'   => $this->options['params'],
-                                         'page'     => $this->options['page'],
-                                         'limit'    => $this->options['limit'],
-                                         'fields'   => $this->options['fields'],
-                                         'group_by' => $this->options['group_by']));
+            $this->setPagerOptions(array('where' => $this->options['where'],
+                'params' => $this->options['params'],
+                'page' => $this->options['page'],
+                'limit' => $this->options['limit'],
+                'fields' => $this->options['fields'],
+                'group_by' => $this->options['group_by']));
         }
 
         // 缓存处理
@@ -414,7 +428,7 @@ class FTable {
 
         if (!$this->options['group_by']) {
             if ($this->options['fields']) {
-                $this->options['fields'] = array("COUNT(0) as count"); //修改leftJoin u.*报错 edit:wyr
+                $this->options['fields'] = array("COUNT(*) as count"); //修改leftJoin u.*报错 edit:wyr
             } else {
                 $this->options['fields'] = array("COUNT(*) as count");
             }
@@ -428,15 +442,29 @@ class FTable {
     }
 
     /**
+     * 汇总某个字段
+     * @param $field
+     * @return int
+     * @throws Exception
+     */
+    public function sum($field) {
+        $this->fields("sum({$field}) as sum");
+        $result = $this->find();
+
+        return intval($result['sum']);
+    }
+
+    /**
      * @return string
      * @throws Exception
      */
     private function buildSql() {
-        global $_F;
 
         $columns = null;
         if ($this->options['fields'] && is_array($this->options['fields'])) {
             $columns = implode(',', $this->options['fields']);
+        } elseif (is_string($this->options['fields'])) {
+            $columns = $this->options['fields'];
         } else {
             $columns = '*';
         }
@@ -454,8 +482,6 @@ class FTable {
         if ($this->options['order_by']) {
             $sql .= ' ORDER BY ' . $this->options['order_by'];
         }
-
-//        var_dump($this->options);
 
         if ($this->options['limit']) {
             if ($this->options['page'] > 0) {
@@ -526,16 +552,16 @@ class FTable {
 
         if ($this->options['where']) {
             // 更新
-            $sql = "UPDATE {$this->_table} SET " . join(', ', $set) . " WHERE {$this->options['where']}";
+            $sql = "UPDATE {$this->config['table_pre']}{$this->table_raw} SET " . join(', ', $set) . " WHERE {$this->options['where']}";
             $params = array_merge($tempParams, $this->options['params']);
         } else {
             // 插入
-            $sql = "INSERT INTO {$this->_table} SET " . join(', ', $set);
+            $sql = "INSERT INTO {$this->config['table_pre']}{$this->table_raw} SET " . join(', ', $set);
             $params = $tempParams;
         }
 
         if ($_F['debug']) {
-            FDebug::logSql($sql, $this->options['params']);
+            FDebug::logSql($sql, $params);
         }
 
         // 捕获PDOException后 抛出Exception
@@ -549,7 +575,8 @@ class FTable {
 
             return $stmt->rowCount();
         } catch (PDOException $e) {
-            throw new Exception($e);
+            $_F['current_sql'] = $sql;
+            throw $e;
         }
     }
 
@@ -716,7 +743,7 @@ class FTable {
             $stmt = $this->_dbh->prepare($sql);
             $result = $stmt->execute($this->options['params']);
         } catch (PDOException $e) {
-            throw new Exception($e);
+            throw $e;
         }
 
         return $result;
@@ -748,7 +775,7 @@ class FTable {
             $stmt = $this->_dbh->prepare($sql);
             $result = $stmt->execute($this->options['params']);
         } catch (PDOException $e) {
-            throw new Exception($e);
+            throw $e;
         }
 
         return $result;
@@ -775,12 +802,12 @@ class FTable {
             $this->reset();
             return $stmt->execute($params);
         } catch (PDOException $e) {
-            throw new Exception($e);
+            throw $e;
         }
     }
 
     /**
-     *
+     * 重置 FTable
      */
     public function reset() {
         $this->options = null;
@@ -791,14 +818,15 @@ class FTable {
      * @return array|null
      * @throws Exception
      */
-    private function getTableInfo() {
+    public function getTableInfo() {
         $tableInfo = FCache::get($this->_table);
         if ($tableInfo) {
             return $tableInfo;
         }
 
+        $sql = "desc {$this->config['table_pre']}$this->table_raw";
+
         try {
-            $sql = "desc $this->_table";
             $this->connect('r');
 
             $stmt = $this->_dbh->prepare($sql);
@@ -813,12 +841,11 @@ class FTable {
 
                 $tableInfo['fields'][$row['Field']] = $row;
             }
-//            $tableInfo['fields'] = $rows;
 
             FCache::set($this->_table, $tableInfo, 8640000);
 
         } catch (PDOException $e) {
-            FLogger::write("获取表信息失败: " . $this->_table . "\t" . $e->getMessage());
+            FLogger::write("获取表信息失败: " . $this->_table . "\t{$sql}\t" . $e->getMessage(), 'error');
             throw new Exception("获取表信息失败。");
         }
 

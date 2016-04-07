@@ -7,9 +7,9 @@
  * 创建: 2012-07-27 21:26:16
  * vim: set expandtab sw=4 ts=4 sts=4 *
  *
- * $Id: FUploader.php 764 2015-04-14 15:09:06Z fanshengshuai $
+ * $Id: Uploader.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
-class FUploader {
+class Uploader {
     public function setFileType($type) {
     }
 
@@ -67,17 +67,15 @@ class FUploader {
     }
 
     public static function saveFile($field, $attach_type = 'image') {
-        $uploader = new FUploader ();
-        $photo_file = "{$attach_type}/" . date('Ymd') . '/' . date('His') . rand(1000, 9999) . ".attach";
+        $uploader = new Uploader ();
+        $photo_file = "{$attach_type}/" . date('Ymd') . '/' . date('YmdHis') . ".attach";
         $upload_file = $uploader->saveAttach($field, $attach_type, $photo_file);
         return $upload_file ['file_path'];
     }
 
     public function saveAttach($field, $attach_type = 'images', $obj = null) {
-        global $_F;
-
         if ($_FILES [$field] ['size'] < 1)
-            return -1;
+            return false;
         if (!$obj) {
             $obj = $attach_type . '/' . date('Y-m') . '/' . date('d') . '/' . date('YmdHis') . '.attach';
         }
@@ -93,19 +91,7 @@ class FUploader {
                 $file_ext = 'txt';
             }
 
-            $default_upload_ext = array('jpg', 'png', 'gif');
-            $config_upload_ext = explode(',', str_replace(' ', '', FConfig::get('global.upload_file_ext')));
-
-            if ($config_upload_ext) {
-                $config_upload_ext = array_merge($config_upload_ext, $default_upload_ext);
-            } else {
-                $config_upload_ext = $default_upload_ext;
-            }
-
-            if (!in_array($file_ext, $config_upload_ext)) {
-                if (FConfig::get('global.debug')) {
-                    throw new Exception('禁止上传此类型的文件。');
-                }
+            if (!in_array($file_ext, array('jpg', 'png', 'gif'))) {
                 return false;
             }
 
@@ -116,8 +102,8 @@ class FUploader {
 
         $attach_url = $obj;
 
-        if (strpos($obj, PUBLIC_ROOT) === false) {
-            $obj =  "uploads/" . $obj;
+        if (strpos($obj, APP_ROOT) === false) {
+            $obj = APP_ROOT . "public/uploads/" . $obj;
         }
 
         $attach_dir = dirname($obj);
@@ -127,12 +113,11 @@ class FUploader {
         }
 
         if ($_FILES [$field]) {
-//            $a = (is_uploaded_file($_FILES [$field] ['tmp_name']));
             if (!move_uploaded_file($_FILES [$field] ['tmp_name'], $obj)) {
                 throw new Exception ('请检查public/uploads目录是否可写!');
             }
 
-//			$attachDAO = new DAO_Attach ();
+            $attachDAO = new DAO_Attach ();
             $data = array(
                 'file_name' => $_FILES [$field] ['name'],
                 'file_type' => $_FILES [$field] ['type'],
@@ -149,7 +134,7 @@ class FUploader {
     }
 
     public static function save($field, $attach_type = 'images', $obj = null) {
-        $uploader = new FUploader;
+        $uploader = new Uploader;
         $upload_file = $uploader->saveAttach($field, $attach_type, $obj);
         return $upload_file;
     }

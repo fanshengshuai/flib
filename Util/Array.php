@@ -7,7 +7,7 @@
  * 创建: 2012-08-27 11:19:33
  * vim: set expandtab sw=4 ts=4 sts=4 *
  *
- * $Id$
+ * $Id: Array.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
 class Util_Array {
 

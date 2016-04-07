@@ -6,7 +6,7 @@
  * 时间: 2012-07-02 01:22:18
  *
  * vim: set expandtab sw=4 ts=4 sts=4
- * $Id: DB.php 273 2012-08-22 10:37:34Z fanshengshuai $
+ * $Id: FDB.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
 class FDB {
 
@@ -33,17 +33,25 @@ class FDB {
         $curConfig = null;
         if ($rw_type == 'w') {
             $curConfig = $gConfig['server'][array_rand($gConfig['server'])];
-        } else {
+        } elseif ($rw_type == 'r' || $rw_type == 'rw') {
             if ($gConfig['server_read'] && count($gConfig['server_read']) > 0) {
                 $curConfig = $gConfig['server_read'][array_rand($gConfig['server_read'])];
             } else {
                 $curConfig = $gConfig['server'][array_rand($gConfig['server'])];
             }
+        } else {
+            if ($gConfig['server_others'][$rw_type]) {
+                $curConfig = $gConfig['server_others'][$rw_type];
+            } elseif ($gConfig['server'][$rw_type]) {
+                $curConfig = $gConfig['server'][$rw_type];
+            } elseif ($gConfig['server_read'][$rw_type]) {
+                $curConfig = $gConfig['server_read'][$rw_type];
+            } else {
+                throw new Exception("DB Connect Config [{$rw_type}] not found!");
+            }
         }
 
         $dsn = $curConfig['dsn'];
-
-        FLogger::write($rw_type, $dsn);
 
         if (isset(self::$_connects[$dsn])) {
             return self::$_connects[$dsn];
@@ -56,7 +64,7 @@ class FDB {
             $dbh = new PDO($curConfig['dsn'], $curConfig['user'], $curConfig['password'], $attr);
             $dbh->exec("SET NAMES '" . $gConfig['charset'] . "'");
         } catch (PDOException $e) {
-            throw new Exception("连接数据库失败：" . $e->getMessage());
+            throw new Exception("连接数据库[{$rw_type}]失败：" . $e->getMessage());
         }
 
         self::$_connects[$dsn] = $dbh;
@@ -107,25 +115,30 @@ class FDB {
     }
 
 
-    public static function query($sql) {
+    public static function query($sql, $db_conf='w') {
         global $_F;
 
-        $_dbh = self::connect('w');
+        $_dbh = self::connect($db_conf);
         return $_dbh->exec($sql);
     }
 
-    public static function fetch($sql) {
+    public static function fetch($sql, $db_conf='r') {
         global $_F;
 
-        $_dbh = self::connect('r');
+        $_dbh = self::connect($db_conf);
 
         if ($_F['debug']) {
             $_F['debug_info']['sql'][] = $sql;
         }
 
-        $stmt = $_dbh->prepare($sql);
-        $stmt->execute();
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $stmt = $_dbh->prepare($sql);
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch(Exception $e) {
+            $_F['current_sql'] = $sql;
+            throw $e;
+        }
 
         return $rows;
     }
@@ -142,17 +155,17 @@ class FDB {
         return $cache_content;
     }
 
-    public static function fetchFirst($sql, $params = null) {
+    public static function fetchFirst($sql, $db_conf='r') {
         global $_F;
 
         if ($_F['debug']) {
             $_F['debug_info']['sql'][] = $sql;
         }
 
-        $dbh = self::connect('r');
+        $dbh = self::connect($db_conf);
 
         $stmt = $dbh->prepare($sql);
-        $stmt->execute($params);
+        $stmt->execute(null);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row;
     }
@@ -177,17 +190,13 @@ class FDB {
      *
      * @return bool
      */
-    public static function insert($table, $data) {
+    public static function insert($table, $data, $db_conf='') {
 
-        if (!$data['create_time']) {
-            $data['create_time'] = date('Y-m-d H:i:s');
+        if ($db_conf) {
+            $table = new FTable($table, '', $db_conf);
+        } else {
+            $table = new FTable($table);
         }
-
-        if (!$data['status']) {
-            $data['status'] = 1;
-        }
-
-        $table = new FTable($table);
         return $table->insert($data);
     }
 
@@ -201,27 +210,27 @@ class FDB {
      * @throws Exception
      * @return bool
      */
-    public static function update($table, $data, $condition) {
+    public static function update($table, $data, $condition, $db_conf='') {
         global $_F;
 
         if (!$condition) {
             throw new Exception("FDB update need condition.");
         }
 
-        if (!$data['update_time']) {
-            $data['update_time'] = date('Y-m-d H:i:s');
+//        $c = '';
+//        if (is_array($condition)) {
+//            foreach ($condition as $_k => $_v) {
+//                $c .= " and {$_k}='{$_v}'";
+//            }
+//
+//            $condition = ltrim($c, ' and');
+//        }
+
+        if ($db_conf) {
+            $table = new FTable($table, '', $db_conf);
+        } else {
+            $table = new FTable($table);
         }
-
-        $c = '';
-        if (is_array($condition)) {
-            foreach ($condition as $_k => $_v) {
-                $c .= " and {$_k}='{$_v}'";
-            }
-
-            $condition = ltrim($c, ' and');
-        }
-
-        $table = new FTable($table);
         return $table->update($data, $condition);
     }
 
@@ -235,13 +244,17 @@ class FDB {
      * @throws Exception
      * @return bool
      */
-    public static function remove($table, $condition, $is_real_delete = false) {
+    public static function remove($table, $condition, $is_real_delete = false, $db_conf='') {
 
         if (!$condition) {
             throw new Exception("FDB remove need condition. Remove is a very dangerous operation.");
         }
 
-        $table = new FTable($table);
+        if ($db_conf) {
+            $table = new FTable($table, '', $db_conf);
+        } else {
+            $table = new FTable($table);
+        }
         $table->where($condition)->remove($is_real_delete);
 
         return true;
@@ -255,9 +268,13 @@ class FDB {
      * @param null $conditions
      * @param int $unit
      */
-    public static function incr($table, $field, $conditions = null, $unit = 1) {
-        $table = new FTable($table);
-        $table->increase($field, $conditions, array(), $unit);
+    public static function incr($table, $field, $conditions = null, $unit = 1, $db_conf='') {
+        if ($db_conf) {
+            $table = new FTable($table, '', $db_conf);
+        } else {
+            $table = new FTable($table);
+        }
+        $table->where($conditions)->increase($field, $unit);
     }
 
     /**
@@ -266,12 +283,18 @@ class FDB {
      * @param $table
      * @param $field
      * @param null $conditions
-     * @param array $params
      * @param int $unit
+     * @param string $db_conf
+     * @throws Exception
+     * @internal param array $params
      */
-    public static function decr($table, $field, $conditions = null, $params = array(), $unit = 1) {
-        $table = new FTable($table);
-        $table->decrease($field, $conditions, array(), $unit);
+    public static function decr($table, $field, $conditions = null, $unit = 1, $db_conf='') {
+        if ($db_conf) {
+            $table = new FTable($table, '', $db_conf);
+        } else {
+            $table = new FTable($table);
+        }
+        $table->where($conditions)->decrease($field, $unit);
     }
 
     /**
@@ -282,8 +305,12 @@ class FDB {
      *
      * @return int
      */
-    public static function count($table, $conditions = null) {
-        $table = new FTable($table);
-        return $table->count($conditions);
+    public static function count($table, $conditions = null, $db_conf='') {
+        if ($db_conf) {
+            $table = new FTable($table, '', $db_conf);
+        } else {
+            $table = new FTable($table);
+        }
+        return $table->where($conditions)->count();
     }
 }

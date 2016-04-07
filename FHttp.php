@@ -41,7 +41,13 @@ class FHttp {
         return $fHttp->getByCurl($url);
     }
 
-    //CURL句柄
+    public static function post($url, $params = array(), $uploadFile = array(), $referer = '') {
+        $fHttp = new self;
+
+        return $fHttp->_post($url, $params, $uploadFile, $referer);
+    }
+
+    // CURL句柄
     private $ch = null;
     //CURL执行前后所设置或服务器端返回的信息
     private $info = array();

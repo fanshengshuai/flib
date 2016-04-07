@@ -7,7 +7,7 @@
  * 创建: 2014-07-19 10:26:09
  * vim: set expandtab sw=4 ts=4 sts=4 *
  *
- * $Id: Log.php 11 2012-07-24 03:42:35Z fanshengshuai $
+ * $Id: Log.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
 class Log {
 
