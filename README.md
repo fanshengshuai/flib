@@ -20,4 +20,10 @@ Flib (Fast Libraries for PHP) 是一个可以灵活使用和扩充的库。
  * 将域名配置到 demo/public 目录
  * 修改 demo/public/index.php，将 flib 框架中的 Flib.php 包含过来。
 
-    require_once APP_ROOT . "libraries/flib/Flib.php";
+## Setup
+```php
+define("FLIB_RUN_MODE", 'manual');
+require_once "lib/flib/Flib.php";
+
+FSetup::getInstance()->init();
+```
