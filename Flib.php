@@ -185,6 +185,8 @@ class Flib {
     public static function init() {
         global $_F;
 
+
+
         $_F ['config'] = array();
         header("Content-type: text/html; charset=utf-8");
         header("Access-Control-Allow-Origin: *");
@@ -193,8 +195,13 @@ class Flib {
             define('FLIB_ROOT', dirname(__FILE__) . '/');
         }
 
-        if (!defined('APP_ROOT') && defined('WEB_ROOT_DIR')) {
-            define('APP_ROOT', WEB_ROOT_DIR);
+        if (!defined('APP_ROOT')) {
+            if ($_SERVER['PWD'])
+                define('APP_ROOT', $_SERVER['PWD'] . '/');
+            else
+                define('APP_ROOT', getcwd());
+        } else {
+            exit('please define APP_ROOT');
         }
 
         date_default_timezone_set('Asia/Chongqing');
