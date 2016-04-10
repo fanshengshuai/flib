@@ -83,7 +83,7 @@ class FDispatcher {
         }
         $path_info = explode('/', $_F['uri']);
 
-        if(isset($path_info[1])&&!isset($path_info[2])&&!isset($path_info[3])){
+        if(isset($path_info[1])&&!isset($path_info[2])&&!isset($path_info[3]) && FConfig::get("global.openDiy")) {
             $pager_table = new FTable('page');
             $pager_info = $pager_table -> where("url='".$_F['uri']."'") -> find();
             if($pager_info){
