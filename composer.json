@@ -1,0 +1,21 @@
+{
+  "name": "fanshengshuai/flib",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "范圣帅",
+      "email": "fanshengshuai@gmail.com"
+    }
+  ],
+  "type": "lib",
+  "autoload": {
+    "files": [
+      "Flib.php"
+    ]
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "Flib::setup"
+    ]
+  }
+}

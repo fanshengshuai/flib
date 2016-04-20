@@ -102,8 +102,8 @@ class Uploader {
 
         $attach_url = $obj;
 
-        if (strpos($obj, APP_ROOT) === false) {
-            $obj = APP_ROOT . "public/uploads/" . $obj;
+        if (strpos($obj, F_APP_ROOT) === false) {
+            $obj = F_APP_ROOT . "uploads/" . $obj;
         }
 
         $attach_dir = dirname($obj);

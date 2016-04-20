@@ -8,8 +8,7 @@
  * vim: set expandtab sw=4 ts=4 sts=4
  * $Id: FCache.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
-class FCache
-{
+class FCache {
 
     private $_cache_type = null;
     private $_cache_key = '';
@@ -34,8 +33,7 @@ class FCache
      *
      * @return FCache
      */
-    public static function getInstance($_cache_type = self::CACHE_TYPE_NULL)
-    {
+    public static function getInstance($_cache_type = self::CACHE_TYPE_NULL) {
         static $ins = null;
 
         if ($ins) {
@@ -50,8 +48,7 @@ class FCache
      * 连接到指定的配置文件
      * @return bool
      */
-    public function connect()
-    {
+    public function connect() {
 
         // 如果 getInstance 中指定了链接
         if ($this->_cache_type == self::CACHE_TYPE_REDIS) {
@@ -81,8 +78,7 @@ class FCache
      * @param int $cache_time
      * @param bool $force
      */
-    public function _set($cache_key, $cache_content, $cache_time = 7200, $force = false)
-    {
+    public function _set($cache_key, $cache_content, $cache_time = 7200, $force = false) {
         $this->_cache_key = $cache_key;
 
         $this->connect();
@@ -106,8 +102,7 @@ class FCache
      *
      * @return null
      */
-    public function _get($cache_key)
-    {
+    public function _get($cache_key) {
         $this->_cache_key = $cache_key;
 
         $this->connect();
@@ -128,8 +123,7 @@ class FCache
         return $ret;
     }
 
-    private function _remove($cache_key)
-    {
+    private function _remove($cache_key) {
         $this->_cache_key = $cache_key;
 
         $this->connect();
@@ -153,8 +147,7 @@ class FCache
     /**
      * 清空 cache
      */
-    public function _flush()
-    {
+    public function _flush() {
         global $_F;
 
         $this->connect();
@@ -171,8 +164,7 @@ class FCache
         }
     }
 
-    public function redisConnect()
-    {
+    public function redisConnect() {
 
         static $redis_server_count = 0;
         static $redis_conn = array();
@@ -202,8 +194,7 @@ class FCache
         return $redis_conn[$server_id];
     }
 
-    public function memcacheConnect()
-    {
+    public function memcacheConnect() {
 
         static $memcache_server_count = 0;
         static $memcache_conn = array();
@@ -246,36 +237,30 @@ class FCache
         return $memcache_conn[$server_id];
     }
 
-    public function fileConnect()
-    {
+    public function fileConnect() {
 
     }
 
-    private function redisSetCache($cache_key, $cache_content, $cache_time = 7200, $force = false)
-    {
+    private function redisSetCache($cache_key, $cache_content, $cache_time = 7200, $force = false) {
         global $_F;
         $this->_redis_conn->set($cache_key, $cache_content, 0, 0, $cache_time);
     }
 
-    private function redisGetCache($cache_key)
-    {
+    private function redisGetCache($cache_key) {
         return $this->_redis_conn->get($cache_key);
     }
 
-    private function redisRemoveCache($cache_key)
-    {
+    private function redisRemoveCache($cache_key) {
         $this->_redis_conn->delete($cache_key);
     }
 
-    private function memcacheGetCache($cache_key)
-    {
+    private function memcacheGetCache($cache_key) {
         global $_F;
 
         return $this->_memcache_conn->get($cache_key);
     }
 
-    private function memcacheSetCache($cache_key, $cache_content, $cache_time = 7200, $force = false)
-    {
+    private function memcacheSetCache($cache_key, $cache_content, $cache_time = 7200, $force = false) {
         global $_F;
         if ($cache_time > 86400 * 30) {
             $cache_time = 86400 * 30;
@@ -283,13 +268,11 @@ class FCache
         $this->_memcache_conn->set($cache_key, $cache_content, MEMCACHE_COMPRESSED, $cache_time);
     }
 
-    private function memcacheRemoveCache($cache_key)
-    {
+    private function memcacheRemoveCache($cache_key) {
         $this->_memcache_conn->delete($cache_key);
     }
 
-    private function fileSetCache($cache_key, $cache_content, $cache_time = 7200, $force = false)
-    {
+    private function fileSetCache($cache_key, $cache_content, $cache_time = 7200, $force = false) {
         global $_F;
 
 //        $cache_key = $_F['domain'] . $cache_key;
@@ -301,14 +284,12 @@ class FCache
         file_put_contents($cache_file, $save_content);
     }
 
-    private function fileRemoveCache($cache_key)
-    {
+    private function fileRemoveCache($cache_key) {
         $cache_file = self::getFileFCachePath($cache_key);
         unlink($cache_file);
     }
 
-    public function fileGetCache($cache_key)
-    {
+    public function fileGetCache($cache_key) {
         $cache_file = self::getFileFCachePath($cache_key);
         $content = json_decode(file_GET_contents($cache_file), true);
 
@@ -328,15 +309,13 @@ class FCache
      * @param int $cache_time 如果用的是memcache，时间最长为30天
      * @param bool $force
      */
-    public static function set($cache_key, $cache_content, $cache_time = 7200, $force = false)
-    {
+    public static function set($cache_key, $cache_content, $cache_time = 7200, $force = false) {
         global $_F;
 
         self::getInstance()->_set($cache_key, $cache_content, $cache_time, $force);
     }
 
-    public static function get($cache_key)
-    {
+    public static function get($cache_key) {
         global $_F;
 
 //        $cache_key = $_F['domain'] . $cache_key;
@@ -344,8 +323,7 @@ class FCache
         return self::getInstance()->_get($cache_key);
     }
 
-    public static function getFileFCachePath($cache_key)
-    {
+    public static function getFileFCachePath($cache_key) {
 
         $cache_dir = self::getCacheDir();
 
@@ -355,12 +333,11 @@ class FCache
         return $cache_file;
     }
 
-    public static function getCacheDir()
-    {
+    public static function getCacheDir() {
         global $_F;
 
-        if (!defined("APP_ROOT")) {
-            throw new Exception("FCache Exception: APP_ROOT not defined.");
+        if (!defined("F_APP_ROOT")) {
+            throw new Exception("FCache Exception: F_APP_ROOT not defined.");
         }
 
         $cache_dir = FConfig::get('global.cache_dir');
@@ -368,7 +345,7 @@ class FCache
         if ($cache_dir) {
             $cache_dir = "{$cache_dir}/" . md5($cache_dir) . '/';
         } else {
-            $cache_dir = APP_ROOT . "data/cache/";
+            $cache_dir = F_APP_ROOT . "data/cache/";
         }
 
         if ($_F['run_in'] == 'shell') {
@@ -380,13 +357,11 @@ class FCache
         return $cache_dir;
     }
 
-    public static function delete($cache_key)
-    {
+    public static function delete($cache_key) {
         self::getInstance()->_remove($cache_key);
     }
 
-    public static function flush()
-    {
+    public static function flush() {
         global $_F;
 
         self::getInstance()->_flush();

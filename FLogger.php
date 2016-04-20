@@ -82,7 +82,7 @@ class FLogger {
         $log_file_size = $log_file_size ? $log_file_size : 1024000;
 
         $file_log_path = FConfig::get('logger.LOG_PATH');
-        $file_log_path = $file_log_path ? $file_log_path : APP_ROOT . 'data/logs/';
+        $file_log_path = $file_log_path ? $file_log_path : F_APP_ROOT . 'data/logs/';
 
 //        $file_log_path = $file_log_path;
 

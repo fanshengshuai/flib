@@ -46,13 +46,13 @@ class FConfig {
 
         $file = F_APP_ROOT . "/config/{$path[0]}.php";
         if ($_F['dev_mode']) {
-            $file_local = APP_ROOT . "config/{$path[0]}.local.php";
+            $file_local = F_APP_ROOT . "config/{$path[0]}.local.php";
 
             if (is_file($file_local)) {
                 $file = $file_local;
             }
         } elseif ($_F['test_mode']) {
-            $file_local = APP_ROOT . "config/{$path[0]}.lan.php";
+            $file_local = F_APP_ROOT . "config/{$path[0]}.lan.php";
 
             if (is_file($file_local)) {
                 $file = $file_local;
@@ -220,13 +220,13 @@ class FConfig {
         $path = explode('.', $key);
         $file = F_APP_ROOT . "/config/{$path[0]}.php";
         if ($_F['dev_mode']) {
-            $file_local = APP_ROOT . "config/{$path[0]}.local.php";
+            $file_local = F_APP_ROOT . "config/{$path[0]}.local.php";
 
             if (is_file($file_local)) {
                 $file = $file_local;
             }
         } elseif ($_F['test_mode']) {
-            $file_local = APP_ROOT . "config/{$path[0]}.lan.php";
+            $file_local = F_APP_ROOT . "config/{$path[0]}.lan.php";
 
             if (is_file($file_local)) {
                 $file = $file_local;

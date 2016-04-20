@@ -65,7 +65,7 @@ class FFile {
 
     public static function unlink($file_path) {
         if (!unlink($file_path)) {
-            file_put_contents(APP_ROOT . "data/ffile_" . date('Y-m-d') . ".log", "{$file_path} unlink failed.\n", FILE_APPEND);
+            file_put_contents(F_APP_ROOT . "data/ffile_" . date('Y-m-d') . ".log", "{$file_path} unlink failed.\n", FILE_APPEND);
         }
     }
 

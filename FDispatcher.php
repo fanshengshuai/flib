@@ -14,10 +14,7 @@ class FDispatcher {
     public static function init() {
         global $_F;
 
-        if (FConfig::get('global.module.status')) {
-            $_F['module'] = FConfig::get('global.module.default');
-        }
-
+        $_F['modules'] = explode(',', str_replace(' ', '', FConfig::get('global.modules')));
         $dispatcher = new FDispatcher;
 
         if (!isset($_F['uri'])) {
@@ -37,24 +34,32 @@ class FDispatcher {
         if (!$c || !$a) {
 
             if ($_F['uri'] == '/' || $_F['uri'] == '' || $_F['uri'] == '/index') {
-
+                if ($_F['modules']) {
+                    $_F['module'] = $app = $_F['modules'][0];
+                }
                 $c = 'index';
-                $a = 'default';
-
+                $a = 'index';
             } else {
 
-                $path_info = explode('/', $_F['uri']);
+                $path_info = explode('/', trim($_F['uri'], '/'));
 
-                if (isset($path_info[3])) {
-                    $_F['module'] = $app = $path_info[1];
-                    $c = $path_info[2];
-                    $a = $path_info[3];
-                } elseif (isset($path_info[2])) {
+                if ($_F['modules']) {
+                    if (in_array($path_info[0], $_F['modules'])) {
+                        $_F['module'] = $app = $path_info[0];
+                    } else {
+                        $_F['module'] = $app = $_F['modules'][0];
+                    }
+                }
+
+                if (isset($path_info[2])) {
                     $c = $path_info[1];
                     $a = $path_info[2];
                 } elseif (isset($path_info[1])) {
-                    $c = $path_info[1];
-                    $a = 'default';
+                    $c = $path_info[0];
+                    $a = $path_info[1];
+                } elseif (isset($path_info[0])) {
+                    $c = $path_info[0];
+                    $a = 'index';
                 }
             }
         }
@@ -83,32 +88,32 @@ class FDispatcher {
         }
         $path_info = explode('/', $_F['uri']);
 
-        if(isset($path_info[1])&&!isset($path_info[2])&&!isset($path_info[3]) && FConfig::get("global.openDiy")) {
+        if (isset($path_info[1]) && !isset($path_info[2]) && !isset($path_info[3]) && FConfig::get("global.openDiy")) {
             $pager_table = new FTable('page');
-            $pager_info = $pager_table -> where("url='".$_F['uri']."'") -> find();
-            if($pager_info){
+            $pager_info = $pager_table->where("url='" . $_F['uri'] . "'")->find();
+            if ($pager_info) {
                 $_F['controller'] = 'Controller_Front_Public';
                 $_F['default'] = $_F['action'];
                 $_F['action'] = 'default';
             }
-        }else{
-        if (!class_exists($_F['controller'])) {
-            if (F_RUN_MODE == 'sync') {
-                return false;
-            }
+        } else {
+            if (!class_exists($_F['controller'])) {
+                if (F_RUN_MODE == 'sync') {
+                    return false;
+                }
 
-            if ($_F['module']) {
-                $c_backup = str_replace(ucfirst($_F['module']) . '_', '', $_F['controller']);
-                if (class_exists($c_backup)) {
-                    $_F['controller'] = $c_backup;
+                if ($_F['module']) {
+                    $c_backup = str_replace(ucfirst($_F['module']) . '_', '', $_F['controller']);
+                    if (class_exists($c_backup)) {
+                        $_F['controller'] = $c_backup;
+                    } else {
+                        throw new Exception("找不到控制器：{$_F['controller']}", 404);
+                    }
                 } else {
                     throw new Exception("找不到控制器：{$_F['controller']}", 404);
                 }
-            } else {
-                throw new Exception("找不到控制器：{$_F['controller']}", 404);
-            }
 
-        }
+            }
         }
 
         $controller = new $_F['controller'];
@@ -131,7 +136,7 @@ class FDispatcher {
             try {
                 $fView = new FView;
                 $fView->disp();
-            }catch (Exception $e) {
+            } catch (Exception $e) {
 
                 throw new Exception("找不到 {$_F['action']}Action ", 404);
             }

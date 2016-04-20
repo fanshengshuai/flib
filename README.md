@@ -15,10 +15,31 @@ Flib (Fast Libraries for PHP) 是一个可以灵活使用和扩充的库。
  * 方法名采用小驼峰式命名法，普通变量一般采用小写，多个单词用下划线线连接，实例一般采用小驼峰式命名法。
  * if while for 等按照 vim 默认缩进。
 
-## DEMO 样例
- * demo 代码位于 demo 目录中
- * 将域名配置到 demo/public 目录
- * 修改 demo/public/index.php，将 flib 框架中的 Flib.php 包含过来。
+## Support composer
+#### add require
+```json
+  "require": {
+    "fanshengshuai/flib": "*"
+  }
+```
+#### add autoload
+```json
+  "autoload": {
+    "files": [
+      "vendor/fanshengshuai/flib/Flib.php"
+    ]
+  },
+```
+#### create index.php, Just OK
+```php
+<?php
+
+require_once "vendor/autoload.php";
+```
+
+
+
+
 
 ## Setup
 ```php

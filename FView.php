@@ -31,24 +31,24 @@ class FView extends Smarty {
 
         if ($_F['module']) {
 
-            $this->cache_dir = APP_ROOT . "data/cache/{$_F['module']}/";
-            $this->compile_dir = APP_ROOT . "data/template/{$_F['module']}/";
-            $this->template_dir = APP_ROOT . "modules/{$_F['module']}/tpl/";
+            $this->cache_dir = F_APP_ROOT . "data/cache/{$_F['module']}/";
+            $this->compile_dir = F_APP_ROOT . "data/template/{$_F['module']}/";
+            $this->template_dir = F_APP_ROOT . "modules/{$_F['module']}/tpl/";
             if (!file_exists($this->template_dir)) {
-                $this->template_dir = APP_ROOT . "modules/{$_F['module']}/templates/";
+                $this->template_dir = F_APP_ROOT . "modules/{$_F['module']}/templates/";
                 if (!file_exists($this->template_dir)) {
-                    $this->template_dir = APP_ROOT . "modules/{$_F['module']}/templates/";
+                    $this->template_dir = F_APP_ROOT . "modules/{$_F['module']}/templates/";
                 }
             }
         } else {
 
-            $this->cache_dir = APP_ROOT . "data/cache";
-            $this->compile_dir = APP_ROOT . 'data/template/';
-            $this->template_dir = APP_ROOT . 'tpl/';
+            $this->cache_dir = F_APP_ROOT . "data/cache";
+            $this->compile_dir = F_APP_ROOT . 'data/template/';
+            $this->template_dir = F_APP_ROOT . 'tpl/';
             if (!file_exists($this->template_dir)) {
-                $this->template_dir = APP_ROOT . "templates/";
+                $this->template_dir = F_APP_ROOT . "templates/";
                 if (!file_exists($this->template_dir)) {
-                    $this->template_dir = APP_ROOT . "template/";
+                    $this->template_dir = F_APP_ROOT . "template/";
                 }
             }
         }
@@ -69,7 +69,7 @@ class FView extends Smarty {
     public function setTemplateDir($template_dir) {
 
         if (!$template_dir) {
-            $template_dir = APP_ROOT . 'template/';
+            $template_dir = F_APP_ROOT . 'template/';
         }
 
         $this->template_dir = $template_dir;

@@ -91,12 +91,12 @@ class FException extends Exception {
 
         header('HTTP/1.1 500 FLib Error');
         header('status: 500 FLib Error');
-        $exception_message = str_replace(APP_ROOT, '', $exception_message);
-        $exception_trace = str_replace(APP_ROOT, '', $exception_trace);
+        $exception_message = str_replace(F_APP_ROOT, '', $exception_message);
+        $exception_trace = str_replace(F_APP_ROOT, '', $exception_trace);
 
         if ($_F[''])
 
-        $this->view->set('exception_message', str_replace(APP_ROOT, '', $exception_message));
+        $this->view->set('exception_message', str_replace(F_APP_ROOT, '', $exception_message));
         $this->view->set('exception_trace', preg_replace('#[\w\d \#]+?/f.php.+?$#si', ' Flib 引导入口', $exception_trace));
 
         $this->view->displaySysPage('exception.tpl');

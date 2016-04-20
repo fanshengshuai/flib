@@ -60,15 +60,15 @@ class Flib {
             $file = str_replace(strtolower($_F['module']) . '/', '', $file);
 
             if (strpos($file, 'controller') !== false) {
-                $inc_file = APP_ROOT . 'modules/' . $_F['module'] . '/' . $file;
+                $inc_file = F_APP_ROOT . 'modules/' . $_F['module'] . '/' . $file;
             } else {
-                $inc_file = APP_ROOT . $file;
+                $inc_file = F_APP_ROOT . $file;
             }
         } else {
-            $inc_file = APP_ROOT . $file;
+            $inc_file = F_APP_ROOT . $file;
         }
 
-        // file_put_contents(APP_ROOT . "data/inc_file.txt", $inc_file . "\n",FILE_APPEND);
+        // file_put_contents(F_APP_ROOT . "data/inc_file.txt", $inc_file . "\n",FILE_APPEND);
         // echo $inc_file . "<hr>";
 
         if (file_exists($inc_file)) {
@@ -77,6 +77,17 @@ class Flib {
             }
 
             return require_once($inc_file);
+        }
+
+        if (strpos($inc_file, 'controllers/')) {
+            $inc_file = str_replace("controllers/", 'c/', $inc_file);
+            if (file_exists($inc_file)) {
+                if ($_F ['debug']) {
+                    $_F ['debug_info'] ['autoload_files'] [] = $inc_file;
+                }
+
+                return require_once($inc_file);
+            }
         }
 
         if (count(spl_autoload_functions()) == 1) {
@@ -137,6 +148,10 @@ class Flib {
     static public function appError($err_no, $err_str, $err_file, $err_line) {
         global $_F;
 
+//        if (error_reporting() === 0) {
+//            return;
+//        }
+
         switch ($err_no) {
             case E_ERROR :
             case E_USER_ERROR :
@@ -179,12 +194,11 @@ class Flib {
         $flib_str = preg_replace('#//.+?$#sim', '', $flib_str);
         $flib_str = preg_replace("#\s{2,}#si", ' ', $flib_str);
 
-        file_put_contents(APP_ROOT . "data/_flib_min.php", "<?php {$flib_str}");
+        file_put_contents(F_APP_ROOT . "data/_flib_min.php", "<?php {$flib_str}");
     }
 
     public static function init() {
         global $_F;
-
 
 
         $_F ['config'] = array();
@@ -195,13 +209,13 @@ class Flib {
             define('FLIB_ROOT', dirname(__FILE__) . '/');
         }
 
-        if (!defined('APP_ROOT')) {
-            if ($_SERVER['PWD'])
-                define('APP_ROOT', $_SERVER['PWD'] . '/');
+        if (!defined('F_APP_ROOT')) {
+            if (isset($_SERVER['PWD']))
+                define('F_APP_ROOT', $_SERVER['PWD'] . '/');
             else
-                define('APP_ROOT', getcwd());
+                define('F_APP_ROOT', getcwd() . '/');
         } else {
-            exit('please define APP_ROOT');
+            exit('please define F_APP_ROOT');
         }
 
         date_default_timezone_set('Asia/Chongqing');
@@ -258,12 +272,13 @@ class Flib {
 
         define('IS_POST', $_F['is_post']);
 
+        !$_F['debug'] && ($_F['debug'] = FConfig::get("global.debug"));
 
         if (FConfig::get('global.flib_compress')) {
-            if (!file_exists(APP_ROOT . "data/_flib_min.php")) {
+            if (!file_exists(F_APP_ROOT . "data/_flib_min.php")) {
                 self::createFlibMin();
             }
-            include_once(APP_ROOT . "data/_flib_min.php");
+            include_once(F_APP_ROOT . "data/_flib_min.php");
         }
 
         $sub_domain_status = FConfig::get('global.sub_domain.status');

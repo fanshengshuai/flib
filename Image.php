@@ -98,7 +98,7 @@ class Image {
         if (!$this->param['watermarkstatus'] || ($this->param['watermarkminwidth'] && $this->img_info['width'] <= $this->param['watermarkminwidth'] && $this->param['watermarkminheight'] && $this->img_info['height'] <= $this->param['watermarkminheight'])) {
             return $this->returncode(0);
         }
-        $this->param['watermarkfile'] = APP_ROOT . '/images/watermark.png';
+        $this->param['watermarkfile'] = F_APP_ROOT . '/images/watermark.png';
         //echo $this->param['watermarkfile'];exit;
         if (!is_readable($this->param['watermarkfile']) || ($this->param['watermarktype'] == 'text' && (!file_exists($this->param['watermarktext']['fontpath']) || !is_file($this->param['watermarktext']['fontpath'])))) {
             return $this->returncode(-3);
