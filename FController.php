@@ -9,7 +9,6 @@
  * $Id: FController.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
 abstract class FController {
-    protected $tpl_engine = 'php';
     protected $view;
 
     protected function showMessage($message, $msgType, $url = null) {
@@ -28,20 +27,12 @@ abstract class FController {
         exit;
     }
 
-    public function setView() {
-        $this->tpl_engine = FConfig::get("global.tpl_engine");
-        !$this->tpl_engine && $this->tpl_engine = "php";
-        if ($this->tpl_engine == 'smarty') {
-            $this->view = new FView;
-        }
-    }
-
     public function indexAction() {
         die('FSS Tips: this is the indexAction, 这是默认的Action，请实现此方法保证显示正确内容');
     }
 
     public function __construct() {
-        $this->setView();
+        $this->view = new FView;
     }
 
     protected function isPost() {
@@ -235,49 +226,11 @@ abstract class FController {
     }
 
     protected function display($tpl = null) {
-        global $_F;
-        if ($this->tpl_engine == 'smarty') {
-            return $this->view->disp($tpl);
-        } elseif ($this->tpl_engine == 'php') {
-            if (!$tpl) {
-                if ($_F['app']) {
-                    $c = str_replace('Controller_' . ucfirst($_F['app']) . '_', '', $_F['controller']);
-                    $c = strtolower($c);
-                    $tpl = "{$_F['app']}/{$c}/{$_F['action']}";
-                } else {
-                    $c = strtolower(str_replace('Controller_', '', $_F['controller']));
-                    $c = str_replace($_F['module'] . '_', '', $c);
-                    $a = $_F['action'];
-                    $tpl = "{$c}/{$a}";
-                }
-
-                $tpl .= ".tpl.php";
-            }
-
-            extract($_F['var']);
-
-            if ($_F['module']) {
-                return include(F_APP_ROOT . 'tpl/' . $tpl);
-            } else {
-                $tpl_file = F_APP_ROOT . 'tpl/' . $tpl;
-                if (file_exists($tpl_file))
-                    return include($tpl_file);
-                else
-                    throw new Exception("模版文件[" . 'tpl/' . $tpl . "]不存在!");
-            }
-
-        } else {
-            return false;
-        }
+        $this->view->display($tpl);
     }
 
-    protected function assign($key, $value) {
-        global $_F;
-        if ($this->tpl_engine == 'smarty') {
-            $this->view->set($key, $value);
-        } elseif ($this->tpl_engine == 'php') {
-            $_F['var'][$key] = $value;
-        }
+    protected function assign($var, $value) {
+        $this->view->assign($var, $value);
     }
 
     protected function ajaxReturn($mix) {

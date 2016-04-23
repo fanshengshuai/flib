@@ -70,15 +70,15 @@ class FFile {
     }
 
     /**
-     * @param $file_path 文件地址
-     * @param $content 文件内容
+     * @param $file_path string 文件地址
+     * @param $content string 文件内容
+     * @return bool|int
      */
     public static function save($file_path, $content) {
         $ret = true;
 
         $path_info = pathinfo($file_path);
 
-//        var_dump($path_info);
         if (!file_exists($path_info['dirname'])) {
             $ret = self::mkdir($path_info['dirname']);
         }
