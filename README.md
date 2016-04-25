@@ -22,14 +22,7 @@ Flib (Fast Libraries for PHP) 是一个可以灵活使用和扩充的库。
     "fanshengshuai/flib": "*"
   }
 ```
-#### add autoload
-```json
-  "autoload": {
-    "files": [
-      "vendor/fanshengshuai/flib/Flib.php"
-    ]
-  },
-```
+
 #### create index.php, Just OK
 ```php
 <?php
