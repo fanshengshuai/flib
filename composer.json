@@ -10,7 +10,7 @@
   "type": "lib",
   "autoload": {
     "files": [
-      "Flib.php"
+      "src/Flib.php"
     ]
   },
   "scripts": {
