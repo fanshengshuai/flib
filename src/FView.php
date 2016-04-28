@@ -21,13 +21,13 @@ class FView {
         $this->tpl_engine = FConfig::get("global.tpl_engine");
         !$this->tpl_engine && $this->tpl_engine = "php";
         if ($this->tpl_engine == 'tiny') {
-            require FLIB_ROOT . 'tplEngine/tiny.php';
+            require_once FLIB_ROOT . 'tplEngine/tiny.php';
             $this->engine = new FView_Tiny;
         } elseif ($this->tpl_engine == 'smarty') {
-            require FLIB_ROOT . 'tplEngine/smarty.php';
+            require_once FLIB_ROOT . 'tplEngine/smarty.php';
             $this->engine = new FView_Smarty;
         } else {
-            require FLIB_ROOT . 'tplEngine/orig.php';
+            require_once FLIB_ROOT . 'tplEngine/orig.php';
             $this->engine = new FView_Orig;
         }
     }
