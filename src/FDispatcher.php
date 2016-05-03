@@ -135,9 +135,8 @@ class FDispatcher {
         } else {
             try {
                 $fView = new FView;
-                $fView->disp();
+                $fView->display();
             } catch (Exception $e) {
-
                 throw new Exception("找不到 {$_F['action']}Action ", 404);
             }
         }

@@ -108,8 +108,7 @@ class FView {
         return $tpl;
     }
 
-    public
-    function load($tpl) {
+    public function load($tpl) {
         global $_F;
 
 
@@ -137,8 +136,7 @@ class FView {
         return $contents;
     }
 
-    public
-    function getDebugInfo() {
+    public function getDebugInfo() {
         global $_F;
 
         unset($_F['db']);
