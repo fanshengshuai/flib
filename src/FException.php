@@ -96,8 +96,8 @@ class FException extends Exception {
 
         if ($_F[''])
 
-        $this->view->set('exception_message', str_replace(F_APP_ROOT, '', $exception_message));
-        $this->view->set('exception_trace', preg_replace('#[\w\d \#]+?/f.php.+?$#si', ' Flib 引导入口', $exception_trace));
+        $this->view->assign('exception_message', str_replace(F_APP_ROOT, '', $exception_message));
+        $this->view->assign('exception_trace', preg_replace('#[\w\d \#]+?/f.php.+?$#si', ' Flib 引导入口', $exception_trace));
 
         $this->view->displaySysPage('exception.tpl');
     }

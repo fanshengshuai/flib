@@ -105,9 +105,9 @@ class FTemplate {
         $compiled_content = $this->parse($content);
 
         $header_comment = "Create On##" . time() . "|Compiled from##" . $this->template_path . $this->template_name;
-        $str = "<? if(!defined('FLIB')) exit('Access Denied'); ";
+        $str = "<? if(!defined('FLIB')) exit('Access Denied'); global \$_F; ";
         if (!$isSubTpl) {
-            $str .= "\$tpl_file_mtime = " . filemtime($tpl_file) . ";";
+            $str .= "\$tpl_file_mtime = " . intval(filemtime($tpl_file)) . ";";
         }
 
         $str .= "/*{$header_comment}*/ ?>$compiled_content";

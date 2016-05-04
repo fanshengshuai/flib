@@ -73,7 +73,7 @@ class FView {
             $this->template_dir = FLIB_ROOT . 'View / ';
             $this->left_delimiter = "{";
             $this->right_delimiter = "}";
-            $content = $this->fetch($tpl);
+            $content = $this->engine->fetch($tpl);
         }
 
         if ($_F['debug'] && !$_F['in_ajax']) {
