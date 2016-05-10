@@ -37,7 +37,7 @@ class FLogger {
 
     public function __construct($log_type = null) {
 
-        $this->logType= $log_type;
+        $this->logType = $log_type;
     }
 
     /**
@@ -60,12 +60,9 @@ class FLogger {
      * @access   public
      * +----------------------------------------------------------
      *
-     * @param string     $message 日志信息
-     * @param int|string $type    日志记录方式
-     * @param string     $level   日志级别
-     *
-     * @internal param string $destination 写入目标
-     * @internal param string $extra 额外参数
+     * @param string $message 日志信息
+     * @param int|string $type 日志记录方式
+     * @param string $level 日志级别
      *
      * @return void
      */
@@ -93,7 +90,8 @@ class FLogger {
         }
 
         if ($type) {
-            $file_log_path .= "{$type}/"; }
+            $file_log_path .= "{$type}/";
+        }
 
         $file_log_path .= date('Y-m-d') . '.log';
 
@@ -105,7 +103,7 @@ class FLogger {
         $write_content = "{$now}\t{$level}";
 
         if ($_SERVER['REQUEST_URI']) {
-            $write_content .= "\tURL:http:/"."/{$_F['http_host']}{$_F['uri']}\t" . ($_F['refer'] ? "REFER:{$_F['refer']}":'');
+            $write_content .= "\tURL:http:/" . "/{$_F['http_host']}{$_F['uri']}\t" . ($_F['refer'] ? "REFER:{$_F['refer']}" : '');
 //        } else {
 //            $write_content .= "\t{$_F['run_in']}\t{$_F['module']}";
         }

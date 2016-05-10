@@ -76,8 +76,14 @@ class FTemplate {
      *  例如你的域名是 http://xxx/admin/index, 那么正确路径就是tpl/admin/index/error_file.html
      */
     public function display($tpl) {
-        $tpl_file = $this->conf['tpl_path_root'] . $tpl . ".tpl.php";
-        $compiled_file = F_APP_ROOT . $this->template_c . $tpl . ".tpl.php";
+
+        if ($tpl[0] == '/') {
+            $tpl_file = $tpl;
+            $compiled_file = F_APP_ROOT.$this->template_c . 'o/' . md5($tpl) . ".tpl.php";
+        } else {
+            $tpl_file = $this->conf['tpl_path_root'] . $tpl . ".tpl.php";
+            $compiled_file = F_APP_ROOT . $this->template_c . $tpl . ".tpl.php";
+        }
 
         if ($this->debug) {
             $this->compile($tpl_file, $compiled_file);

@@ -11,6 +11,8 @@
  */
 class FException extends Exception {
 
+    protected $view;
+
     public function __construct() {
         $this->view = new FView;
     }
@@ -21,6 +23,7 @@ class FException extends Exception {
     public function traceError($e) {
         global $_F;
 
+        $error_code = 0;
 
         if (!is_array($e)) {
             $error_code = $e->getCode();
@@ -67,7 +70,6 @@ class FException extends Exception {
             if ($error_code == 404) {
                 FResponse::sendStatusHeader(404);
                 $this->view->displaySysPage('404.tpl');
-//                echo "<strong>404 NOT FOUND</strong>";
             } else {
                 FResponse::sendStatusHeader(500);
                 $this->view->displaySysPage('500.tpl');
@@ -89,8 +91,8 @@ class FException extends Exception {
             }
         }
 
-        header('HTTP/1.1 500 FLib Error');
-        header('status: 500 FLib Error');
+//        header('HTTP/1.1 500 FLib Error');
+//        header('status: 500 FLib Error');
         $exception_message = str_replace(F_APP_ROOT, '', $exception_message);
         $exception_trace = str_replace(F_APP_ROOT, '', $exception_trace);
 

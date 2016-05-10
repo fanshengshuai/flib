@@ -70,17 +70,15 @@ class FView {
             echo $content;
             exit;
         } else {
-            $this->template_dir = FLIB_ROOT . 'View / ';
-            $this->left_delimiter = "{";
-            $this->right_delimiter = "}";
-            $content = $this->engine->fetch($tpl);
+//            ob_clean();
+            $this->engine->display(FLIB_ROOT . 'View/' . $tpl);
+//            $content = ob_get_clean();
         }
 
         if ($_F['debug'] && !$_F['in_ajax']) {
-            $content .= $this->getDebugInfo();
+            echo $this->getDebugInfo();
         }
 
-        echo $content;
         exit;
     }
 
@@ -114,10 +112,12 @@ class FView {
 
         $tpl = $this->getDefaultTpl($tpl);
 
-        $this->set('_F', $_F);
+        $this->assign('_F', $_F);
 
         $view_compress = FConfig::get('global.output_compress');
-        $contents = $this->fetch($tpl);
+        ob_clean();
+        $this->display($tpl);
+        $contents = ob_get_clean();
 
         if ($view_compress) {
             // 会有 http:// 这样的都替换没了
@@ -216,8 +216,4 @@ class FView {
 
         return "<div class=\"debug_info clearfix\">" . $debug_contents . "</div>";
     }
-
-//    public function setMsgTpl($msg_tpl) {
-//        $this->msg_tpl = $msg_tpl;
-//    }
 }
