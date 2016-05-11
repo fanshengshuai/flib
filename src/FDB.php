@@ -108,21 +108,21 @@ class FDB {
     public function close($dsn = null) {
 
         if ($dsn) {
-            self::$_connects[$dsn] = NULL;
+            self::$_connects[$dsn] = null;
         } else {
-            $this->_dbh = NULL;
+            $this->_dbh = null;
         }
     }
 
 
-    public static function query($sql, $db_conf='w') {
+    public static function query($sql, $db_conf = 'w') {
         global $_F;
 
         $_dbh = self::connect($db_conf);
         return $_dbh->exec($sql);
     }
 
-    public static function fetch($sql, $db_conf='r') {
+    public static function fetch($sql, $db_conf = 'r') {
         global $_F;
 
         $_dbh = self::connect($db_conf);
@@ -135,7 +135,7 @@ class FDB {
             $stmt = $_dbh->prepare($sql);
             $stmt->execute();
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $_F['current_sql'] = $sql;
             throw $e;
         }
@@ -155,7 +155,18 @@ class FDB {
         return $cache_content;
     }
 
-    public static function fetchFirst($sql, $db_conf='r') {
+    public static function fetchRow($sql, $db_conf = 'r') {
+        return self::fetchFirst($sql, $db_conf);
+    }
+
+    /**
+     * @deprecated use fetchRow
+     * @param $sql
+     * @param string $db_conf
+     * @return mixed
+     * @throws Exception
+     */
+    public static function fetchFirst($sql, $db_conf = 'r') {
         global $_F;
 
         if ($_F['debug']) {
@@ -190,7 +201,7 @@ class FDB {
      *
      * @return bool
      */
-    public static function insert($table, $data, $db_conf='') {
+    public static function insert($table, $data, $db_conf = '') {
 
         if ($db_conf) {
             $table = new FTable($table, '', $db_conf);
@@ -210,7 +221,7 @@ class FDB {
      * @throws Exception
      * @return bool
      */
-    public static function update($table, $data, $condition, $db_conf='') {
+    public static function update($table, $data, $condition, $db_conf = '') {
         global $_F;
 
         if (!$condition) {
@@ -244,7 +255,7 @@ class FDB {
      * @throws Exception
      * @return bool
      */
-    public static function remove($table, $condition, $is_real_delete = false, $db_conf='') {
+    public static function remove($table, $condition, $is_real_delete = false, $db_conf = '') {
 
         if (!$condition) {
             throw new Exception("FDB remove need condition. Remove is a very dangerous operation.");
@@ -268,7 +279,7 @@ class FDB {
      * @param null $conditions
      * @param int $unit
      */
-    public static function incr($table, $field, $conditions = null, $unit = 1, $db_conf='') {
+    public static function incr($table, $field, $conditions = null, $unit = 1, $db_conf = '') {
         if ($db_conf) {
             $table = new FTable($table, '', $db_conf);
         } else {
@@ -288,7 +299,7 @@ class FDB {
      * @throws Exception
      * @internal param array $params
      */
-    public static function decr($table, $field, $conditions = null, $unit = 1, $db_conf='') {
+    public static function decr($table, $field, $conditions = null, $unit = 1, $db_conf = '') {
         if ($db_conf) {
             $table = new FTable($table, '', $db_conf);
         } else {
@@ -305,7 +316,7 @@ class FDB {
      *
      * @return int
      */
-    public static function count($table, $conditions = null, $db_conf='') {
+    public static function count($table, $conditions = null, $db_conf = '') {
         if ($db_conf) {
             $table = new FTable($table, '', $db_conf);
         } else {
