@@ -56,7 +56,7 @@ class Flib {
         $file = join('/', $class_explode);
 
         // 查是不是 App 的 class
-        if ($_F['module']) {
+        if (isset($_F['module'])) {
             $file = str_replace(strtolower($_F['module']) . '/', '', $file);
 
             if (strpos($file, 'controller') !== false) {
@@ -200,6 +200,8 @@ class Flib {
     public static function init() {
         global $_F;
 
+        self::initEnv();
+
 
         $_F ['config'] = array();
         header("Content-type: text/html; charset=utf-8");
@@ -217,12 +219,6 @@ class Flib {
         } else {
             exit('please define F_APP_ROOT');
         }
-
-        date_default_timezone_set('Asia/Chongqing');
-        ini_set("error_reporting", E_ALL & ~E_NOTICE);
-
-
-        if (phpversion() < '5.3.0') set_magic_quotes_runtime(0);
 
         define('CURRENT_TIMESTAMP', time());
         define('CURRENT_DATE_TIME', date('Y-m-d H:i:s'));
@@ -306,6 +302,15 @@ class Flib {
 
     }
 
+    private static function initEnv() {
+        date_default_timezone_set('Asia/Chongqing');
+        ini_set("error_reporting", E_ALL & ~E_NOTICE);
+
+        if (phpversion() < '5.3.0') set_magic_quotes_runtime(0);
+
+        !ob_get_status() && ob_start();
+    }
+
     public static function resetAll() {
         global $_F;
 
@@ -318,6 +323,8 @@ class Flib {
         restore_error_handler();
         restore_exception_handler();
     }
+
+
 }
 
 define('FLIB', 1);

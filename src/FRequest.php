@@ -20,6 +20,15 @@ class FRequest {
     }
 
     /**
+     * 是否为ajax
+     * @return bool
+     */
+    public static function isAjax() {
+        global $_F;
+        return $_F['in_ajax'];
+    }
+
+    /**
      * @param null $key
      *
      * @return mixed
@@ -149,9 +158,9 @@ class FRequest {
      * @return mixed
      */
     public static function getClientIP($type = 0) {
-        static $ip = NULL;
+        static $ip = null;
 
-        if ($ip !== NULL) return $ip[$type];
+        if ($ip !== null) return $ip[$type];
 
         if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $arr = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
@@ -346,68 +355,68 @@ class FRequest {
         return $is_mobile;
     }
 
-    /** 
-     * 判断是否为搜索引擎蜘蛛 
-     * 
+    /**
+     * 判断是否为搜索引擎蜘蛛
+     *
      * @author Crazy Snail
-     * @return bool 
-     */ 
-    function isCrawler() { 
+     * @return bool
+     */
+    function isCrawler() {
 
-      $agent= strtolower($_SERVER['HTTP_USER_AGENT']); 
-      if (!empty($agent)) { 
-	$spiderSite= array( 
-			   "TencentTraveler", 
-			   "Baiduspider+", 
-			   "BaiduGame", 
-			   "Googlebot", 
-			   "msnbot", 
-			   "Sosospider+", 
-			   "Sogou web spider", 
-			   "ia_archiver", 
-			   "Yahoo! Slurp", 
-			   "YoudaoBot", 
-			   "Yahoo Slurp", 
-			   "MSNBot", 
-			   "Java (Often spam bot)", 
-			   "BaiDuSpider", 
-			   "Voila", 
-			   "Yandex bot", 
-			   "BSpider", 
-			   "twiceler", 
-			   "Sogou Spider", 
-			   "Speedy Spider", 
-			   "Google AdSense", 
-			   "Heritrix", 
-			   "Python-urllib", 
-			   "Alexa (IA Archiver)", 
-			   "Ask", 
-			   "Exabot", 
-			   "Custo", 
-			   "OutfoxBot/YodaoBot", 
-			   "yacy", 
-			   "SurveyBot", 
-			   "legs", 
-			   "lwp-trivial", 
-			   "Nutch", 
-			   "StackRambler", 
-			   "The web archive (IA Archiver)", 
-			   "Perl tool", 
-			   "MJ12bot", 
-			   "Netcraft", 
-			   "MSIECrawler", 
-			   "WGet tools", 
-			   "larbin", 
-			   "Fish search", 
-			    ); 
-	foreach($spiderSite as $val) { 
-	  $str = strtolower($val); 
-	  if (strpos($agent, $str) !== false) { 
-	    return true; 
-	  } 
-	} 
-      } else { 
-	return false; 
-      } 
-    } 
+        $agent = strtolower($_SERVER['HTTP_USER_AGENT']);
+        if (!empty($agent)) {
+            $spiderSite = array(
+                "TencentTraveler",
+                "Baiduspider+",
+                "BaiduGame",
+                "Googlebot",
+                "msnbot",
+                "Sosospider+",
+                "Sogou web spider",
+                "ia_archiver",
+                "Yahoo! Slurp",
+                "YoudaoBot",
+                "Yahoo Slurp",
+                "MSNBot",
+                "Java (Often spam bot)",
+                "BaiDuSpider",
+                "Voila",
+                "Yandex bot",
+                "BSpider",
+                "twiceler",
+                "Sogou Spider",
+                "Speedy Spider",
+                "Google AdSense",
+                "Heritrix",
+                "Python-urllib",
+                "Alexa (IA Archiver)",
+                "Ask",
+                "Exabot",
+                "Custo",
+                "OutfoxBot/YodaoBot",
+                "yacy",
+                "SurveyBot",
+                "legs",
+                "lwp-trivial",
+                "Nutch",
+                "StackRambler",
+                "The web archive (IA Archiver)",
+                "Perl tool",
+                "MJ12bot",
+                "Netcraft",
+                "MSIECrawler",
+                "WGet tools",
+                "larbin",
+                "Fish search",
+            );
+            foreach ($spiderSite as $val) {
+                $str = strtolower($val);
+                if (strpos($agent, $str) !== false) {
+                    return true;
+                }
+            }
+        } else {
+            return false;
+        }
+    }
 } 

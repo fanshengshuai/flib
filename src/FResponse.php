@@ -69,10 +69,10 @@ class FResponse {
     /**
      * 输出内容，可以是数组，可以是文本
      *
-     * @param $mix
-     * @return bool
+     * @param array | string $mix 输出内容
+     * @param bool $exit 是否结束程序
      */
-    public static function output($mix) {
+    public static function output($mix, $exit = true) {
         global $_F;
 
         $response = new self;
@@ -89,7 +89,7 @@ class FResponse {
             $response->write($mix);
         }
 
-        exit;
+        $exit && exit;
     }
 
     public static function sendHeader($headerKey, $headerValue = null) {
