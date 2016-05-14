@@ -46,7 +46,7 @@ class FException extends Exception {
 
         $log_text = "\n--------------------------------------------------------\n";
 
-        if ($_F['current_sql']) {
+        if (isset($_F['current_sql'])) {
             $log_text .= "SQL: " . $_F['current_sql'] . "\n";
             $log_text .= "--------------------------------------------------------\n";
         }

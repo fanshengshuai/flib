@@ -73,7 +73,6 @@ class FConfig {
          */
 
 
-
         $config =& FConfig::getInstance();
         $value = $config->_GET($key);
         if (!$value) {
@@ -122,7 +121,7 @@ class FConfig {
      */
     protected function _GET($key) {
 
-        if ($this->_values[$key]) {
+        if (isset($this->_values[$key])) {
             return $this->_values[$key];
         }
 
@@ -131,7 +130,7 @@ class FConfig {
         FConfig::set($key, $value);
 
         // 对于全局配置
-        if ($this->_values['global.' . $key]) {
+        if (isset($this->_values['global.' . $key])) {
             return $this->_values['global.' . $key];
         }
 
@@ -149,7 +148,7 @@ class FConfig {
      */
     protected function _match($key) {
 
-        if ($this->_values[$key]) {
+        if (isset($this->_values[$key])) {
             return $this->_values[$key];
         }
 
@@ -164,7 +163,7 @@ class FConfig {
             array_unshift($leave, $part);
 
             $pattern = join('.', $parts);
-            $array = $this->_values[$pattern];
+            $array = isset($this->_values[$pattern]) ? $this->_values[$pattern] : null;
             if ($array) {
                 break;
             }

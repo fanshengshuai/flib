@@ -85,7 +85,7 @@ class FLogger {
 
         if ($_F['run_in'] == 'shell') {
             $file_log_path .= $_F['run_in'] . '/';
-        } elseif ($_F['module']) {
+        } elseif (isset($_F['module'])) {
             $file_log_path .= $_F['module'] . '/';
         }
 

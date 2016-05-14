@@ -8,7 +8,17 @@ class FView_Orig {
 
     public function display($tpl) {
         global $_F;
-        extract($_F['var']);
-        include(F_APP_ROOT . 'tpl/' . $tpl . ".tpl.php");
+        if (isset($_F['var'])) extract($_F['var']);
+
+        if ($tpl[0] == '/') {
+            include($tpl);
+            exit;
+        } else
+            $tplFile = F_APP_ROOT . 'tpl/' . $tpl;
+
+        if (file_exists($tplFile)) include($tplFile);
+        elseif (file_exists($tplFile . ".tpl.php")) include($tplFile . ".tpl.php");
+        else echo("模版文件不存在!" . $tpl . ".tpl.php");
+        exit;
     }
 }
