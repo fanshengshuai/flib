@@ -14,7 +14,10 @@ class FDispatcher {
     public static function init() {
         global $_F;
 
-        $_F['modules'] = explode(',', str_replace(' ', '', FConfig::get('global.modules')));
+        $configModule = FConfig::get('global.modules');
+        if ($configModule)
+            $_F['modules'] = explode(',', str_replace(' ', '', FConfig::get('global.modules')));
+
         $dispatcher = new FDispatcher;
 
         if (!isset($_F['uri'])) {
