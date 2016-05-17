@@ -77,9 +77,14 @@ class FException extends Exception {
             exit;
         }
 
+
+        $exception_message = str_replace(F_APP_ROOT, '', $exception_message);
+
         if ($_F['in_ajax']) {
             if ($_F['debug']) {
-                FResponse::output(array('result' => 'exception', 'content' => preg_replace('/<br.+?>/i', "\n", $exception_message)));
+                $ajaxError = preg_replace('/<br.+?>/i', "\n", $exception_message);
+
+                FResponse::output(array('result' => 'error', 'msg' => $ajaxError));
                 exit;
             } else {
                 if ($error_code == 404) {
@@ -91,14 +96,8 @@ class FException extends Exception {
             }
         }
 
-//        header('HTTP/1.1 500 FLib Error');
-//        header('status: 500 FLib Error');
-        $exception_message = str_replace(F_APP_ROOT, '', $exception_message);
         $exception_trace = str_replace(F_APP_ROOT, '', $exception_trace);
-
-        if ($_F[''])
-
-        $this->view->assign('exception_message', str_replace(F_APP_ROOT, '', $exception_message));
+        $this->view->assign('exception_message', $exception_message);
         $this->view->assign('exception_trace', preg_replace('#[\w\d \#]+?/f.php.+?$#si', ' Flib 引导入口', $exception_trace));
 
         $this->view->displaySysPage('exception.tpl');
