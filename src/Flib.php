@@ -217,7 +217,7 @@ class Flib {
             else
                 define('F_APP_ROOT', getcwd() . '/');
         } else {
-            exit('please define F_APP_ROOT');
+            //exit('please define F_APP_ROOT');
         }
 
         define('CURRENT_TIMESTAMP', time());
