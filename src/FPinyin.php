@@ -6,7 +6,6 @@
 class FPinyin {
 
     public static function getPinyin($string) {
-        $string = preg_replace('#^([0-9]+)#', '', $string);
         $pinyin = new self;
         return $pinyin->_getPinyin($string, 'utf8');
     }
@@ -78,10 +77,9 @@ class FPinyin {
                 $q = ord(substr($string, ++$i, 1));
                 $asc = $asc * 256 + $q - 65536;
             }
-
-            $res .= ucfirst($this->asc2Pinyin($asc, $data));
+            $res .= $this->asc2Pinyin($asc, $data);
         }
-        return preg_replace("/[^a-zA-Z0-9]*/", '', $res);
+        return preg_replace("/[^a-z0-9]*/", '', $res);
     }
 
     /**

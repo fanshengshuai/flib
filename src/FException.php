@@ -24,6 +24,7 @@ class FException extends Exception {
         global $_F;
 
         $error_code = 0;
+        $exception_trace = '';
 
         if (!is_array($e)) {
             $error_code = $e->getCode();
@@ -95,8 +96,6 @@ class FException extends Exception {
 //        header('status: 500 FLib Error');
         $exception_message = str_replace(F_APP_ROOT, '', $exception_message);
         $exception_trace = str_replace(F_APP_ROOT, '', $exception_trace);
-
-        if ($_F[''])
 
         $this->view->assign('exception_message', str_replace(F_APP_ROOT, '', $exception_message));
         $this->view->assign('exception_trace', preg_replace('#[\w\d \#]+?/f.php.+?$#si', ' Flib 引导入口', $exception_trace));

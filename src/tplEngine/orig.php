@@ -10,7 +10,7 @@ class FView_Orig {
         global $_F;
         if (isset($_F['var'])) extract($_F['var']);
 
-        if ($tpl[0] == '/') {
+        if ($tpl[0] == '/' || $tpl[1] == ':') {
             include($tpl);
             exit;
         } else

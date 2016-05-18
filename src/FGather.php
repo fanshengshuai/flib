@@ -1,6 +1,6 @@
 <?php
 
-class Gather {
+class FGather {
     public static function getSubStr($contents, $from, $end = '') {
 
         $from_pos = strpos($contents, $from);

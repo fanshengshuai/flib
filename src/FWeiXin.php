@@ -1,6 +1,6 @@
 <?php
 
-class WeiXin {
+class FWeiXin {
     public static function create_native_url($productid) {
 
         $nativeObj["appid"] = WX_APP_ID;

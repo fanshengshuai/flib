@@ -24,12 +24,12 @@
     <div style="padding:20px;">您可以选择 [ <a href="javascript:location.reload();">重试</a> ] [ <a href="javascript:history.back()">返回</a> ] 或者 [ <a href="/">回到首页</a> ]</div>
     <p class="title">[ 错误信息 ]</p>
 
-    {if $exception_message}
-    <p class="message"> {$exception_message}</p>
-    {/if}
-    {if $exception_trace}
-        <p id="trace" class="message"> {$exception_trace}</p>
-    {/if}
+    <?php if ($exception_message): ?>
+    <p class="message"><?php echo $exception_message; ?></p>
+    <?php endif; ?>
+    <?php if ( $exception_trace): ?>
+        <p id="trace" class="message"><?php echo $exception_trace; ?></p>
+    <?php endif; ?>
 </div>
 <div style="padding:20px;">Power by <a target="_blank" href="https://github.com/fanshengshuai/flib">flib</a>. <a href="http://www.kuboluo.com">fanshengshuai@gmail.com</a></div>
 </body>

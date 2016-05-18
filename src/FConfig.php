@@ -218,13 +218,13 @@ class FConfig {
 
         $path = explode('.', $key);
         $file = F_APP_ROOT . "/config/{$path[0]}.php";
-        if ($_F['dev_mode']) {
+        if (isset($_F['dev_mode']) && $_F['dev_mode']) {
             $file_local = F_APP_ROOT . "config/{$path[0]}.local.php";
 
             if (is_file($file_local)) {
                 $file = $file_local;
             }
-        } elseif ($_F['test_mode']) {
+        } elseif (isset($_F['test_mode']) && $_F['test_mode']) {
             $file_local = F_APP_ROOT . "config/{$path[0]}.lan.php";
 
             if (is_file($file_local)) {
