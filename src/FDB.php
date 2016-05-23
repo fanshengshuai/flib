@@ -34,7 +34,7 @@ class FDB {
         if ($rw_type == 'w') {
             $curConfig = $gConfig['server'][array_rand($gConfig['server'])];
         } elseif ($rw_type == 'r' || $rw_type == 'rw') {
-            if ($gConfig['server_read'] && count($gConfig['server_read']) > 0) {
+            if (isset($gConfig['server_read']) && count($gConfig['server_read']) > 0) {
                 $curConfig = $gConfig['server_read'][array_rand($gConfig['server_read'])];
             } else {
                 $curConfig = $gConfig['server'][array_rand($gConfig['server'])];

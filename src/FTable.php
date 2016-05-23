@@ -67,7 +67,18 @@ class FTable {
     /**
      * @var array
      */
-    protected $options = array();
+    private $db_conf;
+
+    /**
+     * @var array
+     */
+    protected $options = array(
+        'group_by' => null,
+        'fields' => null,
+        'order_by' => null,
+        'useCache' => null,
+        'page' => null,
+        );
 
     /**
      * 分页配置项
