@@ -78,7 +78,10 @@ class FTable {
         'order_by' => null,
         'useCache' => null,
         'page' => null,
-        );
+        'where' => null,
+        'limit' => null,
+        'params' => null,
+    );
 
     /**
      * 分页配置项
