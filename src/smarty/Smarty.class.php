@@ -377,7 +377,8 @@ class Smarty extends Smarty_Internal_Data {
      * @param object $parent next higher level of Smarty variables
      */
     public function display($template, $cache_id = null, $compile_id = null, $parent = null)
-    { 
+    {
+
         // display template
         $this->fetch ($template, $cache_id, $compile_id, $parent, true);
     } 

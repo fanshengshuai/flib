@@ -134,7 +134,7 @@ class FView {
         return $contents;
     }
 
-    public function getDebugInfo() {
+    public static function getDebugInfo() {
         global $_F;
 
         unset($_F['db']);

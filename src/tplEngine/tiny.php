@@ -22,5 +22,9 @@ class FView_Tiny {
         global $_F;
 
         $this->tpl_parser->display($tpl);
+
+        if ($_F['debug'] && !$_F['in_ajax']) {
+            echo FView::getDebugInfo();
+        }
     }
 }
