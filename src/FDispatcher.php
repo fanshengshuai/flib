@@ -70,9 +70,9 @@ class FDispatcher {
         if (!empty($_F['app'])) {
             $_F['controller'] = 'Controller_' . ucfirst($_F['app']) . '_' . ucfirst($c);
         } elseif ($_F['module']) {
-            $_F['controller'] = 'Controller_' . ucfirst($_F['module']) . '_' . ucfirst($c);
+            $_F['controller'] = ucfirst($_F['module']) . ucfirst($c) . 'Ctrl';
         } else {
-            $_F['controller'] = 'Controller_' . ucfirst($c);
+            $_F['controller'] = ucfirst($c) . 'Ctrl';
         }
 
         $_F['action'] = $a;

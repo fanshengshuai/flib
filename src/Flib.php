@@ -42,8 +42,8 @@ class Flib {
 
         // 检查项目文件
         $className = str_replace(
-            array('Service/', 'DAO/', 'Controller/'),
-            array('services/', 'dao/', 'controllers/'),
+            array('Service/', 'DAO/'),
+            array('services/', 'dao/'),
             $class_path);
 
         $class_explode = explode('/', $className);
@@ -55,21 +55,13 @@ class Flib {
         }
         $file = join('/', $class_explode);
 
-        // 查是不是 App 的 class
-        if (isset($_F['module'])) {
-            $file = str_replace(strtolower($_F['module']) . '/', '', $file);
-
-            if (strpos($file, 'controller') !== false) {
-                $inc_file = F_APP_ROOT . 'modules/' . $_F['module'] . '/' . $file;
-            } else {
-                $inc_file = F_APP_ROOT . $file;
-            }
+        if (strpos($file, 'Ctrl.') !== false) {
+            $inc_file = F_APP_ROOT . (isset($_F['module']) ? 'modules/' . $_F['module'] : 'c') . '/' . substr($file, strlen($_F['module']));
         } else {
             $inc_file = F_APP_ROOT . $file;
         }
 
-        // file_put_contents(F_APP_ROOT . "data/inc_file.txt", $inc_file . "\n",FILE_APPEND);
-        // echo $inc_file . "<hr>";
+//        echo $inc_file;
 
         if (file_exists($inc_file)) {
             if ($_F ['debug']) {
