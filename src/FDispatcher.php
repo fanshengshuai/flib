@@ -181,19 +181,19 @@ class FDispatcher {
             return true;
         } else {
 
-            foreach ($router as $key => $item) {
+            foreach ($router as $key => $configRow) {
                 if (strpos($key, '(') === false) {
                     continue;
                 }
 
                 if (preg_match("#^{$key}$#i", $_F['uri'], $res)) {
 
-                    if ($router[$uri]['url']) {
-                        redirect($router[$uri]['url']);
+                    if ($configRow['url']) {
+                        redirect($configRow['url']);
                     }
 
-                    if ($router[$uri]['module']) {
-                        $_F['module'] = $router[$uri]['module'];
+                    if ($configRow['module']) {
+                        $_F['module'] = $configRow['module'];
                     }
 
                     $c = $router[$key]['controller'];
