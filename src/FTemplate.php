@@ -77,7 +77,7 @@ class FTemplate {
      */
     public function display($tpl) {
 
-        if ($tpl[0] == '/') {
+        if ($tpl[0] == '/' || $tpl[1] == ':') {
             $tpl_file = $tpl;
             $compiled_file = F_APP_ROOT.$this->template_c . 'o/' . md5($tpl) . ".tpl.php";
         } else {
