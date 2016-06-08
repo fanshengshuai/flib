@@ -1,11 +1,11 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html>
 <head>
     <title>系统发生错误</title>
     <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
-    <meta name="Generator" content="EditPlus"/>
-    <style>
-        body { font-family: 'Microsoft Yahei', Verdana, arial, sans-serif; font-size: 14px; }
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1.0" name="viewport">
+    <style type="text/css">
+        body { font-family: 'Microsoft Yahei', Verdana, arial, sans-serif; font-size: 14px; word-break: break-all; word-wrap: break-word; }
         .f_notice a { text-decoration: none; color: #174B73; }
         .f_notice a:hover { text-decoration: none; color: #FF6600; }
         .f_notice h2 { border-bottom: 1px solid #DDD; padding: 8px 0; font-size: 25px; }
@@ -14,7 +14,6 @@
         .f_notice .message { background: #FFD; color: #2E2E2E; border: 1px solid #E0E0E0; }
         #trace { background: #E7F7FF; border: 1px solid #E0E0E0; color: #535353; }
         .f_notice { padding: 10px; margin: 5px; color: #666; background: #FCFCFC; border: 1px solid #E0E0E0; }
-        .red { color: red; font-weight: bold; }
     </style>
 </head>
 <body>

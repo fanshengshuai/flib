@@ -1,4 +1,4 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="zh-CN" dir="ltr">
 
 <head>
@@ -76,7 +76,7 @@
             left: -30px;
             right: -30px;
             height: 80px;
-            background: url(error.png) no-repeat;
+            /*background: url(error.png) no-repeat;*/
             background-size: 100% 100%;
         }
 
