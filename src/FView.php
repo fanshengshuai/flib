@@ -43,23 +43,21 @@ class FView {
         global $_F;
 
         if (!$tpl) {
-            if ($_F['app']) {
-                $c = str_replace('Controller_' . ucfirst($_F['app']) . '_', '', $_F['controller']);
-                $c = strtolower($c);
-                $tpl = "{$_F['app']}/{$c}/{$_F['action']}";
-            } else {
-                $c = strtolower(str_replace('Controller_', '', $_F['controller']));
-                $c = str_replace($_F['module'] . '_', '', $c);
-                $a = $_F['action'];
-                $tpl = "{$c}/{$a}";
+            $c = str_replace('Ctrl', '', $_F['controller']);
+            if ($_F['module']) {
+                $c = str_replace(ucfirst($_F['module']), '', $c);
             }
+
+            $c = strtolower($c);
+            $tpl = ($_F['module'] ? $_F['module'] . '/' : '') . strtolower($c) . "/{$_F['action']}";
         }
 
-        $tpl_file = F_APP_ROOT . 'tpl/' . $tpl . ".tpl.php";
-        if (!file_exists($tpl_file))
-            throw new Exception("模版文件[" . 'tpl/' . $tpl . "]不存在!");
+        $tpl = 'tpl/' . $tpl . ".tpl.php";
+        if (!file_exists(F_APP_ROOT . $tpl))
+            throw new Exception("模版文件[" . $tpl . "]不存在!");
 
-        $this->engine->display($tpl);
+        ob_clean();
+        $this->engine->display(F_APP_ROOT . $tpl);
     }
 
     public function displaySysPage($tpl) {
@@ -136,7 +134,7 @@ class FView {
         return $contents;
     }
 
-    public function getDebugInfo() {
+    public static function getDebugInfo() {
         global $_F;
 
         unset($_F['db']);

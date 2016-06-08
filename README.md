@@ -36,7 +36,7 @@ require_once "vendor/autoload.php";
 
 ## Setup
 ```php
-define("FLIB_RUN_MODE", 'manual');
+define("F_RUN_MODE", 'manual');
 require_once "lib/flib/Flib.php";
 
 FSetup::getInstance()->init();

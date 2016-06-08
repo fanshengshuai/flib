@@ -42,8 +42,8 @@ class Flib {
 
         // 检查项目文件
         $className = str_replace(
-            array('Service/', 'DAO/', 'Controller/'),
-            array('services/', 'dao/', 'controllers/'),
+            array('Service/', 'DAO/'),
+            array('services/', 'dao/'),
             $class_path);
 
         $class_explode = explode('/', $className);
@@ -55,21 +55,13 @@ class Flib {
         }
         $file = join('/', $class_explode);
 
-        // 查是不是 App 的 class
-        if (isset($_F['module'])) {
-            $file = str_replace(strtolower($_F['module']) . '/', '', $file);
-
-            if (strpos($file, 'controller') !== false) {
-                $inc_file = F_APP_ROOT . 'modules/' . $_F['module'] . '/' . $file;
-            } else {
-                $inc_file = F_APP_ROOT . $file;
-            }
+        if (strpos($file, 'Ctrl.') !== false) {
+            $inc_file = F_APP_ROOT . (isset($_F['module']) ? 'modules/' . $_F['module'] : 'c') . '/' . substr($file, strlen($_F['module']));
         } else {
             $inc_file = F_APP_ROOT . $file;
         }
 
-        // file_put_contents(F_APP_ROOT . "data/inc_file.txt", $inc_file . "\n",FILE_APPEND);
-        // echo $inc_file . "<hr>";
+//        echo $inc_file;
 
         if (file_exists($inc_file)) {
             if ($_F ['debug']) {
@@ -204,12 +196,9 @@ class Flib {
 
 
         $_F ['config'] = array();
-        header("Content-type: text/html; charset=utf-8");
-        header("Access-Control-Allow-Origin: *");
 
-        if (!defined('FLIB_ROOT')) {
-            define('FLIB_ROOT', dirname(__FILE__) . '/');
-        }
+        !defined("F_RUN_MODE") && define('F_RUN_MODE', 'web');
+        !defined('FLIB_ROOT') && define('FLIB_ROOT', dirname(__FILE__) . '/');
 
         if (!defined('F_APP_ROOT')) {
             if (isset($_SERVER['PWD']))
@@ -220,15 +209,12 @@ class Flib {
             //exit('please define F_APP_ROOT');
         }
 
-        define('CURRENT_TIMESTAMP', time());
-        define('CURRENT_DATE_TIME', date('Y-m-d H:i:s'));
-
         $_F['user_agent'] = $_SERVER ['HTTP_USER_AGENT'];
         $_F['query_string'] = $_SERVER ['QUERY_STRING'];
 
-        $_F['http_host'] ? $_F['http_host'] : $_F['http_host'] = $_SERVER ['HTTP_HOST'];
+        !isset($_F['http_host']) && ($_F['http_host'] = $_SERVER ['HTTP_HOST']);
 
-        $last_part = substr($_F ['http_host'], strrpos($_F ['http_host'], '.'));
+        $last_part = substr($_F['http_host'], strrpos($_F['http_host'], '.'));
         if ($last_part == '.local') {
             $_F['dev_mode'] = true;
         } elseif ($last_part == '.lan') {
@@ -260,7 +246,6 @@ class Flib {
         if ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
             $_F['in_ajax'] = true;
         }
-
 
         $_F['is_post'] = ($_POST) ? true : false;
 
@@ -304,9 +289,13 @@ class Flib {
 
     private static function initEnv() {
         date_default_timezone_set('Asia/Chongqing');
-        ini_set("error_reporting", E_ALL & ~E_NOTICE);
+//        ini_set("error_reporting", E_ALL & ~E_NOTICE);
+        ini_set("error_reporting", E_ALL);
 
         if (phpversion() < '5.3.0') set_magic_quotes_runtime(0);
+
+        header("Content-type: text/html; charset=utf-8");
+        header("Access-Control-Allow-Origin: *");
 
         !ob_get_status() && ob_start();
     }
@@ -330,6 +319,6 @@ class Flib {
 define('FLIB', 1);
 Flib::init();
 
-if (FLIB_RUN_MODE != 'manual') {
+if (F_RUN_MODE != 'manual') {
     FApp::run();
 }

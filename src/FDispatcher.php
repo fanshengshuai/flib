@@ -70,9 +70,9 @@ class FDispatcher {
         if (!empty($_F['app'])) {
             $_F['controller'] = 'Controller_' . ucfirst($_F['app']) . '_' . ucfirst($c);
         } elseif ($_F['module']) {
-            $_F['controller'] = 'Controller_' . ucfirst($_F['module']) . '_' . ucfirst($c);
+            $_F['controller'] = ucfirst($_F['module']) . ucfirst($c) . 'Ctrl';
         } else {
-            $_F['controller'] = 'Controller_' . ucfirst($c);
+            $_F['controller'] = ucfirst($c) . 'Ctrl';
         }
 
         $_F['action'] = $a;
@@ -181,19 +181,19 @@ class FDispatcher {
             return true;
         } else {
 
-            foreach ($router as $key => $item) {
+            foreach ($router as $key => $configRow) {
                 if (strpos($key, '(') === false) {
                     continue;
                 }
 
                 if (preg_match("#^{$key}$#i", $_F['uri'], $res)) {
 
-                    if ($router[$uri]['url']) {
-                        redirect($router[$uri]['url']);
+                    if ($configRow['url']) {
+                        redirect($configRow['url']);
                     }
 
-                    if ($router[$uri]['module']) {
-                        $_F['module'] = $router[$uri]['module'];
+                    if ($configRow['module']) {
+                        $_F['module'] = $configRow['module'];
                     }
 
                     $c = $router[$key]['controller'];
