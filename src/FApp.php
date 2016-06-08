@@ -20,11 +20,6 @@ class FApp {
     +----------------------------------------------------------
      */
     static public function init() {
-        global $_F;
-
-        if (FConfig::get('global.debug')) {
-            $_F['debug'] = true;
-        }
 
         $session_type = FConfig::get('global.session.type');
         if ($session_type == 'db') {
@@ -41,7 +36,7 @@ class FApp {
             $handler->start();
         } elseif ($session_type == 'memcache') {
             ini_set('session.save_handler', 'memcache');
-            ini_set('session.save_path', 'tcp:/'.'/127.0.0.1:11211'); // . FConfig::get('global.memcache.ip')
+            ini_set('session.save_path', 'tcp:/' . '/127.0.0.1:11211'); // . FConfig::get('global.memcache.ip')
 
             $handler = new FSession();
             $handler->start();
@@ -62,7 +57,6 @@ class FApp {
     +----------------------------------------------------------
      */
     static public function run() {
-        global $_F;
 
         FApp::init();
 

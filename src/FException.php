@@ -18,7 +18,7 @@ class FException extends Exception {
     }
 
     /**
-     * @param $e Exception
+     * @param $e Exception | array
      */
     public function traceError($e) {
         global $_F;

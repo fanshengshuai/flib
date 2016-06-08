@@ -33,7 +33,7 @@ class Flib {
         $file = $class_path;
         $inc_file = FLIB_ROOT . $file;
         if (file_exists($inc_file)) {
-            if (isset($_F ['debug'])) {
+            if ($_F ['debug']) {
                 $_F ['debug_info'] ['autoload_files'] [] = $inc_file;
             }
 
@@ -255,17 +255,18 @@ class Flib {
 
         !$_F['debug'] && ($_F['debug'] = FConfig::get("global.debug"));
 
-        if (FConfig::get('global.flib_compress')) {
+        if (FConfig::get('global.f_compress')) {
             if (!file_exists(F_APP_ROOT . "data/_flib_min.php")) {
                 self::createFlibMin();
             }
-            include_once(F_APP_ROOT . "data/_flib_min.php");
+            @include_once(F_APP_ROOT . "data/_flib_min.php");
         }
 
         $sub_domain_status = FConfig::get('global.sub_domain.status');
 
         // 是否开了子域名
         if ($sub_domain_status) {
+            $default_module = 'www';
             foreach (FConfig::get('global.sub_domain.sub_domain_rewrite') as $key => $value) {
                 if ($key == $_F['subdomain']) {
                     $_F['module'] = $value;
