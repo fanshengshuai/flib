@@ -79,7 +79,7 @@ class FTemplate {
 
         if ($tpl[0] == '/' || $tpl[1] == ':') {
             $tpl_file = $tpl;
-            $compiled_file = F_APP_ROOT.$this->template_c . 'o/' . md5($tpl) . ".tpl.php";
+            $compiled_file = F_APP_ROOT . $this->template_c . 'o/' . md5($tpl) . ".tpl.php";
         } else {
             $tpl_file = $this->conf['tpl_path_root'] . $tpl . ".tpl.php";
             $compiled_file = F_APP_ROOT . $this->template_c . $tpl . ".tpl.php";
@@ -158,7 +158,21 @@ class FTemplate {
      */
     private function parse_php($content) {
         if (empty($content)) return false;
-        $content = preg_replace("/" . $this->template_tag_left . "([\$\\d\\w_]+?)" . $this->template_tag_right . "/i", "<?php echo $1; ?>", $content);
+        $content = preg_replace_callback("/" . $this->template_tag_left . "([\$\\d\\w_.'\"\\]\\[]+?)" . $this->template_tag_right . "/i",
+            function ($matches) {
+                if (strpos($matches[1], '.')) {
+                    $var = explode('.', $matches[1]);
+                    $var_c = $var[0];
+
+                    for ($i = 1; $i < sizeof($var); $i++) {
+                        $var_c .= '[\'' . $var[$i] . '\']';
+                    }
+
+                    return '<?php echo ' . $var_c . '; ?>';
+                } else
+                    return '<?php echo ' . $matches[1] . '; ?>';
+
+            }, $content);
 
         return $content;
     }
