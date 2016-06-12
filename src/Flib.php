@@ -201,7 +201,9 @@ class Flib {
         !defined('FLIB_ROOT') && define('FLIB_ROOT', dirname(__FILE__) . '/');
 
         if (!defined('F_APP_ROOT')) {
-            if (isset($_SERVER['PWD']))
+            if (isset($_SERVER['DOCUMENT_ROOT']))
+                define('F_APP_ROOT', $_SERVER['DOCUMENT_ROOT'] . '/');
+            elseif (isset($_SERVER['TERM']) && isset($_SERVER['PWD'])) // run in shell
                 define('F_APP_ROOT', $_SERVER['PWD'] . '/');
             else
                 define('F_APP_ROOT', getcwd() . '/');
