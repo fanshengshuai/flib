@@ -12,7 +12,7 @@ class FView {
      * @var FView_Smarty
      */
     protected $engine;
-    public $msg_tpl = "public/msg.tpl.php";
+    public $msg_tpl = "public/msg";
 
 
     public function __construct() {
