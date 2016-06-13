@@ -211,6 +211,8 @@ class Flib {
             //exit('please define F_APP_ROOT');
         }
 
+        !defined('WEB_ROOT_DIR') && define('WEB_ROOT_DIR', F_APP_ROOT);
+
         $_F['user_agent'] = $_SERVER ['HTTP_USER_AGENT'];
         $_F['query_string'] = $_SERVER ['QUERY_STRING'];
 
