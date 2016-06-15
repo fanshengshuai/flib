@@ -12,6 +12,7 @@ class FTemplate {
     private $template_c = '';//编译目录
     private $template_path = '';//模板完整路径 
     private $template_name = '';//模板名称 index.html
+    private $orig_php_code = array();
 
 
     // 定义每个模板的标签的元素
@@ -64,16 +65,9 @@ class FTemplate {
 
     /**
      *  渲染页面
-     * @param string $filename
-     * @param string $view_path
-     * @throws Exception
-     * param $ 使用方法 1*  使用方法 1
-     *  $this->view->display('error', 'comm/');
-     *  默认是指向TPL模版的跟目录，所以comm/就是 tpl/comm/error.html
-     *  使用方法 2
-     *  $this->view->display('error_file');
-     *  默认指向控制器固定的文件夹
-     *  例如你的域名是 http://xxx/admin/index, 那么正确路径就是tpl/admin/index/error_file.html
+     * @param $tpl
+     * @internal param string $filename
+     * @internal param string $view_path
      */
     public function display($tpl) {
 
@@ -102,9 +96,11 @@ class FTemplate {
     }
 
     /**
-     * @param $content string 模板文件主体
+     * @param $tpl_file
      * @param string $save_file 保存目录，相对于data目录
+     * @param bool $isSubTpl
      * @return string 模板文件主体
+     * @internal param string $content 模板文件主体
      */
     public function compile($tpl_file, $save_file = "", $isSubTpl = false) {
         $content = file_get_contents($tpl_file);
@@ -131,6 +127,8 @@ class FTemplate {
      * @return string 模板内容
      */
     public function parse($content) {
+
+        $content = $this->split_orig_php($content);
         //foreach
         $content = $this->parse_foreach($content);
 
@@ -148,6 +146,27 @@ class FTemplate {
 
         //转为PHP代码
         $content = $this->parse_php($content);
+
+        $content = $this->restore_orig_php($content);
+        return $content;
+    }
+
+    private function split_orig_php($content) {
+        $content = preg_replace_callback('/<\?php(.+?)\?>/si',
+            function ($matches) {
+                $md5 = '--' . md5($matches[0]) . '--';
+                $this->orig_php_code[$md5] = $matches[0];
+                return $md5;
+            }, $content);
+
+
+        return $content;
+    }
+
+    private function restore_orig_php($content) {
+        foreach ($this->orig_php_code as $key => $code) {
+            $content = str_replace($key, $code, $content);
+        }
         return $content;
     }
 
@@ -278,6 +297,8 @@ class FTemplate {
 
     /**
      * 匹配结束 字符串
+     * @param $content
+     * @return mixed
      */
     private function parse_comm($content) {
         $search = array(
