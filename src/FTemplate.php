@@ -19,12 +19,14 @@ class FTemplate {
     private $tag_foreach = array('from', 'item', 'key');
 
     public function __construct($conf = array('template_c' => 'data/template_c/')) {
+        global $_tpl_val;
+        $_tpl_val = array();
+
         $this->conf = &$conf;
 
         $this->template_c = $this->conf['template_c'];//编译目录
         $this->_tpl_suffix = $this->tpl_suffix();
     }
-
 
     private function str_replace($search, $replace, $content) {
         if (empty($search) || empty($replace) || empty($content)) return false;
@@ -127,7 +129,6 @@ class FTemplate {
      * @return string 模板内容
      */
     public function parse($content) {
-
         $content = $this->split_orig_php($content);
         //foreach
         $content = $this->parse_foreach($content);
@@ -148,14 +149,16 @@ class FTemplate {
         $content = $this->parse_php($content);
 
         $content = $this->restore_orig_php($content);
+
         return $content;
     }
 
     private function split_orig_php($content) {
         $content = preg_replace_callback('/<\?php(.+?)\?>/si',
             function ($matches) {
+                global $_tpl_val;
                 $md5 = '--' . md5($matches[0]) . '--';
-                $this->orig_php_code[$md5] = $matches[0];
+                $_tpl_val[$md5] = $matches[0];
                 return $md5;
             }, $content);
 
@@ -164,7 +167,8 @@ class FTemplate {
     }
 
     private function restore_orig_php($content) {
-        foreach ($this->orig_php_code as $key => $code) {
+        global $_tpl_val;
+        foreach ($_tpl_val as $key => $code) {
             $content = str_replace($key, $code, $content);
         }
         return $content;
