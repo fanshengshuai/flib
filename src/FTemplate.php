@@ -181,7 +181,7 @@ class FTemplate {
      */
     private function parse_php($content) {
         if (empty($content)) return false;
-        $content = preg_replace_callback("/" . $this->template_tag_left . "([\$\\d\\w_.'\"\\]\\[]+?)" . $this->template_tag_right . "/i",
+        $content = preg_replace_callback("/" . $this->template_tag_left . "(^\$[\\d\\w_.'\"\\]\\[]+?)" . $this->template_tag_right . "/i",
             function ($matches) {
                 if (strpos($matches[1], '.')) {
                     $var = explode('.', $matches[1]);
