@@ -11,73 +11,6 @@
  */
 class FDispatcher {
 
-    public static function init() {
-        global $_F;
-
-        $configModule = FConfig::get('global.modules');
-        if ($configModule)
-            $_F['modules'] = explode(',', str_replace(' ', '', FConfig::get('global.modules')));
-
-        $dispatcher = new FDispatcher;
-
-        if (!isset($_F['uri'])) {
-            self::getURI();
-        }
-
-        $c = isset($_GET['c']) ? $_GET['c'] : null;
-        $a = isset($_GET['a']) ? $_GET['a'] : null;
-
-
-        if (!$c || !$a) {
-
-            $dispatcher->_checkRouter($c, $a);
-        }
-
-
-        if (!$c || !$a) {
-
-            if ($_F['uri'] == '/' || $_F['uri'] == '' || $_F['uri'] == '/index') {
-                if ($_F['modules']) {
-                    $_F['module'] = $app = $_F['modules'][0];
-                }
-                $c = 'index';
-                $a = 'index';
-            } else {
-
-                $path_info = explode('/', trim($_F['uri'], '/'));
-
-                if ($_F['modules']) {
-                    if (in_array($path_info[0], $_F['modules'])) {
-                        $_F['module'] = $app = $path_info[0];
-                    } else {
-                        $_F['module'] = $app = $_F['modules'][0];
-                    }
-                }
-
-                if (isset($path_info[2])) {
-                    $c = $path_info[1];
-                    $a = $path_info[2];
-                } elseif (isset($path_info[1])) {
-                    $c = $path_info[0];
-                    $a = $path_info[1];
-                } elseif (isset($path_info[0])) {
-                    $c = $path_info[0];
-                    $a = 'index';
-                }
-            }
-        }
-
-        if (!empty($_F['app'])) {
-            $_F['controller'] = 'Controller_' . ucfirst($_F['app']) . '_' . ucfirst($c);
-        } elseif ($_F['module']) {
-            $_F['controller'] = ucfirst($_F['module']) . ucfirst($c) . 'Ctrl';
-        } else {
-            $_F['controller'] = ucfirst($c) . 'Ctrl';
-        }
-
-        $_F['action'] = $a;
-    }
-
     public static function dispatch() {
         global $_F;
 
@@ -147,6 +80,107 @@ class FDispatcher {
         return true;
     }
 
+    public static function init() {
+        global $_F;
+
+        $configModule = FConfig::get('global.modules');
+        if ($configModule)
+            $_F['modules'] = explode(',', str_replace(' ', '', FConfig::get('global.modules')));
+
+        $dispatcher = new FDispatcher;
+
+        if (!isset($_F['uri'])) {
+            self::getURI();
+        }
+
+        $c = isset($_GET['c']) ? $_GET['c'] : null;
+        $a = isset($_GET['a']) ? $_GET['a'] : null;
+
+
+        if (!$c || !$a) {
+
+            $dispatcher->_checkRouter($c, $a);
+        }
+
+
+        if (!$c || !$a) {
+
+            if ($_F['uri'] == '/' || $_F['uri'] == '' || $_F['uri'] == '/index') {
+                if ($_F['modules']) {
+                    $_F['module'] = $app = $_F['modules'][0];
+                }
+                $c = 'index';
+                $a = 'index';
+            } else {
+
+                $path_info = explode('/', trim($_F['uri'], '/'));
+
+                if ($_F['modules']) {
+                    if (in_array($path_info[0], $_F['modules'])) {
+                        $_F['module'] = $app = $path_info[0];
+
+                        /*
+                         * 处理一下 URL:
+                         * 情况1: /mobile
+                         * 情况2: /mobile/user
+                         */
+                        switch (sizeof($path_info)) {
+                            case 1: // 情况1: /mobile
+                                $path_info[1] = 'index';
+                                $path_info[2] = 'index';
+                                break;
+                            case 2: // 情况2: /mobile/user
+                                $path_info[2] = 'index';
+                                break;
+                        }
+                    } else {
+                        $_F['module'] = $app = $_F['modules'][0];
+                    }
+                }
+
+                if (isset($path_info[2])) {
+                    $c = $path_info[1];
+                    $a = $path_info[2];
+                } elseif (isset($path_info[1])) {
+                    $c = $path_info[0];
+                    $a = $path_info[1];
+                } elseif (isset($path_info[0])) {
+                    $c = $path_info[0];
+                    $a = 'index';
+                }
+            }
+        }
+
+        if (!empty($_F['app'])) {
+            $_F['controller'] = 'Controller_' . ucfirst($_F['app']) . '_' . ucfirst($c);
+        } elseif ($_F['module']) {
+            $_F['controller'] = ucfirst($_F['module']) . ucfirst($c) . 'Ctrl';
+        } else {
+            $_F['controller'] = ucfirst($c) . 'Ctrl';
+        }
+
+        $_F['action'] = $a;
+    }
+
+    public static function getURI() {
+        global $_F;
+
+        $_F['uri'] = isset($_SERVER['HTTP_X_ORIGINAL_URL']) ? $_SERVER['HTTP_X_ORIGINAL_URL'] : null;
+        if (!$_F['uri']) {
+            $_F['uri'] = $_SERVER['REQUEST_URI'];
+        }
+
+        $_F['uri'] = preg_replace('/\?.*$/', '', $_F['uri']);
+
+        if ($_F['uri']) {
+            $_F['uri'] = rtrim($_F['uri'], '/');
+        }
+
+        if (!$_F['uri']) {
+            $_F['uri'] = '/';
+        }
+    }
+
     private function _checkRouter(&$c, &$a) {
         global $_F;
 
@@ -211,25 +245,6 @@ class FDispatcher {
             }
 
             return false;
-        }
-    }
-
-    public static function getURI() {
-        global $_F;
-
-        $_F['uri'] = isset($_SERVER['HTTP_X_ORIGINAL_URL']) ? $_SERVER['HTTP_X_ORIGINAL_URL'] : null;
-        if (!$_F['uri']) {
-            $_F['uri'] = $_SERVER['REQUEST_URI'];
-        }
-
-        $_F['uri'] = preg_replace('/\?.*$/', '', $_F['uri']);
-
-        if ($_F['uri']) {
-            $_F['uri'] = rtrim($_F['uri'], '/');
-        }
-
-        if (!$_F['uri']) {
-            $_F['uri'] = '/';
         }
     }
 }
