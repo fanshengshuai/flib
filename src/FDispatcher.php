@@ -115,6 +115,17 @@ class FDispatcher {
 
                 $path_info = explode('/', trim($_F['uri'], '/'));
 
+                /*
+                 * 处理 URL 中直接传 ID 的情况
+                 */
+                if (is_numeric($path_info[2])) {
+                    $_GET['id'] = $path_info[2];
+                    unset($path_info[2]);
+                } elseif (is_numeric($path_info[1])) {
+                    $_GET['id'] = $path_info[1];
+                    unset($path_info[1]);
+                }
+
                 if ($_F['modules']) {
                     if (in_array($path_info[0], $_F['modules'])) {
                         $_F['module'] = $app = $path_info[0];
