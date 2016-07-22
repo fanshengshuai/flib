@@ -25,6 +25,8 @@ class FSetting {
     public static function updateSystemCache() {
         $setting_file = WEB_ROOT_DIR . self::$cache_file;
 
+//        FFile::rmDir(WEB_ROOT_DIR . 'data/system/');
+
         $t = new FTable('setting');
         $settings = $t->select();
 
@@ -34,5 +36,7 @@ class FSetting {
         }
 
         FFile::save($setting_file, "<?php\n" . 'return ' . var_export($setting_write, true) . ';');
+
+        FCache::flush();
     }
 }

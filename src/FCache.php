@@ -10,66 +10,31 @@
  */
 class FCache {
 
-    private $_cache_type = null;
-    private $_cache_key = '';
-
-    /**
-     * @var Memcache
-     */
-    private $_memcache_conn = null;
-
     const CACHE_TYPE_NULL = 0;
     const CACHE_TYPE_REDIS = 1;
     const CACHE_TYPE_MEMCACHE = 2;
     const CACHE_TYPE_FILE = 3;
-
+    private $_cache_type = null;
+    private $_cache_key = '';
+    /**
+     * @var Memcache
+     */
+    private $_memcache_conn = null;
     /**
      * @var FRedis
      */
     private $_redis_conn;
 
     /**
-     * @param int $_cache_type
-     *
-     * @return FCache
+     * 设置缓存
+     * @param $cache_key
+     * @param $cache_content
+     * @param int $cache_time 如果用的是memcache，时间最长为30天
+     * @param bool $force
      */
-    public static function getInstance($_cache_type = self::CACHE_TYPE_NULL) {
-        static $ins = null;
+    public static function set($cache_key, $cache_content, $cache_time = 7200, $force = false) {
 
-        if ($ins) {
-            return $ins;
-        }
-
-        $ins = new self;
-        return $ins;
-    }
-
-    /**
-     * 连接到指定的配置文件
-     * @return bool
-     */
-    public function connect() {
-
-        // 如果 getInstance 中指定了链接
-        if ($this->_cache_type == self::CACHE_TYPE_REDIS) {
-            $this->_redis_conn = $this->redisConnect();
-            return $this->_redis_conn;
-        } elseif ($this->_cache_type == self::CACHE_TYPE_MEMCACHE) {
-            $this->_memcache_conn = $this->memcacheConnect();
-            return $this->_memcache_conn;
-        }
-
-        if (FConfig::get('cache.redis.enable')) {
-            $this->_cache_type = self::CACHE_TYPE_REDIS;
-            $this->_redis_conn = $this->redisConnect();
-            return $this->_redis_conn;
-        } elseif (FConfig::get('cache.memcache.enable')) {
-            $this->_cache_type = self::CACHE_TYPE_MEMCACHE;
-            $this->_memcache_conn = $this->memcacheConnect();
-            return $this->_memcache_conn;
-        } else {
-            $this->_cache_type = self::CACHE_TYPE_FILE;
-        }
+        self::getInstance()->_set($cache_key, $cache_content, $cache_time, $force);
     }
 
     /**
@@ -98,69 +63,32 @@ class FCache {
     }
 
     /**
-     * @param $cache_key
-     *
-     * @return null
+     * 连接到指定的配置文件
+     * @return bool
      */
-    public function _get($cache_key) {
-        $this->_cache_key = $cache_key;
+    public function connect() {
 
-        $this->connect();
-
-        $ret = null;
-        switch ($this->_cache_type) {
-            case self::CACHE_TYPE_REDIS:
-                $ret = $this->redisGetCache($cache_key);
-                break;
-            case self::CACHE_TYPE_MEMCACHE:
-                $ret = $this->memcacheGetCache($cache_key);
-                break;
-            case self::CACHE_TYPE_FILE:
-                $ret = $this->fileGetCache($cache_key);
-                break;
+        // 如果 getInstance 中指定了链接
+        if ($this->_cache_type == self::CACHE_TYPE_REDIS) {
+            $this->_redis_conn = $this->redisConnect();
+            return $this->_redis_conn;
+        } elseif ($this->_cache_type == self::CACHE_TYPE_MEMCACHE) {
+            $this->_memcache_conn = $this->memcacheConnect();
+            return $this->_memcache_conn;
         }
 
-        return $ret;
-    }
+        if (FConfig::get('cache.redis.enable')) {
+            $this->_cache_type = self::CACHE_TYPE_REDIS;
+            $this->_redis_conn = $this->redisConnect();
+            return $this->_redis_conn;
+        } elseif (FConfig::get('cache.memcache.enable')) {
+            $this->_cache_type = self::CACHE_TYPE_MEMCACHE;
+            $this->_memcache_conn = $this->memcacheConnect();
+            return $this->_memcache_conn;
+        } else {
+            $this->_cache_type = self::CACHE_TYPE_FILE;
 
-    private function _remove($cache_key) {
-        $this->_cache_key = $cache_key;
-
-        $this->connect();
-
-        $ret = null;
-        switch ($this->_cache_type) {
-            case self::CACHE_TYPE_REDIS:
-                $this->redisRemoveCache($cache_key);
-                break;
-            case self::CACHE_TYPE_MEMCACHE:
-                $this->memcacheRemoveCache($cache_key);
-                break;
-            case self::CACHE_TYPE_FILE:
-                $this->fileRemoveCache($cache_key);
-                break;
-        }
-
-        return $ret;
-    }
-
-    /**
-     * 清空 cache
-     */
-    public function _flush() {
-        global $_F;
-
-        $this->connect();
-
-        if (FConfig::get('global.memcache.enable')) {
-            $_F['memcache']->flush();
-        }
-
-        // 清除文件缓存
-        $cache_dir = dirname(self::getCacheDir() . 'file');
-        if (is_dir($cache_dir)) {
-            $cache_dir_new = $cache_dir . '.bak_' . $_F['http_host'] . '_' . date('Y-m-d_H_i_s') . rand(1000, 9999);
-            rename($cache_dir, $cache_dir_new);
+            return null;
         }
     }
 
@@ -237,27 +165,9 @@ class FCache {
         return $memcache_conn[$server_id];
     }
 
-    public function fileConnect() {
-
-    }
-
     private function redisSetCache($cache_key, $cache_content, $cache_time = 7200, $force = false) {
         global $_F;
         $this->_redis_conn->set($cache_key, $cache_content, 0, 0, $cache_time);
-    }
-
-    private function redisGetCache($cache_key) {
-        return $this->_redis_conn->get($cache_key);
-    }
-
-    private function redisRemoveCache($cache_key) {
-        $this->_redis_conn->delete($cache_key);
-    }
-
-    private function memcacheGetCache($cache_key) {
-        global $_F;
-
-        return $this->_memcache_conn->get($cache_key);
     }
 
     private function memcacheSetCache($cache_key, $cache_content, $cache_time = 7200, $force = false) {
@@ -266,10 +176,6 @@ class FCache {
             $cache_time = 86400 * 30;
         }
         $this->_memcache_conn->set($cache_key, $cache_content, MEMCACHE_COMPRESSED, $cache_time);
-    }
-
-    private function memcacheRemoveCache($cache_key) {
-        $this->_memcache_conn->delete($cache_key);
     }
 
     private function fileSetCache($cache_key, $cache_content, $cache_time = 7200, $force = false) {
@@ -282,45 +188,6 @@ class FCache {
 
         $cache_file = self::getFileFCachePath($cache_key);
         file_put_contents($cache_file, $save_content);
-    }
-
-    private function fileRemoveCache($cache_key) {
-        $cache_file = self::getFileFCachePath($cache_key);
-        unlink($cache_file);
-    }
-
-    public function fileGetCache($cache_key) {
-        $cache_file = self::getFileFCachePath($cache_key);
-        $content = json_decode(file_GET_contents($cache_file), true);
-
-        if ($content &&
-            (filemtime($cache_file) + intval($content['cache_time'])) > time()
-        ) {
-            return $content['content'];
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * 设置缓存
-     * @param $cache_key
-     * @param $cache_content
-     * @param int $cache_time 如果用的是memcache，时间最长为30天
-     * @param bool $force
-     */
-    public static function set($cache_key, $cache_content, $cache_time = 7200, $force = false) {
-        global $_F;
-
-        self::getInstance()->_set($cache_key, $cache_content, $cache_time, $force);
-    }
-
-    public static function get($cache_key) {
-        global $_F;
-
-//        $cache_key = $_F['domain'] . $cache_key;
-
-        return self::getInstance()->_get($cache_key);
     }
 
     public static function getFileFCachePath($cache_key) {
@@ -348,23 +215,156 @@ class FCache {
             $cache_dir = F_APP_ROOT . "data/cache/";
         }
 
-        if ($_F['run_in'] == 'shell') {
-            $cache_dir .= $_F['run_in'] . '/';
-        } elseif ($_F['module']) {
-            $cache_dir .= $_F['module'] . '/';
-        }
+//        if ($_F['run_in'] == 'shell') {
+//            $cache_dir .= $_F['run_in'] . '/';
+//        } elseif ($_F['module']) {
+//            $cache_dir .= $_F['module'] . '/';
+//        }
 
         return $cache_dir;
+    }
+
+    /**
+     * @param int $_cache_type
+     *
+     * @return FCache
+     */
+    public static function getInstance($_cache_type = self::CACHE_TYPE_NULL) {
+        static $ins = null;
+
+        if ($ins) {
+            return $ins;
+        }
+
+        $ins = new self;
+        return $ins;
+    }
+
+    public static function get($cache_key) {
+        global $_F;
+
+//        $cache_key = $_F['domain'] . $cache_key;
+
+        return self::getInstance()->_get($cache_key);
+    }
+
+    /**
+     * @param $cache_key
+     *
+     * @return null
+     */
+    public function _get($cache_key) {
+        $this->_cache_key = $cache_key;
+
+        $this->connect();
+
+        $ret = null;
+        switch ($this->_cache_type) {
+            case self::CACHE_TYPE_REDIS:
+                $ret = $this->redisGetCache($cache_key);
+                break;
+            case self::CACHE_TYPE_MEMCACHE:
+                $ret = $this->memcacheGetCache($cache_key);
+                break;
+            case self::CACHE_TYPE_FILE:
+                $ret = $this->fileGetCache($cache_key);
+                break;
+        }
+
+        return $ret;
+    }
+
+    private function redisGetCache($cache_key) {
+        return $this->_redis_conn->get($cache_key);
+    }
+
+    private function memcacheGetCache($cache_key) {
+        global $_F;
+
+        return $this->_memcache_conn->get($cache_key);
+    }
+
+    public function fileGetCache($cache_key) {
+        $cache_file = self::getFileFCachePath($cache_key);
+        $content = json_decode(file_GET_contents($cache_file), true);
+
+        if ($content &&
+            (filemtime($cache_file) + intval($content['cache_time'])) > time()
+        ) {
+            return $content['content'];
+        } else {
+            return null;
+        }
     }
 
     public static function delete($cache_key) {
         self::getInstance()->_remove($cache_key);
     }
 
+    private function _remove($cache_key) {
+        $this->_cache_key = $cache_key;
+
+        $this->connect();
+
+        $ret = null;
+        switch ($this->_cache_type) {
+            case self::CACHE_TYPE_REDIS:
+                $this->redisRemoveCache($cache_key);
+                break;
+            case self::CACHE_TYPE_MEMCACHE:
+                $this->memcacheRemoveCache($cache_key);
+                break;
+            case self::CACHE_TYPE_FILE:
+                $this->fileRemoveCache($cache_key);
+                break;
+        }
+
+        return $ret;
+    }
+
+    private function redisRemoveCache($cache_key) {
+        $this->_redis_conn->delete($cache_key);
+    }
+
+    private function memcacheRemoveCache($cache_key) {
+        $this->_memcache_conn->delete($cache_key);
+    }
+
+    private function fileRemoveCache($cache_key) {
+        $cache_file = self::getFileFCachePath($cache_key);
+        unlink($cache_file);
+    }
+
     public static function flush() {
         global $_F;
 
         self::getInstance()->_flush();
+    }
+
+    /**
+     * 清空 cache
+     */
+    public function _flush() {
+        global $_F;
+
+        $this->connect();
+
+        if (FConfig::get('global.memcache.enable')) {
+            $_F['memcache']->flush();
+            return;
+        }
+
+        // 清除文件缓存
+        $cache_dir = dirname(self::getCacheDir() . 'file');
+        if (is_dir($cache_dir)) {
+            $cache_dir_new = $cache_dir . '.bak_' . $_F['http_host'] . '_' . date('Y-m-d_H_i_s') . rand(1000, 9999);
+            rename($cache_dir, $cache_dir_new);
+            FFile::rmDir($cache_dir_new . '/');
+        }
+    }
+
+    public function fileConnect() {
+
     }
 
 }

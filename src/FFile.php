@@ -59,6 +59,44 @@ class FFile {
         return $ret;
     }
 
+    /**
+     * 删除目录和目录下文件
+     *
+     * @param $dir
+     * @return bool
+     * @throws Exception
+     */
+    public static function rmDir($dir) {
+//        global $_F;
+
+
+        if ($dir == '/' || !FString::endWith($dir, '/')) {
+            throw new Exception('DIR must end of / and can not be Root Dir');
+        }
+
+        // 先删除目录下的文件
+        $dirHandle = opendir($dir);
+        while ($file = readdir($dirHandle)) {
+            if ($file != "." && $file != "..") {
+                $fullpath = $dir . "/" . $file;
+                if (!is_dir($fullpath)) {
+                    unlink($fullpath);
+                } else {
+                    self::rmDir($fullpath);
+                }
+            }
+        }
+
+        closedir($dirHandle);
+
+        // 删除当前文件夹
+        if (rmdir($dir)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public static function parsePath($file_path) {
         $_tmp = parse_url($file_path);
     }
