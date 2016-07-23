@@ -167,4 +167,13 @@ class FResponse {
     public static function refresh() {
         self::redirect('r');
     }
+
+    public function ajaxErr($msg) {
+        if (is_string($msg)) {
+            self::output(array('result' => 'error', 'msg' => $msg));
+        } else {
+            $msg['result'] = 'error';
+            self::output($msg);
+        }
+    }
 }
