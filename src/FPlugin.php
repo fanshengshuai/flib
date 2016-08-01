@@ -1,7 +1,11 @@
 <?php
 
 class FPlugin {
-    public function load($plugin) {
+    /**
+     * @param $plugin
+     * @return mixed
+     */
+    public static function load($plugin) {
         global $_F;
         $plugin_file = F_APP_ROOT . "plugin/$plugin/{$plugin}.plugin.php";
         if (file_exists($plugin_file)) {

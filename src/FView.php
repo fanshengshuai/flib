@@ -144,7 +144,7 @@ class FView {
             $debug_contents = "DEBUG INFO:\n";
         } else {
             $debug_contents = '<style>
-            .debug_info { clear: both; position: relative; margin-top:300px; }
+            .debug_info { clear: both; margin-top:300px; }
             .debug_table { border-collapse: collapse;margin:20px; border:1px solid #000;} .debug_table th, .debug_table td { padding:5px; border:1px solid #000; } </style>';
         }
 
