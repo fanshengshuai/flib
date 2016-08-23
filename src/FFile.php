@@ -82,7 +82,7 @@ class FFile {
                 if (!is_dir($fullpath)) {
                     unlink($fullpath);
                 } else {
-                    self::rmDir($fullpath);
+                    self::rmDir($fullpath . "/");
                 }
             }
         }

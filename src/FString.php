@@ -7,7 +7,7 @@ class FString {
 
     public static function endWith($haystack, $needle) {
 
-        $length = strlen($needle);
+        $length = strlen($haystack);
         if ($length == 0) {
             return false;
         }

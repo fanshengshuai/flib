@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class FResponse
+ * Class FRequest
  *
  * User: fanshengshuai
  * Date: 14-6-22
