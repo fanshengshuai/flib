@@ -52,7 +52,7 @@ class FCaptcha {
 
         for ($i = 0; $i < $this->codeLen; $i++) {
             $this->fontSize = intval(rand(10, $this->height / 2));
-            $this->fontColor = imagecolorallocate($this->img, mt_rand(0, 156), mt_rand(0, 156), mt_rand(0, 156));
+            $this->fontColor = imagecolorallocate($this->img, mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 156));
             $left = $_x * $i + mt_rand(1, 2);
             imagettftext($this->img, $this->fontSize, mt_rand(-30, 30), $left, $this->height / 1.4, $this->fontColor, $this->font, $this->code[$i]);
         }
@@ -62,12 +62,12 @@ class FCaptcha {
     private function createLine() {
 
         // 线条
-        for ($i = 0; $i < 6; $i++) {
-            $color = imagecolorallocate($this->img, mt_rand(0, 156), mt_rand(0, 156), mt_rand(0, 156));
+        for ($i = 0; $i < 3; $i++) {
+            $color = imagecolorallocate($this->img, mt_rand(0, 100), mt_rand(0, 100), mt_rand(0, 100));
             imageline($this->img, mt_rand(0, $this->width), mt_rand(0, $this->height), mt_rand(0, $this->width), mt_rand(0, $this->height), $color);
         }
         // 雪花
-        for ($i = 0; $i < 100; $i++) {
+        for ($i = 0; $i < 20; $i++) {
             $color = imagecolorallocate($this->img, mt_rand(200, 255), mt_rand(200, 255), mt_rand(200, 255));
             imagestring($this->img, mt_rand(1, 5), mt_rand(0, $this->width), mt_rand(0, $this->height), '*', $color);
         }

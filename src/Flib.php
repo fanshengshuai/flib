@@ -192,7 +192,9 @@ class Flib {
     public static function init() {
         global $_F;
 
+        self::checkVersion();
         self::initEnv();
+        self::safe();
 
 
         $_F ['config'] = array();
@@ -319,7 +321,46 @@ class Flib {
     }
 
 
+    private static function checkVersion() {
+        if (phpversion() < '5.3') {
+            echo "PHP版本太低,请升级到 5.3 以上, 建议版本 5.4.x ";
+            exit;
+        }
+    }
+
+    private static function safe() {
+        if (!get_magic_quotes_gpc()) {//首先判断未开启
+            if ($_GET) {
+                $_GET = self::addslashes_deep($_GET);
+            }
+            if ($_POST) {
+                $_POST = self::addslashes_deep($_POST);
+            }
+            if ($_REQUEST) {
+                $_REQUEST = self::addslashes_deep($_REQUEST);
+            }
+
+        }
+    }
+
+    /**
+     * 递归方式的对变量中的特殊字符进行转义
+     *
+     * @access  public
+     * @param    $value
+     * @return array|string
+     */
+    private static function addslashes_deep($value) {
+        if (empty($value)) {
+            return $value;
+        } else {
+            return is_array($value) ? array_map(array("Flib", "addslashes_deep"), $value) : addslashes($value);
+        }
+    }
+
+
 }
+
 
 define('FLIB', 1);
 Flib::init();
