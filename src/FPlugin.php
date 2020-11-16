@@ -1,27 +1,59 @@
 <?php
 
-class FPlugin {
+class FPlugin
+{
     /**
-     * @param $plugin
-     * @return mixed
+     * @var $this
      */
-    public static function load($plugin) {
+    protected static $__instance;
+
+    /**
+     * @return $this
+     */
+    public static function getInstance()
+    {
+        if (self::$__instance === null) {
+            self::$__instance = new self;
+        }
+
+        return self::$__instance;
+    }
+
+    public function adminModifyFormBefore()
+    {
+
+    }
+
+    public function adminModifyFormAfter()
+    {
+    }
+
+    public function adminListPageTop()
+    {
+    }
+
+
+    /**
+     * @param String $plugin
+     * @return $this
+     */
+    public static function load($plugin)
+    {
         global $_F;
-        $plugin_file = F_APP_ROOT . "plugin/$plugin/{$plugin}.plugin.php";
+        $plugin_file = F_APP_ROOT . "addons/plugin/{$plugin}Plugin.php";
         if (file_exists($plugin_file)) {
             if (@include_once($plugin_file)) {
                 $class = ucfirst($plugin) . 'Plugin';
                 if (class_exists($class))
                     return new $class;
             }
-        } else {
-
         }
 
-        return null;
+        return new self;
     }
 
-    public function loadModelPlugin($modelData) {
+    public function loadModelPlugin($modelData)
+    {
         global $_F;
         $model = $modelData['table_name'];
 
@@ -41,7 +73,8 @@ class FPlugin {
         }
     }
 
-    function getModelPluginTpl($plugin_id, $modelData) {
+    function getModelPluginTpl($plugin_id, $modelData)
+    {
         global $_F;
         $model = $modelData['table_name'];
 

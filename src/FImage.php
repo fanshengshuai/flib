@@ -66,7 +66,7 @@ class FImage {
      *
      * @param  string $imgname 图片路径
      *
-     * @return Object          当前图片处理库对象
+     * @return $this          当前图片处理库对象
      */
     public function open($imgname) {
         $this->img->open($imgname);
@@ -165,7 +165,7 @@ class FImage {
      * @param  integer $height 缩略图最大高度
      * @param  integer $type 缩略图裁剪类型
      *
-     * @return Object          当前图片处理库对象
+     * @return $this          当前图片处理库对象
      */
     public function thumb($width, $height, $type = self::THUMB_SCALE) {
         $this->img->thumb($width, $height, $type);
@@ -224,7 +224,7 @@ class FImage {
 
         FFile::mkdir(dirname($thumb_file));
         $fImage = new FImage();
-        $fImage->open($full_pic_file)->thumb($w, $h, FImage::THUMB_CENTER)->save($thumb_file);
+        $fImage->open($full_pic_file)->setThumbQuality(100)->thumb($w, $h, FImage::THUMB_CENTER)->save($thumb_file);
 
         return $thumb_pic_url;
     }

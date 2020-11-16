@@ -399,51 +399,6 @@ function unescape($str) {
 }
 
 /**
- * 获得视频链接地址
- *
- * @param unknown $v_info
- *
- * @return string
- */
-function getVideoInfoUrl($v_info) {
-    if ($v_info ['cat_pinyin'] && $v_info ['title_pinyin']) {
-        $encode_vid = base64_encode($v_info['vid']);
-
-        return "/{$v_info['cat_pinyin']}/v_{$v_info['title_pinyin']}-{$encode_vid}.html";
-    } else {
-        return "/view/{$v_info['vid']}.html";
-    }
-}
-
-/**
- * 判断图片地址是否为远程地址
- *
- * @param unknown $pic_url
- *
- * @return unknown string
- */
-function getPicUrl($pic_url) {
-    if (strpos($pic_url, 'ttp:') != false) {
-        return $pic_url;
-    } else {
-        return "http://s.fmscg.com/uploads/{$pic_url}";
-    }
-}
-
-
-function get_article($limit, $cid1, $cid2, $sort="id desc") {
-    global $_F;
-//    $_F['debug'] =1;
-    $t = new FTable('article');
-    $where = array('cat_id' => $cid1);
-    if ($cid2) {
-        $where['cat_id_2'] = $cid2;
-    }
-    $list = $t->where($where)->order($sort)->limit($limit)->select();
-    return $list;
-}
-
-/**
  * URL过滤
  * @param   string  $url  参数字符串，一个urld地址,对url地址进行校正
  * @return  返回校正过的url;

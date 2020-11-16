@@ -27,8 +27,12 @@ class FSession {
     public function start() {
         global $_F;
 
+        // 先关闭session
+        session_abort();
+
         $life_time = FConfig::get('global.session.life_time');
         $life_time = $life_time ? $life_time : ini_get('session.gc_maxlifetime');
+
 
         ini_set('session.name', 'sid');
 

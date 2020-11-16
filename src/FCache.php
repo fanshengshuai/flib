@@ -102,7 +102,7 @@ class FCache {
             $redis_server_count = count($redis_server_config);
         }
 
-        if ($redis_server_count == 1) {
+        if ($redis_server_count <= 1) {
             $server_id = 0;
         } else {
             $server_id = FMisc::str2int($this->_cache_key) % $redis_server_count;
@@ -112,7 +112,7 @@ class FCache {
             return $redis_conn[$server_id];
         }
 
-        $cache_keys = array_keys($redis_server_config);
+        // $cache_keys = array_keys($redis_server_config);
 
         $redis_conn[$server_id] = new FRedis();
 //        $redis_conn[$server_id]->connect(
@@ -184,7 +184,7 @@ class FCache {
 //        $cache_key = $_F['domain'] . $cache_key;
 
         $save_content = json_encode(array(
-            'cache_time' => $cache_time, 'content' => $cache_content));
+            'expires_time' => time() + intval($cache_time), 'content' => $cache_content));
 
         $cache_file = self::getFileFCachePath($cache_key);
         file_put_contents($cache_file, $save_content);
@@ -286,13 +286,15 @@ class FCache {
 
     public function fileGetCache($cache_key) {
         $cache_file = self::getFileFCachePath($cache_key);
-        $content = json_decode(file_GET_contents($cache_file), true);
+        if( is_file($cache_file)){
+            $content = json_decode(file_get_contents($cache_file), true);
 
-        if ($content &&
-            (filemtime($cache_file) + intval($content['cache_time'])) > time()
-        ) {
-            return $content['content'];
-        } else {
+            if ($content && $content['expires_time'] >= time()) {
+                return $content['content'];
+            } else {
+                return null;
+            }
+        }else{
             return null;
         }
     }

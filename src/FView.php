@@ -6,7 +6,8 @@
  * 创建: 2012-07-28 10:57:45
  * vim: set expandtab sw=4 ts=4 sts=4 *
  */
-class FView {
+class FView
+{
 
     /**
      * @var FView_Smarty
@@ -14,11 +15,12 @@ class FView {
     protected $engine;
     public $msg_tpl = "public/msg";
 
-
-    public function __construct() {
+    public function __construct($engine = null)
+    {
         global $_F;
 
-        $this->tpl_engine = FConfig::get("global.tpl_engine");
+        $engine = $engine ? $engine : FConfig::get("global.tpl_engine");
+        $this->tpl_engine = $engine ? $engine : 'tiny';
         !$this->tpl_engine && $this->tpl_engine = "php";
         if ($this->tpl_engine == 'tiny') {
             require_once FLIB_ROOT . 'tplEngine/tiny.php';
@@ -32,35 +34,41 @@ class FView {
         }
     }
 
-    public function __destruct() {
+    public function __destruct()
+    {
     }
 
-    public function assign($var, $value) {
+    public function assign($var, $value)
+    {
         $this->engine->assign($var, $value);
     }
 
-    public function display($tpl = null) {
+    public function display($tpl = null)
+    {
         global $_F;
 
         if (!$tpl) {
             $c = str_replace('Ctrl', '', $_F['controller']);
             if ($_F['module']) {
-                $c = str_replace(ucfirst($_F['module']), '', $c);
+                $c = substr($c, strlen($_F['module']));
             }
 
             $c = strtolower($c);
-            $tpl = ($_F['module'] ? $_F['module'] . '/' : '') . strtolower($c) . "/{$_F['action']}";
+            $tpl = strtolower($c) . "/{$_F['action']}";
         }
 
-        $tpl = 'tpl/' . $tpl . ".tpl.php";
-        if (!file_exists(F_APP_ROOT . $tpl))
-            throw new Exception("模版文件[" . $tpl . "]不存在!");
+        $tpl = ($_F['module'] ? 'modules/' . $_F['module'] : '') . '/tpl/' . $tpl . ".tpl.php";
+        if (!file_exists(F_APP_ROOT . $tpl)) {
+            FException::getInstance()->traceError(new Exception("模版文件[" . $tpl . "]不存在!"));
+        }
 
         ob_clean();
+        $this->engine->assign("_F", $_F);
         $this->engine->display(F_APP_ROOT . $tpl);
     }
 
-    public function displaySysPage($tpl) {
+    public function displaySysPage($tpl)
+    {
         global $_F;
 
         if ($_F['run_in'] == 'shell') {
@@ -80,7 +88,8 @@ class FView {
         exit;
     }
 
-    private function getDefaultTpl($tpl = null) {
+    private function getDefaultTpl($tpl = null)
+    {
         global $_F;
 
         if (!$tpl) {
@@ -100,13 +109,12 @@ class FView {
             $tpl .= '.tpl.php';
         }
 
-
         return $tpl;
     }
 
-    public function load($tpl) {
+    public function load($tpl)
+    {
         global $_F;
-
 
         $tpl = $this->getDefaultTpl($tpl);
 
@@ -134,17 +142,17 @@ class FView {
         return $contents;
     }
 
-    public static function getDebugInfo() {
+    public static function getDebugInfo()
+    {
         global $_F;
 
         unset($_F['db']);
-
 
         if ($_F['run_in'] == 'shell') {
             $debug_contents = "DEBUG INFO:\n";
         } else {
             $debug_contents = '<style>
-            .debug_info { clear: both; margin-top:300px; }
+            .debug_info { clear: both; position: relative; margin-top:300px; }
             .debug_table { border-collapse: collapse;margin:20px; border:1px solid #000;} .debug_table th, .debug_table td { padding:5px; border:1px solid #000; } </style>';
         }
 
@@ -183,7 +191,6 @@ class FView {
             $debug_contents .= '</table>';
             unset($_F['errors']);
         }
-
 
         // $_F DEBUG
         $debug_F = $_F;

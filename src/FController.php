@@ -8,10 +8,14 @@
  * vim: set expandtab sw=4 ts=4 sts=4
  * $Id: FController.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
-abstract class FController {
+abstract class FController
+{
     protected $view;
 
-    protected function showMessage($message, $msgType, $url = null) {
+    protected function showMessage($message, $msgType, $url = null)
+    {
+        global $_F;
+        $this->view = new FView('tiny');
         if ($this->view->msg_tpl) {
             $this->assign('msg', $message);
             $this->assign('msgType', $msgType);
@@ -27,22 +31,25 @@ abstract class FController {
         exit;
     }
 
-    public function indexAction() {
-        die('FSS Tips: this is the indexAction, 这是默认的Action，请实现此方法保证显示正确内容');
+    public function __construct()
+    {
+        $this->view = new FView();
+        $phpInput = file_get_contents('php://input');
+        if (!$_POST && $phpInput) {
+            $_POST = array_merge(json_decode($phpInput, true), $_POST);
+        }
     }
 
-    public function __construct() {
-        $this->view = new FView;
-    }
-
-    protected function isPost() {
+    protected function isPost()
+    {
         return FRequest::isPost();
     }
 
     /**
      * 检查空项目
      */
-    protected function _ajaxCheckNullPostItems($not_null_fields) {
+    protected function _ajaxCheckNullPostItems($not_null_fields)
+    {
 
         $check_results = null;
 
@@ -63,7 +70,8 @@ abstract class FController {
      * 成功提示
      * $items = array('username' => '已经存在', 'password' => '长度不够');
      */
-    protected function _ajaxSuccessMessage($items, $url = '', $close_time = 0) {
+    protected function _ajaxSuccessMessage($items, $url = '', $close_time = 0)
+    {
 
         $result = array('result' => 'success', 'close_time' => $close_time);
 
@@ -88,7 +96,8 @@ abstract class FController {
     /**
      * 检查是否是数字
      */
-    protected function _ajaxCheckIsNum($num_fields) {
+    protected function _ajaxCheckIsNum($num_fields)
+    {
         $check_results = null;
 
         foreach ($num_fields as $item) {
@@ -107,13 +116,16 @@ abstract class FController {
     /**
      * 检查下拉列表的选中值是否为-1
      */
-    protected function _ajaxCheckSelect($select_fields) {
+    protected function _ajaxCheckSelect($select_fields)
+    {
 
         $check_results = null;
 
         foreach ($select_fields as $item) {
-            if ($_POST[$item] == -1)
+            if ($_POST[$item] == -1) {
                 $check_results[$item] = '请选择下拉列表';
+            }
+
         }
 
         if ($check_results) {
@@ -123,7 +135,8 @@ abstract class FController {
         return true;
     }
 
-    protected function _ajaxErrorMessage($items) {
+    protected function _ajaxErrorMessage($items)
+    {
 
         $result = array('result' => 'failed');
 
@@ -138,7 +151,8 @@ abstract class FController {
         exit;
     }
 
-    public function ajaxRedirect($url) {
+    public function ajaxRedirect($url)
+    {
         $result = array('result' => 'redirect', 'url' => $url);
 
         ob_clean();
@@ -146,30 +160,36 @@ abstract class FController {
         exit;
     }
 
-    protected function success($message, $url = '', $close_time = 0) {
+    protected function success($message, $url = '', $close_time = 0)
+    {
         global $_F;
 
-        if ($url == 'r')
+        if ($url == 'r') {
             $url = $_SERVER['HTTP_REFERER'];
+        }
 
-        if ($_F['in_ajax'])
+        if ($_F['in_ajax']) {
             $this->_ajaxSuccessMessage($message, $url, $close_time);
-        else
+        } else {
             $this->showMessage($message, 'success', $url);
+        }
 
         return 1;
     }
 
-    protected function error($message, $url = '') {
+    protected function error($message, $url = '')
+    {
         global $_F;
 
-        if ($url == 'r')
+        if ($url == 'r') {
             $url = $_SERVER['HTTP_REFERER'];
+        }
 
-        if ($_F['in_ajax'])
+        if ($_F['in_ajax']) {
             $this->_ajaxErrorMessage($message);
-        else
+        } else {
             $this->showMessage($message, 'error', $url);
+        }
 
         return -1;
     }
@@ -177,7 +197,8 @@ abstract class FController {
     /**
      * 取出POST内容
      */
-    protected function checkPostData($items) {
+    protected function checkPostData($items)
+    {
 
         global $_F;
 
@@ -202,7 +223,8 @@ abstract class FController {
     /**
      * 取出POST内容
      */
-    protected function getPostData($form_fields, $force = false) {
+    protected function getPostData($form_fields, $force = false)
+    {
 
         $post_data = array();
         foreach ($form_fields as $item) {
@@ -214,10 +236,11 @@ abstract class FController {
         return $post_data;
     }
 
-    protected function load($tpl = null) {
-        if ($this->tpl_engine == 'smarty')
+    protected function load($tpl = null)
+    {
+        if ($this->tpl_engine == 'smarty') {
             return $this->view->load($tpl);
-        else {
+        } else {
             ob_clean();
             $this->display($tpl);
             $content = ob_get_clean();
@@ -225,23 +248,36 @@ abstract class FController {
         }
     }
 
-    protected function display($tpl = null) {
+    protected function display($tpl = null)
+    {
         $this->view->display($tpl);
     }
 
-    protected function assign($var, $value) {
+    protected function assign($var, $value = null)
+    {
+        if (!$value) {
+            $value = $$var;
+        }
         $this->view->assign($var, $value);
     }
 
-    protected function ajaxReturn($mix) {
+    protected function ajaxReturn($mix)
+    {
         FResponse::output($mix);
-
         return true;
     }
 
-    protected function openDebug() {
+    protected function openDebug()
+    {
         global $_F;
 
         $_F['debug'] = 1;
+    }
+
+    protected function closeDebug()
+    {
+        global $_F;
+
+        $_F['debug'] = 0;
     }
 }

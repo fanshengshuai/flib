@@ -12,6 +12,8 @@ class FString {
             return false;
         }
 
-        return ($haystack[$length - 1] === $needle);
+        $str = substr($haystack,$length-strlen($needle) );
+
+        return ($str == $needle);
     }
 }

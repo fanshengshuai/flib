@@ -1,35 +1,40 @@
 <?php
 
-class FTemplate {
+class FTemplate
+{
     public $debug = 0;
     protected $view_path_param;
     private $vars = array();
     private $conf = '';
-    private $tpl_suffix = '.html';//如果CONFIG没配置默认后缀 则显示
-    private $tpl_compile_suffix = '.tpl.php';//编译模板路径
-    private $template_tag_left = '{';//模板左标签
-    private $template_tag_right = '}';//模板右标签
-    private $template_c = '';//编译目录
-    private $template_path = '';//模板完整路径 
-    private $template_name = '';//模板名称 index.html
+    private $tpl_suffix = '.html'; //如果CONFIG没配置默认后缀 则显示
+    private $tpl_compile_suffix = '.tpl.php'; //编译模板路径
+    private $template_tag_left = '{'; //模板左标签
+    private $template_tag_right = '}'; //模板右标签
+    private $template_c = ''; //编译目录
+    private $template_path = ''; //模板完整路径
+    private $template_name = ''; //模板名称 index.html
     private $orig_php_code = array();
-
 
     // 定义每个模板的标签的元素
     private $tag_foreach = array('from', 'item', 'key');
 
-    public function __construct($conf = array('template_c' => 'data/template_c/')) {
+    public function __construct($conf = array('template_c' => 'data/template_c/'))
+    {
         global $_tpl_val;
         $_tpl_val = array();
 
         $this->conf = &$conf;
 
-        $this->template_c = $this->conf['template_c'];//编译目录
+        $this->template_c = $this->conf['template_c']; //编译目录
         $this->_tpl_suffix = $this->tpl_suffix();
     }
 
-    private function str_replace($search, $replace, $content) {
-        if (empty($search) || empty($replace) || empty($content)) return false;
+    private function str_replace($search, $replace, $content)
+    {
+        if (empty($search) || empty($replace) || empty($content)) {
+            return false;
+        }
+
         return str_replace($search, $replace, $content);
     }
 
@@ -40,8 +45,12 @@ class FTemplate {
      * @return array
      * @throws Exception
      */
-    private function preg_match_all($pattern, $content) {
-        if (empty($pattern) || empty($content)) $this->error('查找模板标签失败!');
+    private function preg_match_all($pattern, $content)
+    {
+        if (empty($pattern) || empty($content)) {
+            $this->error('查找模板标签失败!');
+        }
+
         preg_match_all("/" . $this->template_tag_left . $pattern . $this->template_tag_right . "/is", $content, $match);
         return $match;
     }
@@ -49,19 +58,21 @@ class FTemplate {
     /**
      * 模板文件后缀
      */
-    public function tpl_suffix() {
+    public function tpl_suffix()
+    {
         $tpl_suffix = empty($this->conf['template_suffix']) ?
-            $this->tpl_suffix :
-            $this->conf['template_suffix'];
+        $this->tpl_suffix :
+        $this->conf['template_suffix'];
         return $tpl_suffix;
     }
 
     /**
-     *  此处不解释了
+     * 注入变量
      * @param $key
      * @param $value
      */
-    public function assign($key, $value) {
+    public function assign($key, $value)
+    {
         $this->vars[$key] = $value;
     }
 
@@ -71,14 +82,23 @@ class FTemplate {
      * @internal param string $filename
      * @internal param string $view_path
      */
-    public function display($tpl) {
+    public function display($tpl)
+    {
+        global $_F;
 
         if ($tpl[0] == '/' || $tpl[1] == ':') {
+            $tpl = str_replace('\\','/', $tpl);
             $tpl_file = $tpl;
-            $compiled_file = F_APP_ROOT . $this->template_c . 'o/' . md5($tpl) . ".tpl.php";
+
+            $web_root = str_replace('\\','/', WEB_ROOT_DIR);
+
+//            var_dump($flib_root, $tpl,WEB_ROOT_DIR);exit;
+
+            $compiled_file = str_replace($web_root, '', $tpl) . ".compile.php";
+            $compiled_file = F_APP_ROOT . $this->template_c . $compiled_file;
         } else {
             $tpl_file = $this->conf['tpl_path_root'] . $tpl . ".tpl.php";
-            $compiled_file = F_APP_ROOT . $this->template_c . $tpl . ".tpl.php";
+            $compiled_file = F_APP_ROOT . $this->template_c . $tpl . ".tpl.compile.php";
         }
 
         if ($this->debug) {
@@ -88,7 +108,7 @@ class FTemplate {
         $tpl_file_mtime = -1;
         extract($this->vars);
         ob_start();
-        include($compiled_file);
+        include $compiled_file;
 
         if ($tpl_file_mtime != filemtime($tpl_file)) {
             $this->compile($tpl_file, $compiled_file);
@@ -104,12 +124,13 @@ class FTemplate {
      * @return string 模板文件主体
      * @internal param string $content 模板文件主体
      */
-    public function compile($tpl_file, $save_file = "", $isSubTpl = false) {
+    public function compile($tpl_file, $save_file = "", $isSubTpl = false)
+    {
         $content = file_get_contents($tpl_file);
         $compiled_content = $this->parse($content);
 
         $header_comment = "Create On##" . time() . "|Compiled from##" . $this->template_path . $this->template_name;
-        $str = "<? if(!defined('FLIB')) exit('Access Denied'); global \$_F; ";
+        $str = "<?php if(!defined('FLIB')) exit('Access Denied'); global \$_F; ";
         if (!$isSubTpl) {
             $str .= "\$tpl_file_mtime = " . intval(filemtime($tpl_file)) . ";";
         }
@@ -128,7 +149,11 @@ class FTemplate {
      * @param $content string 模板内容
      * @return string 模板内容
      */
-    public function parse($content) {
+    public function parse($content)
+    {
+        $content = str_replace("<!-- {", "{", $content);
+        $content = str_replace("} -->", "}", $content);
+        // $content = $this->parseRemarks()
         $content = $this->split_orig_php($content);
         //foreach
         $content = $this->parse_foreach($content);
@@ -153,7 +178,8 @@ class FTemplate {
         return $content;
     }
 
-    private function split_orig_php($content) {
+    private function split_orig_php($content)
+    {
         $content = preg_replace_callback('/<\?php(.+?)\?>/si',
             function ($matches) {
                 global $_tpl_val;
@@ -162,11 +188,11 @@ class FTemplate {
                 return $md5;
             }, $content);
 
-
         return $content;
     }
 
-    private function restore_orig_php($content) {
+    private function restore_orig_php($content)
+    {
         global $_tpl_val;
         foreach ($_tpl_val as $key => $code) {
             $content = str_replace($key, $code, $content);
@@ -179,8 +205,12 @@ class FTemplate {
      * @param $content string 模板内容
      * @return string 替换好的HTML
      */
-    private function parse_php($content) {
-        if (empty($content)) return false;
+    private function parse_php($content)
+    {
+        if (empty($content)) {
+            return false;
+        }
+
         $content = preg_replace_callback("/" . $this->template_tag_left . "(\\\$[\\$\\d\\w_.'\"\\]\\[]+?)" . $this->template_tag_right . "/i",
             function ($matches) {
                 if (strpos($matches[1], '.')) {
@@ -192,8 +222,9 @@ class FTemplate {
                     }
 
                     return '<?php echo ' . $var_c . '; ?>';
-                } else
+                } else {
                     return '<?php echo ' . $matches[1] . '; ?>';
+                }
 
             }, $content);
 
@@ -212,11 +243,16 @@ class FTemplate {
      * @param $content
      * @return bool|mixed
      */
-    private function parse_if($content) {
-        if (empty($content)) return false;
+    private function parse_if($content)
+    {
+        if (empty($content)) {
+            return false;
+        }
 
         $match = $this->preg_match_all("if\s+(.*?)", $content);
-        if (!isset($match[1]) || !is_array($match[1])) return $content;
+        if (!isset($match[1]) || !is_array($match[1])) {
+            return $content;
+        }
 
         foreach ($match[1] as $k => $v) {
             $content = str_replace($match[0][$k], "<?php if({$v}) { ?>", $content);
@@ -225,10 +261,16 @@ class FTemplate {
         return $content;
     }
 
-    private function parse_elseif($content) {
-        if (empty($content)) return false;
+    private function parse_elseif($content)
+    {
+        if (empty($content)) {
+            return false;
+        }
+
         $match = $this->preg_match_all("elseif\s+(.*?)", $content);
-        if (!isset($match[1]) || !is_array($match[1])) return $content;
+        if (!isset($match[1]) || !is_array($match[1])) {
+            return $content;
+        }
 
         foreach ($match[1] as $k => $v) {
             $content = str_replace($match[0][$k], "<?php } elseif ({$v}) { ?>", $content);
@@ -243,19 +285,25 @@ class FTemplate {
      * @param $content string 模板内容
      * @return string html
      */
-    private function parse_include($content) {
-        if (empty($content)) return false;
+    private function parse_include($content)
+    {
+        global $_F;
+        if (empty($content)) {
+            return false;
+        }
 
         $match = $this->preg_match_all("include\s+['\"](.*?)['\"]", $content);
-        if (!isset($match[1]) || !is_array($match[1])) return $content;
+        if (!isset($match[1]) || !is_array($match[1])) {
+            return $content;
+        }
 
         foreach ($match[1] as $match_key => $subTpl) {
             $conf_view_tpl = $this->conf['tpl_path_root'] . $subTpl;
             if (is_file($conf_view_tpl)) {
                 $tpl_file = $conf_view_tpl;
-                $compiled_file = F_APP_ROOT . $this->template_c . $subTpl;
+                $compiled_file = $this->template_c . $_F['module'] . '/' . str_replace('tpl.php', 'tpl.compile.php', $subTpl);
                 $this->compile($tpl_file, $compiled_file, true);
-                $content = str_replace($match[0][$match_key], '<?php include("' . $compiled_file . '"); ?>', $content);
+                $content = str_replace($match[0][$match_key], '<?php include(F_APP_ROOT."' . $compiled_file . '"); ?>', $content);
             } else {
                 $this->error('模板文件不存在:' . $conf_view_tpl);
             }
@@ -270,11 +318,16 @@ class FTemplate {
      * @param $content string 模板内容
      * @return string 解析后的内容
      */
-    private function parse_foreach($content) {
-        if (empty($content)) return false;
+    private function parse_foreach($content)
+    {
+        if (empty($content)) {
+            return false;
+        }
 
         $match = $this->preg_match_all("foreach\s+(.*?)", $content);
-        if (!isset($match[1]) || !is_array($match[1])) return $content;
+        if (!isset($match[1]) || !is_array($match[1])) {
+            return $content;
+        }
 
         foreach ($match[1] as $match_key => $value) {
 
@@ -284,7 +337,7 @@ class FTemplate {
             $new_tag = array();
             foreach ($split as $v) {
                 $a = explode("=", $v);
-                if (in_array($a[0], $this->tag_foreach)) {//此处过滤标签 不存在过滤
+                if (in_array($a[0], $this->tag_foreach)) { //此处过滤标签 不存在过滤
                     $new_tag[$a[0]] = $a[1];
                 }
             }
@@ -292,7 +345,7 @@ class FTemplate {
 
             extract($new_tag);
             $key = ($key) ? '$' . $key . ' => ' : '';
-            $s = '<?php foreach(' . $from . ' as ' . $key . '$' . $item . ') { ?>';
+            $s = '<?php if (' . $from . ') foreach(' . $from . ' as ' . $key . '$' . $item . ') { ?>';
             $content = $this->str_replace($match[0][$match_key], $s, $content);
         }
 
@@ -304,7 +357,8 @@ class FTemplate {
      * @param $content
      * @return mixed
      */
-    private function parse_comm($content) {
+    private function parse_comm($content)
+    {
         $search = array(
             "/" . $this->template_tag_left . "\/foreach" . $this->template_tag_right . "/is",
             "/" . $this->template_tag_left . "\/if" . $this->template_tag_right . "/is",
@@ -315,7 +369,7 @@ class FTemplate {
         $replace = array(
             "<?php } ?>",
             "<?php } ?>",
-            "<?php } else { ?>"
+            "<?php } else { ?>",
         );
         $content = preg_replace($search, $replace, $content);
         return $content;
@@ -329,10 +383,13 @@ class FTemplate {
      * @return string 文件名
      * @throws Exception
      */
-    private function compile_file($filename, $content, $dir) {
-        if (empty($filename)) $this->error("{$filename} Creation failed");
+    private function compile_file($filename, $content, $dir)
+    {
+        if (empty($filename)) {
+            $this->error("{$filename} Creation failed");
+        }
 
-        $content = $this->body_content($content);//对文件内容操作
+        $content = $this->body_content($content); //对文件内容操作
         //echo '开始编译了=====';
         $f = $dir . $filename . $this->tpl_compile_suffix;
 
@@ -349,13 +406,14 @@ class FTemplate {
         return $f;
     }
 
-    public function __destruct() {
+    public function __destruct()
+    {
         $this->vars = null;
         $this->view_path_param = null;
     }
 
-
-    private function error($msg) {
+    private function error($msg)
+    {
         echo $msg;
         exit;
     }

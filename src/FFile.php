@@ -9,13 +9,16 @@
  *
  * $Id: FFile.php 764 2015-04-14 15:09:06Z fanshengshuai $
  */
-class FFile {
+class FFile
+{
 
-    public static function getFileExtion($file_name) {
+    public static function getFileExtion($file_name)
+    {
         return addslashes(strtolower(substr(strrchr($file_name, '.'), 1, 10)));
     }
 
-    public static function getHashPath($seed, $deep = 3, $root_path = null, $create_dir = false) {
+    public static function getHashPath($seed, $deep = 3, $root_path = null, $create_dir = false)
+    {
 
         $md5 = md5($seed);
 
@@ -48,12 +51,13 @@ class FFile {
      *
      * @return bool
      */
-    public static function mkdir($dir) {
+    public static function mkdir($dir)
+    {
         $ret = false;
 
         if (!file_exists($dir)) {
-            $ret = mkdir($dir, 0755, true);
-            chmod($dir, 0755);
+            $ret = @mkdir($dir, 0755, true);
+            @chmod($dir, 0755);
         }
 
         return $ret;
@@ -66,9 +70,9 @@ class FFile {
      * @return bool
      * @throws Exception
      */
-    public static function rmDir($dir) {
+    public static function rmDir($dir)
+    {
 //        global $_F;
-
 
         if ($dir == '/' || !FString::endWith($dir, '/')) {
             throw new Exception('DIR must end of / and can not be Root Dir');
@@ -97,11 +101,13 @@ class FFile {
         }
     }
 
-    public static function parsePath($file_path) {
+    public static function parsePath($file_path)
+    {
         $_tmp = parse_url($file_path);
     }
 
-    public static function unlink($file_path) {
+    public static function unlink($file_path)
+    {
         if (!unlink($file_path)) {
             file_put_contents(F_APP_ROOT . "data/ffile_" . date('Y-m-d') . ".log", "{$file_path} unlink failed.\n", FILE_APPEND);
         }
@@ -112,7 +118,8 @@ class FFile {
      * @param $content string 文件内容
      * @return bool|int
      */
-    public static function save($file_path, $content) {
+    public static function save($file_path, $content)
+    {
         $ret = true;
 
         $path_info = pathinfo($file_path);
@@ -128,11 +135,13 @@ class FFile {
         return $ret;
     }
 
-    public static function append($file_path, $content) {
+    public static function append($file_path, $content)
+    {
         file_put_contents($file_path, FILE_APPEND);
     }
 
-    public static function isWriteAble($file) {
+    public static function isWriteAble($file)
+    {
         return is_writable($file);
     }
 }

@@ -24,18 +24,21 @@ class FRedis
     private $_CTYPE = 1;
 
     //实例名
-    public static $_REDIS = null;
+    public  $_REDIS = null;
 
     //事物对象
     private $_TRANSCATION = null;
-
 
     /**
      * @param $db_name
      * @return self
      */
-    public static function getInstance($db_name)
+    public static function getInstance($db_name = null)
     {
+        if (!$db_name) {
+            $db_name = FConfig::get("redis.db");
+        }
+
         static $redis = array();
         if (!isset($redis[$db_name])) {
             $redis[$db_name] = new self($db_name);
@@ -45,55 +48,44 @@ class FRedis
     }
 
     //初始化
-    public function __construct($db_name)
+    public function __construct($db_name = null)
     {
-        $config = FConfig::get('redis_config');
+        $config = FConfig::get('redis');
 
-        $this->_HOST = $config['REDIS_HOST'];
+        $this->_HOST = $config['host'];
+        $this->_PORT = $config['port'];
+        $this->_TIMEOUT = $config['timeout'];
 
-        $this->_PORT = $config['REDIS_PORT'];
+        if ($db_name) {
+            $this->_DBNAME = $db_name;
+        } else {
+            $this->_DBNAME = $config['db'];
+        }
 
-        $this->_TIMEOUT = $config['REDIS_TIMEOUT'];
-
-        $this->_DBNAME = $db_name;
-
-        $this->_CTYPE = $config['REDIS_CTYPE'];
+        $this->_CTYPE = $config['type'];
 
         if (!isset($this->_REDIS)) {
-
             $this->_REDIS = new Redis();
-
             $this->connect($this->_HOST, $this->_PORT, $this->_TIMEOUT, $this->_CTYPE);
 
-//            $this->_REDIS->select($this->_DBNAME);
+            if ($this->_DBNAME) {
+                $this->selectDb($this->_DBNAME);
+            }
 
         }
 
     }
 
-
     /**
      * 连接redis服务器
 
      */
-    private function connect($host, $port, $timeout, $type)
+    private function connect($host, $port, $timeout = 5, $type = 1)
     {
-        switch ($type) {
-
-            case 1:
-                $this->_REDIS->connect($host, $port, $timeout);
-//                $this->_REDIS->select($this->_DBNAME);
-                break;
-
-            case 2:
-                $this->_REDIS->pconnect($host, $port, $timeout);
-//                $this->_REDIS->select($this->_DBNAME);
-                break;
-
-            default:
-
-                break;
-
+        if ($type == 1) {
+            $this->_REDIS->connect($host, $port, $timeout);
+        } else {
+            $this->_REDIS->pconnect($host, $port, $timeout);
         }
     }
 
@@ -101,7 +93,6 @@ class FRedis
     {
         $this->_REDIS->select($index);
     }
-
 
     /**
      * 查看redis连接是否断开
@@ -112,14 +103,11 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->ping();
-
 
         return 'PONG' ? true : false;
 
     }
-
 
     /**
      * 设置redis模式参数
@@ -131,7 +119,6 @@ class FRedis
         return $this->_REDIS->setOption();
     }
 
-
     /**
      * 获取redis模式参数
      * @param $option array 要获取的参数数组
@@ -140,7 +127,6 @@ class FRedis
     {
         return $this->_REDIS->getOption();
     }
-
 
     /**
      * 写入key-value
@@ -158,7 +144,6 @@ class FRedis
         $return = null;
 
         $value = json_encode($value);
-
 
         if ($type) {
 
@@ -178,9 +163,11 @@ class FRedis
 
                 } else {
 
-                    if ($time && is_numeric($time)) $return = $this->_REDIS->setex($key, $time, $value);
-
-                    else $return = $this->_REDIS->set($key, $value);
+                    if ($time && is_numeric($time)) {
+                        $return = $this->_REDIS->setex($key, $time, $value);
+                    } else {
+                        $return = $this->_REDIS->set($key, $value);
+                    }
 
                 }
 
@@ -188,11 +175,9 @@ class FRedis
 
         }
 
-
         return $return;
 
     }
-
 
     /**
      * 获取某个key值 如果指定了start end 则返回key值的start跟end之间的字符
@@ -211,15 +196,16 @@ class FRedis
 
         } else {
 
-            if (isset($start) && isset($end)) $return = $this->_REDIS->getRange($key);
-
-            else $return = json_decode($this->_REDIS->get($key), true);
+            if (isset($start) && isset($end)) {
+                $return = $this->_REDIS->getRange($key);
+            } else {
+                $return = json_decode($this->_REDIS->get($key), true);
+            }
 
         }
 
         return $return;
     }
-
 
     /**
      * 删除某个key值
@@ -231,14 +217,11 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->delete($key);
-
 
         return $return;
 
     }
-
 
     /**
      * 判断某个key是否存在
@@ -249,14 +232,11 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->exists($key);
-
 
         return $return;
 
     }
-
 
     /**
      * key值自增或者自减
@@ -268,24 +248,27 @@ class FRedis
     {
         $return = null;
 
-        $n = (int)$n;
-
+        $n = (int) $n;
 
         switch ($type) {
 
             case 0:
 
-                if ($n == 1) $return = $this->_REDIS->decr($key);
-
-                else if ($n > 1) $return = $this->_REDIS->decrBy($key, $n);
+                if ($n == 1) {
+                    $return = $this->_REDIS->decr($key);
+                } else if ($n > 1) {
+                    $return = $this->_REDIS->decrBy($key, $n);
+                }
 
                 break;
 
             case 1:
 
-                if ($n == 1) $return = $this->_REDIS->incr($key);
-
-                else if ($n > 1) $return = $this->_REDIS->incrBy($key, $n);
+                if ($n == 1) {
+                    $return = $this->_REDIS->incr($key);
+                } else if ($n > 1) {
+                    $return = $this->_REDIS->incrBy($key, $n);
+                }
 
                 break;
 
@@ -297,11 +280,9 @@ class FRedis
 
         }
 
-
         return $return;
 
     }
-
 
     /**
      * 同时给多个key赋值
@@ -312,14 +293,11 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->mset($data);
-
 
         return $return;
 
     }
-
 
     /**
      * 查询某个key的生存时间
@@ -330,14 +308,11 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->ttl($key);
-
 
         return $return;
 
     }
-
 
     /**
      * 删除到期的key
@@ -348,14 +323,11 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->persist($key);
-
 
         return $return;
 
     }
-
 
     /**
      * 获取某一key的value
@@ -366,18 +338,13 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->strlen($key);
-
 
         return $return;
 
     }
 
-
-
     //+++-------------------------队列操作-------------------------+++//
-
 
     /**
      * 入队列
@@ -386,35 +353,30 @@ class FRedis
      * @param $deriction int 0:数据入队列头(左) 1:数据入队列尾(右) 默认为0
      * @param $repeat int 判断value是否存在  0:不判断存在 1:判断存在 如果value存在则不入队列
      */
-    public function listPush($list, $value, $direction = 0, $repeat = 0)
+    public function push($list, $value, $direction = 0, $repeat = 0)
     {
 
         $return = null;
-
 
         switch ($direction) {
 
             case 0:
 
-                if ($repeat)
-
+                if ($repeat) {
                     $return = $this->_REDIS->lPushx($list, $value);
-
-                else
-
+                } else {
                     $return = $this->_REDIS->lPush($list, $value);
+                }
 
                 break;
 
             case 1:
 
-                if ($repeat)
-
+                if ($repeat) {
                     $return = $this->_REDIS->rPushx($list, $value);
-
-                else
-
+                } else {
                     $return = $this->_REDIS->rPush($list, $value);
+                }
 
                 break;
 
@@ -426,11 +388,9 @@ class FRedis
 
         }
 
-
         return $return;
 
     }
-
 
     /**
      * 出队列
@@ -440,35 +400,30 @@ class FRedis
      * @param $timeout int timeout为0:只获取list1队列的数据
      *        timeout>0:如果队列list1为空 则等待timeout秒 如果还是未获取到数据 则对list2队列执行pop操作
      */
-    public function listPop($list1, $deriction = 0, $list2 = null, $timeout = 0)
+    public function pop($list1, $direction = 0, $list2 = null, $timeout = 0)
     {
 
         $return = null;
-
 
         switch ($direction) {
 
             case 0:
 
-                if ($timeout && $list2)
-
+                if ($timeout && $list2) {
                     $return = $this->_REDIS->blPop($list1, $list2, $timeout);
-
-                else
-
+                } else {
                     $return = $this->_REDIS->lPop($list1);
+                }
 
                 break;
 
             case 1:
 
-                if ($timeout && $list2)
-
+                if ($timeout && $list2) {
                     $return = $this->_REDIS->brPop($list1, $list2, $timeout);
-
-                else
-
+                } else {
                     $return = $this->_REDIS->rPop($list1);
+                }
 
                 break;
 
@@ -480,11 +435,9 @@ class FRedis
 
         }
 
-
         return $return;
 
     }
-
 
     /**
      * 获取队列中元素数
@@ -495,14 +448,11 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->lSize($list);
-
 
         return $return;
 
     }
-
 
     /**
      * 为list队列的index位置的元素赋值
@@ -515,14 +465,11 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->lSet($list, $index, $value);
-
 
         return $return;
 
     }
-
 
     /**
      * 获取list队列的index位置的元素值
@@ -535,7 +482,6 @@ class FRedis
 
         $return = null;
 
-
         if ($end) {
 
             $return = $this->_REDIS->lRange($list, $index, $end);
@@ -546,11 +492,9 @@ class FRedis
 
         }
 
-
         return $return;
 
     }
-
 
     /**
      * 截取list队列，保留start至end之间的元素
@@ -563,14 +507,11 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->lTrim($list, $start, $end);
-
 
         return $return;
 
     }
-
 
     /**
      * 删除list队列中count个值为value的元素
@@ -583,14 +524,11 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->lRem($list, $value, $count);
-
 
         return $return;
 
     }
-
 
     /**
      * 在list中值为$value1的元素前Redis::BEFORE或者后Redis::AFTER插入值为$value2的元素
@@ -604,7 +542,6 @@ class FRedis
     {
 
         $return = null;
-
 
         switch ($location) {
 
@@ -628,11 +565,9 @@ class FRedis
 
         }
 
-
         return $return;
 
     }
-
 
     /**
      * pop出list1的尾部元素并将该元素push入list2的头部
@@ -644,18 +579,13 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->rpoplpush($list1, $list2);
-
 
         return $return;
 
     }
 
-
-
     //+++-------------------------集合操作-------------------------+++//
-
 
     /**
      * 将value写入set集合 如果value存在 不写入 返回false
@@ -670,7 +600,6 @@ class FRedis
 
         $return = null;
 
-
         if ($stype && $score !== null) {
 
             $return = $this->_REDIS->zAdd($set, $score, $value);
@@ -681,11 +610,9 @@ class FRedis
 
         }
 
-
         return $return;
 
     }
-
 
     /**
      * 移除set1中的value元素 如果指定了set2 则将该元素写入set2
@@ -699,24 +626,23 @@ class FRedis
 
         $return = null;
 
-
         if ($set2) {
 
             $return = $this->_REDIS->sMove($set1, $set2, $value);
 
         } else {
 
-            if ($stype) $return = $this->_REDIS->zRem($set1, $value);
-
-            else $return = $this->_REDIS->sRem($set1, $value);
+            if ($stype) {
+                $return = $this->_REDIS->zRem($set1, $value);
+            } else {
+                $return = $this->_REDIS->sRem($set1, $value);
+            }
 
         }
-
 
         return $return;
 
     }
-
 
     /**
      * 查询set中是否有value元素
@@ -737,7 +663,6 @@ class FRedis
 
     }
 
-
     /**
      * 返回set中所有元素个数 有序集合要指定$stype=1
      * 如果是有序集合并指定了$start和$end 则返回score在start跟end之间的元素个数
@@ -751,12 +676,13 @@ class FRedis
 
         $return = null;
 
-
         if ($stype) {
 
-            if ($start && $end) $return = $this->_REDIS->zCount($set, $start, $end);
-
-            else $return = $this->_REDIS->zSize($set);
+            if ($start && $end) {
+                $return = $this->_REDIS->zCount($set, $start, $end);
+            } else {
+                $return = $this->_REDIS->zSize($set);
+            }
 
         } else {
 
@@ -764,11 +690,9 @@ class FRedis
 
         }
 
-
         return $return;
 
     }
-
 
     /**
      * 随机返回set中一个元素并可选是否删除该元素
@@ -780,7 +704,6 @@ class FRedis
 
         $return = null;
 
-
         if ($isdel) {
 
             $return = $this->_REDIS->sPop($set);
@@ -791,11 +714,9 @@ class FRedis
 
         }
 
-
         return $return;
 
     }
-
 
     /**
      * 求交集 并可选是否将交集保存到新集合
@@ -810,14 +731,15 @@ class FRedis
 
         $return = array();
 
-
         if (is_array($set) && !empty($set)) {
 
             if ($newset) {
 
-                if ($stype) $return = $this->_REDIS->zInter($newset, $set, $weight, $function);
-
-                else $return = $this->_REDIS->sInterStore($newset, $set);
+                if ($stype) {
+                    $return = $this->_REDIS->zInter($newset, $set, $weight, $function);
+                } else {
+                    $return = $this->_REDIS->sInterStore($newset, $set);
+                }
 
             } else {
 
@@ -827,11 +749,9 @@ class FRedis
 
         }
 
-
         return $return;
 
     }
-
 
     /**
      * 求并集 并可选是否将并集保存到新集合
@@ -846,14 +766,15 @@ class FRedis
 
         $return = array();
 
-
         if (is_array($set) && !empty($set)) {
 
             if ($newset) {
 
-                if ($stype) $return = $this->_REDIS->zUnion($newset, $set, $weight, $function);
-
-                else $return = $this->_REDIS->sUnionStore($newset, $set);
+                if ($stype) {
+                    $return = $this->_REDIS->zUnion($newset, $set, $weight, $function);
+                } else {
+                    $return = $this->_REDIS->sUnionStore($newset, $set);
+                }
 
             } else {
 
@@ -863,11 +784,9 @@ class FRedis
 
         }
 
-
         return $return;
 
     }
-
 
     /**
      * 求差集 并可选是否将差集保存到新集合
@@ -878,7 +797,6 @@ class FRedis
     {
 
         $return = array();
-
 
         if (is_array($set) && !empty($set)) {
 
@@ -894,11 +812,9 @@ class FRedis
 
         }
 
-
         return $return;
 
     }
-
 
     /**
      * 返回set中所有元素
@@ -909,14 +825,11 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->sMembers($set);
-
 
         return $return;
 
     }
-
 
     /**
      * 排序 分页等
@@ -938,27 +851,21 @@ class FRedis
 
             'sort' => 'asc', // asc|desc 默认asc
 
-            'alpha' => TRUE, //
+            'alpha' => true, //
 
-            'store' => 'some_need_pattern_*' //永久性排序值
+            'store' => 'some_need_pattern_*', //永久性排序值
 
         );
 
-
         $option = array_merge($default_option, $option);
 
-
         $return = $this->_REDIS->sort($set, $option);
-
 
         return $return;
 
     }
 
-
-
     //+++-------------------------有序集合操作-------------------------+++//
-
 
     /**
      * ***只针对有序集合操作
@@ -974,7 +881,6 @@ class FRedis
 
         $return = null;
 
-
         if ($order) {
 
             $return = $this->_REDIS->zRevRange($set, $start, $end, $score);
@@ -985,11 +891,9 @@ class FRedis
 
         }
 
-
         return $return;
 
     }
-
 
     /**
      * ***只针对有序集合操作
@@ -1003,14 +907,11 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->zRemRangeByScore($set, $start, $end);
-
 
         return $return;
 
     }
-
 
     /**
      * ***只针对有序集合操作
@@ -1026,7 +927,6 @@ class FRedis
 
         $return = null;
 
-
         if ($inc) {
 
             $return = $this->_REDIS->zIncrBy($set, $inc, $value);
@@ -1037,15 +937,11 @@ class FRedis
 
         }
 
-
         return $return;
 
     }
 
-
-
     //+++-------------------------哈希操作-------------------------+++//
-
 
     /**
      * 将key->value写入hash表中
@@ -1057,18 +953,15 @@ class FRedis
 
         $return = null;
 
-
         if (is_array($data) && !empty($data)) {
 
             $return = $this->_REDIS->hMset($hash, $data);
 
         }
 
-
         return $return;
 
     }
-
 
     /**
      * 获取hash表的数据
@@ -1081,16 +974,13 @@ class FRedis
 
         $return = null;
 
-
         if ($key) {
 
-            if (is_array($key) && !empty($key))
-
+            if (is_array($key) && !empty($key)) {
                 $return = $this->_REDIS->hMGet($hash, $key);
-
-            else
-
+            } else {
                 $return = $this->_REDIS->hGet($hash, $key);
+            }
 
         } else {
 
@@ -1124,11 +1014,9 @@ class FRedis
 
         }
 
-
         return $return;
 
     }
-
 
     /**
      * 获取hash表中元素个数
@@ -1139,14 +1027,11 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->hLen($hash);
-
 
         return $return;
 
     }
-
 
     /**
      * 删除hash表中的key
@@ -1158,14 +1043,11 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->hDel($hash, $key);
-
 
         return $return;
 
     }
-
 
     /**
      * 查询hash表中某个key是否存在
@@ -1177,14 +1059,11 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->hExists($hash, $key);
-
 
         return $return;
 
     }
-
 
     /**
      * 自增hash表中某个key的值
@@ -1197,18 +1076,13 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->hIncrBy($hash, $key, $inc);
-
 
         return $return;
 
     }
 
-
-
     //+++-------------------------其他操作-------------------------+++//
-
 
     /**
      * 自增hash表中某个key的值
@@ -1220,14 +1094,11 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->setTimeout($key, $time);
-
 
         return $return;
 
     }
-
 
     /**
      * 获取满足给定pattern的所有key
@@ -1238,14 +1109,11 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->keys($key);
-
 
         return $return;
 
     }
-
 
     /**
      * 将数据保存到硬盘 同步/异步
@@ -1256,7 +1124,6 @@ class FRedis
     {
 
         $return = null;
-
 
         if ($type) {
 
@@ -1274,11 +1141,9 @@ class FRedis
 
         }
 
-
         return $return;
 
     }
-
 
     /**
      * 获取上次成功将数据保存到磁盘的Unix时戳
@@ -1289,14 +1154,11 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->lastSave();
-
 
         return $return;
 
     }
-
 
     /**
      * 获取redis版本信息等详情
@@ -1307,14 +1169,11 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->info();
-
 
         return $return;
 
     }
-
 
     /**
      * 获取数据库中key的数目
@@ -1325,18 +1184,13 @@ class FRedis
 
         $return = null;
 
-
         $return = $this->_REDIS->dbSize();
-
 
         return $return;
 
     }
 
-
-
     //+++-------------------------事务操作-------------------------+++//
-
 
     /**
      * 开始进入事务操作
@@ -1349,7 +1203,6 @@ class FRedis
 
     }
 
-
     /**
      * 提交完成事务
      * @param $return bool 事务执行成功 提交操作
@@ -1360,7 +1213,6 @@ class FRedis
         return $this->_TRANSCATION->exec();
 
     }
-
 
     /**
      * 回滚事务
@@ -1373,5 +1225,4 @@ class FRedis
 
     }
 
-
-} 
+}

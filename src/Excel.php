@@ -20,19 +20,16 @@ class Excel_XML
         $this->setEncoding($sEncoding);
         $this->setWorksheetTitle($sWorksheetTitle);
     }
-
     public function setEncoding($sEncoding)
     {
         $this->sEncoding = $sEncoding;
     }
-
     public function setWorksheetTitle ($title)
     {
         $title = preg_replace ("/[\\\|:|\/|\?|\*|\[|\]]/", "", $title);
         $title = substr ($title, 0, 31);
         $this->sWorksheetTitle = $title;
     }
-
     private function addRow ($array)
     {
         $cells = "";
@@ -46,17 +43,15 @@ class Excel_XML
         endforeach;
         $this->lines[] = "<Row>\n" . $cells . "</Row>\n";
     }
-
     public function addArray ($array)
     {
         foreach ($array as $k => $v)
             $this->addRow ($v);
     }
 
-
     public function generateXML ($filename = 'excel-export')
     {
-        $filename = preg_replace('/[^aA-zZ0-9\_\-]/', '', $filename);
+//        $filename = preg_replace('/[^aA-zZ0-9\_\-]/', '', $filename);
 
         header("Content-Type: application/vnd.ms-excel; charset=" . $this->sEncoding);
         header("Content-Disposition: inline; filename=\"" . $filename . ".xls\"");

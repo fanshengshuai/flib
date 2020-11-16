@@ -13,7 +13,31 @@
  * 8: 自动支持服务器301跳转或重写问题
  * 9: 其它可选项,如自定义端口，超时时间，USERAGENT，Gzip压缩等.
  */
-class FHttp {
+class FHttp
+{
+
+    private $opt_follow_location = true;
+    private $opt_refer = false;
+
+    /**
+     * @param boolean $opt_refer
+     * @return $this
+     */
+    public function setOptRefer($opt_refer)
+    {
+        $this->opt_refer = $opt_refer;
+        return $this;
+    }
+
+    /**
+     * @param boolean $opt_follow_location
+     * @return $this
+     */
+    public function setOptFollowLocation($opt_follow_location)
+    {
+        $this->opt_follow_location = $opt_follow_location;
+        return $this;
+    }
 
     /**
      * 下载网络文件
@@ -23,7 +47,8 @@ class FHttp {
      *
      * @return object
      */
-    public static function download($http_file, $save_path = null) {
+    public static function download($http_file, $save_path = null)
+    {
         $http_file_raw = file_get_contents($http_file);
 
         if ($save_path) {
@@ -35,13 +60,15 @@ class FHttp {
         return true;
     }
 
-    public static function get($url) {
+    public static function get($url)
+    {
         $fHttp = new self;
 
         return $fHttp->getByCurl($url);
     }
 
-    public static function post($url, $params = array(), $uploadFile = array(), $referer = '') {
+    public static function post($url, $params = array(), $uploadFile = array(), $referer = '')
+    {
         $fHttp = new self;
 
         return $fHttp->_post($url, $params, $uploadFile, $referer);
@@ -98,8 +125,8 @@ class FHttp {
      *
      * @param array $set_opt :请参考 private $set_opt 来设置
      */
-    public function __construct($set_opt = array()) {
-
+    public function __construct($set_opt = array())
+    {
 
         //合并用户的设置和系统的默认设置
         $this->set_opt = array_merge($this->set_opt, $set_opt);
@@ -124,26 +151,24 @@ class FHttp {
             }
         }
         //启用时会将服务器服务器返回的“Location:”放在header中递归的返回给服务器
-        curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, $this->opt_follow_location);
         //打开的支持SSL
-        if ($this->set_opt['ssl']) {
-            //curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, 1);
-            //curl_setopt($this->ch, CURLOPT_RETURNTRANSFER,1); // return into a variable
-            //不对认证证书来源的检查
-            curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, false);
-            //从证书中检查SSL加密算法是否存在
-            curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, true);
-        }
+        //curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, 1);
+        //curl_setopt($this->ch, CURLOPT_RETURNTRANSFER,1); // return into a variable
+        //不对认证证书来源的检查
+        curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, false);
+        //从证书中检查SSL加密算法是否存在
+        curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, true);
 
         //设置http头,支持lighttpd服务器的访问
         $header[] = 'Expect:';
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $header);
         //设置 HTTP USER AGENT
         $userAgents = array(
-            'Mozilla/5.0'
+            'Mozilla/5.0',
 //            'chrome' => 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/14.0.835.202 Safari/535.1',
-//            'firefox' => 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:7.0.1) Gecko/20100101 Firefox/7.0.1',
-//            'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; GTB6; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; OfficeLiveConnector.1.4; OfficeLivePatch.1.3)',
+            //            'firefox' => 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:7.0.1) Gecko/20100101 Firefox/7.0.1',
+            //            'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; GTB6; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; OfficeLiveConnector.1.4; OfficeLivePatch.1.3)',
         );
         $userAgent = $this->set_opt['userAgent'] ? $this->set_opt['userAgent'] : $_SERVER['HTTP_USER_AGENT'];
         if (!$userAgent) {
@@ -173,14 +198,16 @@ class FHttp {
         curl_setopt($this->ch, CURLOPT_BINARYTRANSFER, true);
     }
 
-    public function setHeader($key, $value) {
+    public function setHeader($key, $value)
+    {
 
         $this->unsetHeader($key);
 
         $this->header[] = "$key: $value";
     }
 
-    public function unsetHeader($key) {
+    public function unsetHeader($key)
+    {
 
         foreach ($this->header as $header_key => $header_value) {
             if (strpos(strtolower($header_value), strtolower($key)) === 0) {
@@ -188,7 +215,6 @@ class FHttp {
             }
         }
     }
-
 
     /**
      * 以 GET 方式执行请求
@@ -199,11 +225,12 @@ class FHttp {
      *
      * @return bool :false 正确返回:结果内容
      */
-    public function getByCurl($url, $params = array(), $referer = '') {
+    public function getByCurl($url, $params = array(), $referer = '')
+    {
 
 //        if ($host) {
-//            $this->setHeader('Host', $host);
-//        }
+        //            $this->setHeader('Host', $host);
+        //        }
 
         return $this->_request('GET', $url, $params, array(), $referer);
     }
@@ -220,17 +247,18 @@ class FHttp {
      *
      * @return bool :false 正确返回:结果内容
      */
-    public function _post($url, $params = array(), $uploadFile = array(), $referer = '') {
+    public function _post($url, $params = array(), $uploadFile = array(), $referer = '')
+    {
         return $this->_request('POST', $url, $params, $uploadFile, $referer);
     }
-
 
     /**
      * 得到错误信息
      *
      * @return string
      */
-    public function getError() {
+    public function getError()
+    {
 
         return curl_error($this->ch);
     }
@@ -240,7 +268,8 @@ class FHttp {
      *
      * @return int
      */
-    public function getErrCode() {
+    public function getErrCode()
+    {
 
         return curl_errno($this->ch);
     }
@@ -253,17 +282,23 @@ class FHttp {
      *
      * @return array
      */
-    public function getHeader() {
+    public function getHeader()
+    {
 
         return $this->info;
     }
 
+    public function getResponseHeader()
+    {
+        return $this->info['after'];
+    }
 
     /**
      * 析构函数
      *
      */
-    public function __destruct() {
+    public function __destruct()
+    {
 
         //关闭CURL
         curl_close($this->ch);
@@ -280,7 +315,8 @@ class FHttp {
      *
      * @return bool :false 正确返回:结果内容
      */
-    private function _request($method, $url, $params = array(), $uploadFile = array(), $referer = '') {
+    private function _request($method, $url, $params = array(), $uploadFile = array(), $referer = '')
+    {
         //如果是以GET方式请求则要连接到URL后面
         if ($method == 'GET') {
             $url = $this->_parseUrl($url, $params);
@@ -290,8 +326,8 @@ class FHttp {
 
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $this->header);
         //设置了引用页,否则自动设置
-        if ($referer) {
-            curl_setopt($this->ch, CURLOPT_REFERER, $referer);
+        if ($this->opt_refer) {
+            curl_setopt($this->ch, CURLOPT_REFERER, $this->opt_refer);
         } else {
             curl_setopt($this->ch, CURLOPT_AUTOREFERER, true);
         }
@@ -353,7 +389,8 @@ class FHttp {
      *
      * @return string
      */
-    private function _parseUrl($url, $params) {
+    private function _parseUrl($url, $params)
+    {
         $fieldStr = $this->_parsmEncode($params);
         if ($fieldStr) {
             $url .= strstr($url, '?') === false ? '?' : '&';
@@ -370,7 +407,8 @@ class FHttp {
      *
      * @return string || array
      */
-    private function _parsmEncode($params, $isRetStr = true) {
+    private function _parsmEncode($params, $isRetStr = true)
+    {
         $fieldStr = '';
         $spr = '';
         $result = array();
